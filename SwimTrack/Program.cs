@@ -1,3 +1,7 @@
+using Microsoft.EntityFrameworkCore;
+
+using SwimTrack.Data;
+
 namespace SwimTrack;
 
 public class Program
@@ -6,8 +10,15 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        string connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+            ?? throw new InvalidOperationException("Connection string 'DefaultConnection' was not found.");
+
         // Add services to the container.
         builder.Services.AddControllersWithViews();
+        builder.Services.AddDbContext<SwimTrackDbContext>(options =>
+        {
+            options.UseSqlServer(connectionString);
+        });
 
         var app = builder.Build();
 
