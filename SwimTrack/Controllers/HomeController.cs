@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using SwimTrack.Models;
+using SwimTrack.ViewModels;
 
 namespace SwimTrack.Controllers;
 
