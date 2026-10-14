@@ -14,9 +14,8 @@ public class TrainingPlan
     [MaxLength(NameMaxLength)]
     public string Name { get; set; } = null!;
 
-    [Required]
     [MaxLength(GoalMaxLength)]
-    public string Goal { get; set; } = null!;
+    public string? Goal { get; set; }
 
     [Column(TypeName = "DATE")]
     public DateTime StartDate { get; set; }

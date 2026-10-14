@@ -7,7 +7,6 @@ public static class EntityValidation
         public const int NameMinLength = 3;
         public const int NameMaxLength = 100;
 
-        public const int GoalMinLength = 3;
         public const int GoalMaxLength = 250;
     }
 
