@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-using SwimTrack.Data.Enums;
-using static SwimTrack.Common.EntityValidation.Workout;
+using SwimTrack.Data.Models.Enums;
+using static SwimTrack.Shared.Constants.EntityValidation.Workout;
 
 namespace SwimTrack.Data.Models;
 

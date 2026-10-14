@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 using SwimTrack.Data;
 
-namespace SwimTrack;
+namespace SwimTrack.Web;
 
 public class Program
 {

@@ -1,3 +1,8 @@
 <Solution>
-  <Project Path="SwimTrack/SwimTrack.csproj" />
+  <Project Path="SwimTrack.Data.Models/SwimTrack.Data.Models.csproj" />
+  <Project Path="SwimTrack.Data/SwimTrack.Data.csproj" />
+  <Project Path="SwimTrack.DTOs/SwimTrack.DTOs.csproj" />
+  <Project Path="SwimTrack.Services/SwimTrack.Services.csproj" />
+  <Project Path="SwimTrack.Shared/SwimTrack.Shared.csproj" />
+  <Project Path="SwimTrack.Web/SwimTrack.Web.csproj" />
 </Solution>

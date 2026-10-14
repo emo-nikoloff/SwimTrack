@@ -1,4 +1,4 @@
-namespace SwimTrack.ViewModels;
+namespace SwimTrack.DTOs;
 
 public class ErrorViewModel
 {

@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using SwimTrack.ViewModels;
+using SwimTrack.DTOs;
 
-namespace SwimTrack.Controllers;
+namespace SwimTrack.Web.Controllers;
 
 public class HomeController : Controller
 {

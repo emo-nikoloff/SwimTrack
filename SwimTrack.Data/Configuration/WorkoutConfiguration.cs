@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using SwimTrack.Data.Enums;
+using SwimTrack.Data.Models.Enums;
 using SwimTrack.Data.Models;
 
 namespace SwimTrack.Data.Configuration;

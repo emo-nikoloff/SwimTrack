@@ -1,4 +1,4 @@
-namespace SwimTrack.Common;
+namespace SwimTrack.Shared.Constants;
 
 public static class EntityValidation
 {

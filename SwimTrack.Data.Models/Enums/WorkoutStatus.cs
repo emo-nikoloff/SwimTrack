@@ -1,4 +1,4 @@
-namespace SwimTrack.Data.Enums;
+namespace SwimTrack.Data.Models.Enums;
 
 public enum WorkoutStatus
 {
