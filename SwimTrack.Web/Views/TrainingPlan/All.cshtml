@@ -1,0 +1,100 @@
+﻿@model IEnumerable<TrainingPlanViewModel>
+
+@{
+    ViewData["Title"] = "Training plans";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+        <h1 class="mb-1">Training plans</h1>
+        <p class="text-muted mb-0">View all your swimming training plans.</p>
+    </div>
+    @if (Model.Any())
+    {
+        <a asp-controller="TrainingPlan" asp-action="Create" class="btn btn-primary">
+            Create training plan
+        </a>
+    }
+</div>
+
+@if (!Model.Any())
+{
+    <div class="card text-center">
+        <div class="card-body py-5">
+            <h2 class="h4">No training plans yet</h2>
+            <p class="text-muted">Create your first training plan to get started.</p>
+            <a asp-controller="TrainingPlan" asp-action="Create" class="btn btn-primary">
+                Create training plan
+            </a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row g-4">
+        @foreach (TrainingPlanViewModel plan in Model)
+        {
+            <div class="col-12">
+                <article class="card shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex flex-wrap justify-content-between gap-3 mb-3">
+                            <div>
+                                <h2 class="h4 mb-1">@plan.Name</h2>
+                                <p class="text-muted mb-0">
+                                    @plan.StartDate.ToString(DateTimeFormat)
+                                    &ndash;
+                                    @plan.EndDate.ToString(DateTimeFormat)
+                                </p>
+                            </div>
+                            <span class="badge text-bg-primary align-self-start">
+                                @plan.Workouts.Count() workout@(plan.Workouts.Count() == 1 ? "" : "s")
+                            </span>
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(plan.Goal))
+                        {
+                            <p class="mb-4">@plan.Goal</p>
+                        }
+
+                        @if (!plan.Workouts.Any())
+                        {
+                            <p class="text-muted mb-0">No workouts have been added to this plan.</p>
+                        }
+                        else
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-sm table-hover align-middle mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Date</th>
+                                            <th scope="col">Planned distance</th>
+                                            <th scope="col">Planned duration</th>
+                                            <th scope="col">Notes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (WorkoutViewModel workout in plan.Workouts.OrderBy(w => w.Date))
+                                        {
+                                            <tr>
+                                                <td>@workout.Date.ToString(DateTimeFormat)</td>
+                                                <td>@workout.PlannedDistance m</td>
+                                                <td>@workout.PlannedDuration min</td>
+                                                <td>@(string.IsNullOrWhiteSpace(workout.Notes) ? "–" : workout.Notes)</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+
+                        <div class="d-flex flex-wrap gap-2 mt-4">
+                            <a asp-controller="TrainingPlan" asp-action="Details" asp-route-id="@plan.Id" class="btn btn-outline-primary">
+                                Details
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        }
+    </div>
+}

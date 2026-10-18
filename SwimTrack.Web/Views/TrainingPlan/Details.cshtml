@@ -1,0 +1,82 @@
+﻿@model TrainingPlanViewModel
+
+@{
+    ViewData["Title"] = "Training plan details";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+        <h1 class="mb-1">@Model.Name</h1>
+        <p class="text-muted mb-0">
+            @Model.StartDate.ToString(DateTimeFormat)
+            &ndash;
+            @Model.EndDate.ToString(DateTimeFormat)
+        </p>
+    </div>
+
+    <div class="d-flex flex-wrap gap-2">
+        <a asp-controller="TrainingPlan" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+        <a asp-controller="TrainingPlan" asp-action="All" class="btn btn-outline-secondary">Back to plans</a>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <h2 class="h5">Goal</h2>
+        @if (string.IsNullOrWhiteSpace(Model.Goal))
+        {
+            <p class="text-muted mb-0">No goal specified.</p>
+        }
+        else
+        {
+            <p class="mb-0">@Model.Goal</p>
+        }
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h2 class="h5 mb-3">Workouts (@Model.Workouts.Count())</h2>
+
+        @if (!Model.Workouts.Any())
+        {
+            <p class="text-muted mb-0">No workouts have been added to this plan.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col">Date</th>
+                            <th scope="col">Planned distance</th>
+                            <th scope="col">Planned duration</th>
+                            <th scope="col">Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var workout in Model.Workouts.OrderBy(w => w.Date))
+                        {
+                            <tr>
+                                <td>@workout.Date.ToString(DateTimeFormat)</td>
+                                <td>@workout.PlannedDistance m</td>
+                                <td>@workout.PlannedDuration min</td>
+                                <td>@(string.IsNullOrWhiteSpace(workout.Notes) ? "-" : workout.Notes)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="d-flex justify-content-end mt-4">
+    <form asp-controller="TrainingPlan"
+          asp-action="Remove"
+          asp-route-id="@Model.Id"
+          method="post"
+          onsubmit="return confirm('Are you sure you want to remove this training plan?');">
+        <button type="submit" class="btn btn-danger">Remove</button>
+    </form>
+</div>

@@ -1,0 +1,33 @@
+﻿@model WorkoutInputModel
+
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="mb-3">
+            <label asp-for="Date" class="form-label">Date</label>
+            <input asp-for="Date" type="date" class="form-control" />
+            <span asp-validation-for="Date" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="PlannedDistance" class="form-label">
+                Planned distance
+            </label>
+            <input asp-for="PlannedDistance" type="number" class="form-control" />
+            <span asp-validation-for="PlannedDistance" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="PlannedDuration" class="form-label">
+                Planned duration
+            </label>
+            <input asp-for="PlannedDuration" type="number" class="form-control" />
+            <span asp-validation-for="PlannedDuration" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Notes" class="form-label">Notes</label>
+            <textarea asp-for="Notes" class="form-control"></textarea>
+            <span asp-validation-for="Notes" class="text-danger"></span>
+        </div>
+    </div>
+</div>
