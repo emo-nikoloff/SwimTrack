@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 
 using SwimTrack.DTOs.TrainingPlan;
+using SwimTrack.DTOs.Workout;
 using SwimTrack.Services.Contracts;
 
 namespace SwimTrack.Web.Controllers;
@@ -18,6 +19,7 @@ public class TrainingPlanController : Controller
     public async Task<IActionResult> All()
     {
         IEnumerable<TrainingPlanViewModel> trainingPlanViewModel = await _trainingPlanService.GetAllTrainingPlansAsync();
+        //IEnumerable<TrainingPlanViewModel> trainingPlanViewModel = new List<TrainingPlanViewModel>();
 
         return View(trainingPlanViewModel);
     }
@@ -29,8 +31,41 @@ public class TrainingPlanController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(TrainingPlanInputModel trainingPlanInputModel)
+    public async Task<IActionResult> Create(
+        [FromQuery] string? workoutAction,
+        [FromQuery] int? workoutIndex,
+        [FromForm] TrainingPlanInputModel trainingPlanInputModel)
     {
+        List<WorkoutInputModel> trainingPlanWorkouts = trainingPlanInputModel.Workouts.ToList();
+
+        if (workoutAction == "add")
+        {
+            trainingPlanWorkouts.Add(new WorkoutInputModel());
+            trainingPlanInputModel.Workouts = trainingPlanWorkouts;
+
+            return View(trainingPlanInputModel);
+        }
+
+        if (workoutAction == "remove")
+        {
+            if (!workoutIndex.HasValue
+                || workoutIndex.Value < 0
+                || workoutIndex.Value >= trainingPlanWorkouts.Count)
+            {
+                return BadRequest();
+            }
+
+            trainingPlanWorkouts.RemoveAt(workoutIndex.Value);
+            trainingPlanInputModel.Workouts = trainingPlanWorkouts;
+
+            return View(trainingPlanInputModel);
+        }
+
+        if (workoutAction != null)
+        {
+            return BadRequest();
+        }
+
         if (!ModelState.IsValid)
         {
             return View(trainingPlanInputModel);
@@ -59,9 +94,48 @@ public class TrainingPlanController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Edit([FromRoute] int? id, TrainingPlanInputModel trainingPlanInputModel)
+    public async Task<IActionResult> Edit(
+        [FromRoute] int? id,
+        [FromQuery] string? workoutAction,
+        [FromQuery] int? workoutIndex,
+        [FromForm] TrainingPlanInputModel trainingPlanInputModel)
     {
         if (!id.HasValue || id.Value <= 0)
+        {
+            return BadRequest();
+        }
+
+        List<WorkoutInputModel> trainingPlanWorkouts = trainingPlanInputModel.Workouts.ToList();
+
+        if (workoutAction == "add")
+        {
+            if (workoutIndex.HasValue)
+            {
+                return BadRequest();
+            }
+
+            trainingPlanWorkouts.Add(new WorkoutInputModel());
+            trainingPlanInputModel.Workouts = trainingPlanWorkouts;
+
+            return View(trainingPlanInputModel);
+        }
+
+        if (workoutAction == "remove")
+        {
+            if (!workoutIndex.HasValue
+                || workoutIndex.Value < 0
+                || workoutIndex.Value >= trainingPlanWorkouts.Count)
+            {
+                return BadRequest();
+            }
+
+            trainingPlanWorkouts.RemoveAt(workoutIndex.Value);
+            trainingPlanInputModel.Workouts = trainingPlanWorkouts;
+
+            return View(trainingPlanInputModel);
+        }
+
+        if (workoutAction != null || workoutIndex.HasValue)
         {
             return BadRequest();
         }
