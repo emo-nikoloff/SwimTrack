@@ -19,7 +19,6 @@ public class TrainingPlanController : Controller
     public async Task<IActionResult> All()
     {
         IEnumerable<TrainingPlanViewModel> trainingPlanViewModel = await _trainingPlanService.GetAllTrainingPlansAsync();
-        //IEnumerable<TrainingPlanViewModel> trainingPlanViewModel = new List<TrainingPlanViewModel>();
 
         return View(trainingPlanViewModel);
     }
