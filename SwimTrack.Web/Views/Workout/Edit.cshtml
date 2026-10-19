@@ -1,0 +1,28 @@
+@model WorkoutInputModel
+
+@{
+    ViewData["Title"] = "Edit workout";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-7">
+        <h1 class="mb-4">Edit workout</h1>
+
+        <form asp-controller="Workout"
+              asp-action="Edit"
+              asp-route-trainingPlanId="@ViewData["TrainingPlanId"]"
+              method="post">
+            <partial name="_WorkoutInputPartial" model="Model" />
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Save changes</button>
+                <a asp-controller="TrainingPlan"
+                   asp-action="Details"
+                   asp-route-id="@ViewData["TrainingPlanId"]"
+                   class="btn btn-secondary">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
