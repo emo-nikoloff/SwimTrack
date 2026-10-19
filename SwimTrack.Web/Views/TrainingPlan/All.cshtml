@@ -70,6 +70,7 @@ else
                                             <th scope="col">Planned distance</th>
                                             <th scope="col">Planned duration</th>
                                             <th scope="col">Notes</th>
+                                            <th scope="col">Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -80,6 +81,7 @@ else
                                                 <td>@workout.PlannedDistance m</td>
                                                 <td>@workout.PlannedDuration min</td>
                                                 <td>@(string.IsNullOrWhiteSpace(workout.Notes) ? "–" : workout.Notes)</td>
+                                                <td>@workout.Status</td>
                                             </tr>
                                         }
                                     </tbody>

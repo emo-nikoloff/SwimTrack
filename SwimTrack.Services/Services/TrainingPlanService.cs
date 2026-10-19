@@ -35,6 +35,7 @@ public class TrainingPlanService : ITrainingPlanService
                         PlannedDistance = w.PlannedDistance,
                         PlannedDuration = w.PlannedDuration,
                         Notes = w.Notes,
+                        Status = w.Status,
                     })
                     .ToArray(),
             })
@@ -154,6 +155,7 @@ public class TrainingPlanService : ITrainingPlanService
                         PlannedDistance = w.PlannedDistance,
                         PlannedDuration = w.PlannedDuration,
                         Notes = w.Notes,
+                        Status = w.Status,
                     })
                     .ToArray(),
             })

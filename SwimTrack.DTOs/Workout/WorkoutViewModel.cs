@@ -1,3 +1,5 @@
+using SwimTrack.Shared.Enums;
+
 namespace SwimTrack.DTOs.Workout;
 
 public class WorkoutViewModel
@@ -11,4 +13,6 @@ public class WorkoutViewModel
     public int PlannedDuration { get; set; }
 
     public string? Notes { get; set; }
+
+    public WorkoutStatus Status { get; set; }
 }
