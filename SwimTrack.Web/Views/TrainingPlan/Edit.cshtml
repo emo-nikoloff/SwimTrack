@@ -15,11 +15,9 @@
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h2 class="mb-0">Workouts</h2>
                 <button type="submit"
-                        formaction="@Url.Action("Edit", new
-                        {
-                            id = ViewContext.RouteData.Values["id"],
-                            workoutAction = "add"
-                        })"
+                        asp-controller="TrainingPlan"
+                        asp-action="Edit"
+                        asp-route-workoutAction="add"
                         class="btn btn-outline-primary">
                     Add workout
                 </button>
@@ -32,12 +30,10 @@
 
                 <div class="d-flex justify-content-end">
                     <button type="submit"
-                            formaction="@Url.Action("Edit", new
-                            {
-                                id = ViewContext.RouteData.Values["id"],
-                                workoutAction = "remove",
-                                workoutIndex = i
-                            })"
+                            asp-controller="TrainingPlan"
+                            asp-action="Edit"
+                            asp-route-workoutAction="remove"
+                            asp-route-workoutIndex="@i"
                             class="btn btn-sm btn-outline-danger">
                         Remove
                     </button>
