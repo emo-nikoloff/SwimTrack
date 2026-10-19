@@ -44,30 +44,37 @@
         }
         else
         {
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead>
-                        <tr>
-                            <th scope="col">Date</th>
-                            <th scope="col">Planned distance</th>
-                            <th scope="col">Planned duration</th>
-                            <th scope="col">Notes</th>
-                            <th scope="col">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var workout in Model.Workouts.OrderBy(w => w.Date))
-                        {
-                            <tr>
-                                <td>@workout.Date.ToString(DateTimeFormat)</td>
-                                <td>@workout.PlannedDistance m</td>
-                                <td>@workout.PlannedDuration min</td>
-                                <td>@(string.IsNullOrWhiteSpace(workout.Notes) ? "-" : workout.Notes)</td>
-                                <td>@workout.Status</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+            <div class="row g-4">
+                @foreach (var workout in Model.Workouts.OrderBy(w => w.Date))
+                {
+                    <div class="col-12 col-md-6 col-xl-4">
+                        <article class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start gap-3 mb-4">
+                                    <h3 class="h4 mb-0">@workout.Date.ToString(DateTimeFormat)</h3>
+                                    <span class="badge text-bg-primary">@workout.Status</span>
+                                </div>
+
+                                <dl class="row mb-4">
+                                    <dt class="col-7">Planned distance</dt>
+                                    <dd class="col-5 text-end">@workout.PlannedDistance m</dd>
+                                    <dt class="col-7">Planned duration</dt>
+                                    <dd class="col-5 text-end">@workout.PlannedDuration min</dd>
+                                </dl>
+
+                                <h4 class="h6">Notes</h4>
+                                @if (string.IsNullOrWhiteSpace(workout.Notes))
+                                {
+                                    <p class="text-muted mb-0">No notes.</p>
+                                }
+                                else
+                                {
+                                    <p class="mb-0">@workout.Notes</p>
+                                }
+                            </div>
+                        </article>
+                    </div>
+                }
             </div>
         }
     </div>
