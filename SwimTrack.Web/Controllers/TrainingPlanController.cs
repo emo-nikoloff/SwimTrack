@@ -150,7 +150,7 @@ public class TrainingPlanController : Controller
             return NotFound();
         }
 
-        return RedirectToAction(nameof(All));
+        return RedirectToAction(nameof(Details), new { id = id.Value });
     }
 
     [HttpPost]
