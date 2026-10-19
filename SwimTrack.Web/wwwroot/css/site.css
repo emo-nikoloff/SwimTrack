@@ -21,6 +21,15 @@ body {
   margin-bottom: 60px;
 }
 
+.sticky-section-header {
+  position: sticky;
+  top: 0;
+  z-index: 1020;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  background-color: var(--bs-body-bg);
+}
+
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
   color: var(--bs-secondary-color);
   text-align: end;
