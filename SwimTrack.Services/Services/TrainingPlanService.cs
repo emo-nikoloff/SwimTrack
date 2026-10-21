@@ -84,6 +84,7 @@ public class TrainingPlanService : ITrainingPlanService
             Workouts = requestedTrainingPlan.Workouts
                 .Select(w => new WorkoutInputModel
                 {
+                    Id = w.Id,
                     Date = w.Date,
                     PlannedDistance = w.PlannedDistance,
                     PlannedDuration = w.PlannedDuration,
@@ -97,7 +98,9 @@ public class TrainingPlanService : ITrainingPlanService
 
     public async Task<bool> EditTrainingPlanAsync(int id, TrainingPlanInputModel trainingPlanInputModel)
     {
-        TrainingPlan? requestedTrainingPlan = await _dbContext.TrainingPlans.FindAsync(id);
+        TrainingPlan? requestedTrainingPlan = await _dbContext.TrainingPlans
+            .Include(tp => tp.Workouts)
+            .FirstOrDefaultAsync(tp => tp.Id == id);
         if (requestedTrainingPlan == null)
         {
             return false;
@@ -107,15 +110,39 @@ public class TrainingPlanService : ITrainingPlanService
         requestedTrainingPlan.Goal = trainingPlanInputModel.Goal;
         requestedTrainingPlan.StartDate = trainingPlanInputModel.StartDate;
         requestedTrainingPlan.EndDate = trainingPlanInputModel.EndDate;
-        requestedTrainingPlan.Workouts = trainingPlanInputModel.Workouts
-            .Select(workoutInputModel => new Workout
+
+        _dbContext.Workouts.RemoveRange(
+            requestedTrainingPlan.Workouts
+                .Where(workout => trainingPlanInputModel.Workouts
+                    .All(workoutInputModel => workoutInputModel.Id != workout.Id)));
+
+        foreach (WorkoutInputModel workoutInputModel in trainingPlanInputModel.Workouts)
+        {
+            if (workoutInputModel.Id.HasValue)
+            {
+                Workout? existingWorkout = requestedTrainingPlan.Workouts
+                    .FirstOrDefault(workout => workout.Id == workoutInputModel.Id.Value);
+                if (existingWorkout == null)
+                {
+                    return false;
+                }
+
+                existingWorkout.Date = workoutInputModel.Date;
+                existingWorkout.PlannedDistance = workoutInputModel.PlannedDistance;
+                existingWorkout.PlannedDuration = workoutInputModel.PlannedDuration;
+                existingWorkout.Notes = workoutInputModel.Notes;
+
+                continue;
+            }
+
+            requestedTrainingPlan.Workouts.Add(new Workout
             {
                 Date = workoutInputModel.Date,
                 PlannedDistance = workoutInputModel.PlannedDistance,
                 PlannedDuration = workoutInputModel.PlannedDuration,
                 Notes = workoutInputModel.Notes,
-            })
-            .ToArray();
+            });
+        }
 
         await _dbContext.SaveChangesAsync();
 

@@ -6,6 +6,8 @@ namespace SwimTrack.DTOs.Workout;
 
 public class WorkoutInputModel
 {
+    public int? Id { get; set; }
+
     public DateTime Date { get; set; }
 
     [Range(1, int.MaxValue)]
