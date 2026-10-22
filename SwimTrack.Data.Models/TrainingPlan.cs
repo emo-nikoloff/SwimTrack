@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Identity;
 
 using static SwimTrack.Shared.Constants.EntityValidation.TrainingPlan;
 
@@ -24,4 +25,10 @@ public class TrainingPlan
     public DateTime EndDate { get; set; }
 
     public virtual ICollection<Workout> Workouts { get; set; } = new List<Workout>();
+
+    [Required]
+    [ForeignKey(nameof(User))]
+    public string UserId { get; set; } = null!;
+
+    public virtual IdentityUser User { get; set; } = null!;
 }

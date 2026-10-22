@@ -1,12 +1,15 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 using SwimTrack.Data.Models;
 
 namespace SwimTrack.Data;
 
-public class SwimTrackDbContext : DbContext
+public class SwimTrackDbContext : IdentityDbContext<IdentityUser>
 {
-    public SwimTrackDbContext(DbContextOptions<SwimTrackDbContext> options) : base(options)
+    public SwimTrackDbContext(DbContextOptions<SwimTrackDbContext> options)
+        : base(options)
     {
     }
 
@@ -51,7 +54,5 @@ public class SwimTrackDbContext : DbContext
                     "CK_WorkoutResult_ActualDuration_Positive",
                     "[ActualDuration] > 0");
             });
-
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(SwimTrackDbContext).Assembly);
     }
 }
