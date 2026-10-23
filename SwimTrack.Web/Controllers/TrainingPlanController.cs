@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using SwimTrack.DTOs.TrainingPlan;
@@ -6,6 +7,7 @@ using SwimTrack.Services.Contracts;
 
 namespace SwimTrack.Web.Controllers;
 
+[Authorize]
 public class TrainingPlanController : Controller
 {
     private readonly ITrainingPlanService _trainingPlanService;
