@@ -17,10 +17,17 @@ public class WorkoutService : IWorkoutService
         _dbContext = dbContext;
     }
 
-    public async Task<WorkoutInputModel?> GetWorkoutForEditAsync(int id)
+    public async Task<WorkoutInputModel?> GetWorkoutForEditAsync(int id, string currentUserId)
     {
-        Workout? requestedWorkout = await _dbContext.Workouts.FirstOrDefaultAsync(w => w.Id == id);
+        Workout? requestedWorkout = await _dbContext.Workouts
+            .Include(w => w.TrainingPlan)
+            .FirstOrDefaultAsync(w => w.Id == id);
         if (requestedWorkout == null)
+        {
+            return null;
+        }
+
+        if (requestedWorkout.TrainingPlan.UserId != currentUserId)
         {
             return null;
         }
@@ -36,10 +43,17 @@ public class WorkoutService : IWorkoutService
         return workoutInputModel;
     }
 
-    public async Task<bool> EditWorkoutAsync(int id, WorkoutInputModel workoutInputModel)
+    public async Task<bool> EditWorkoutAsync(int id, WorkoutInputModel workoutInputModel, string currentUserId)
     {
-        Workout? requestedWorkout = await _dbContext.Workouts.FindAsync(id);
+        Workout? requestedWorkout = await _dbContext.Workouts
+            .Include(w => w.TrainingPlan)
+            .FirstOrDefaultAsync(w => w.Id == id);
         if (requestedWorkout == null)
+        {
+            return false;
+        }
+
+        if (requestedWorkout.TrainingPlan.UserId != currentUserId)
         {
             return false;
         }
@@ -54,10 +68,17 @@ public class WorkoutService : IWorkoutService
         return true;
     }
 
-    public async Task<bool> CompleteWorkoutAsync(int id)
+    public async Task<bool> CompleteWorkoutAsync(int id, string currentUserId)
     {
-        Workout? requestedWorkout = await _dbContext.Workouts.FindAsync(id);
+        Workout? requestedWorkout = await _dbContext.Workouts
+            .Include(w => w.TrainingPlan)
+            .FirstOrDefaultAsync(w => w.Id == id);
         if (requestedWorkout == null)
+        {
+            return false;
+        }
+
+        if (requestedWorkout.TrainingPlan.UserId != currentUserId)
         {
             return false;
         }
@@ -75,10 +96,17 @@ public class WorkoutService : IWorkoutService
         return true;
     }
 
-    public async Task<bool> SkipWorkoutAsync(int id)
+    public async Task<bool> SkipWorkoutAsync(int id, string currentUserId)
     {
-        Workout? requestedWorkout = await _dbContext.Workouts.FindAsync(id);
+        Workout? requestedWorkout = await _dbContext.Workouts
+            .Include(w => w.TrainingPlan)
+            .FirstOrDefaultAsync(w => w.Id == id);
         if (requestedWorkout == null)
+        {
+            return false;
+        }
+
+        if (requestedWorkout.TrainingPlan.UserId != currentUserId)
         {
             return false;
         }

@@ -10,4 +10,8 @@
     <ProjectReference Include="..\SwimTrack.Shared\SwimTrack.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.13" />
+  </ItemGroup>
+
 </Project>

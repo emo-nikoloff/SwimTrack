@@ -17,9 +17,10 @@ public class TrainingPlanService : ITrainingPlanService
         _dbContext = dbContext;
     }
 
-    public async Task<IEnumerable<TrainingPlanViewModel>> GetAllTrainingPlansAsync()
+    public async Task<IEnumerable<TrainingPlanViewModel>> GetAllTrainingPlansAsync(string currentUserId)
     {
         return await _dbContext.TrainingPlans
+            .Where(tp => tp.UserId == currentUserId)
             .Select(tp => new TrainingPlanViewModel
             {
                 Id = tp.Id,
@@ -42,7 +43,7 @@ public class TrainingPlanService : ITrainingPlanService
             .ToArrayAsync();
     }
 
-    public async Task CreateTrainingPlanAsync(TrainingPlanInputModel trainingPlanInputModel)
+    public async Task CreateTrainingPlanAsync(TrainingPlanInputModel trainingPlanInputModel, string currentUserId)
     {
         TrainingPlan newTrainingPlan = new()
         {
@@ -59,18 +60,24 @@ public class TrainingPlanService : ITrainingPlanService
                     Notes = workoutInputModel.Notes,
                 })
                 .ToList(),
+            UserId = currentUserId,
         };
 
         await _dbContext.TrainingPlans.AddAsync(newTrainingPlan);
         await _dbContext.SaveChangesAsync();
     }
 
-    public async Task<TrainingPlanInputModel?> GetTrainingPlanForEditAsync(int id)
+    public async Task<TrainingPlanInputModel?> GetTrainingPlanForEditAsync(int id, string currentUserId)
     {
         TrainingPlan? requestedTrainingPlan = await _dbContext.TrainingPlans
             .Include(tp => tp.Workouts)
             .FirstOrDefaultAsync(tp => tp.Id == id);
         if (requestedTrainingPlan == null)
+        {
+            return null;
+        }
+
+        if (requestedTrainingPlan.UserId != currentUserId)
         {
             return null;
         }
@@ -96,12 +103,17 @@ public class TrainingPlanService : ITrainingPlanService
         return trainingPlanInputModel;
     }
 
-    public async Task<bool> EditTrainingPlanAsync(int id, TrainingPlanInputModel trainingPlanInputModel)
+    public async Task<bool> EditTrainingPlanAsync(int id, TrainingPlanInputModel trainingPlanInputModel, string currentUserId)
     {
         TrainingPlan? requestedTrainingPlan = await _dbContext.TrainingPlans
             .Include(tp => tp.Workouts)
             .FirstOrDefaultAsync(tp => tp.Id == id);
         if (requestedTrainingPlan == null)
+        {
+            return false;
+        }
+
+        if (requestedTrainingPlan.UserId != currentUserId)
         {
             return false;
         }
@@ -149,10 +161,15 @@ public class TrainingPlanService : ITrainingPlanService
         return true;
     }
 
-    public async Task<bool> RemoveTrainingPlanAsync(int id)
+    public async Task<bool> RemoveTrainingPlanAsync(int id, string currentUserId)
     {
         TrainingPlan? requestedTrainingPlan = await _dbContext.TrainingPlans.FindAsync(id);
         if (requestedTrainingPlan == null)
+        {
+            return false;
+        }
+
+        if (requestedTrainingPlan.UserId != currentUserId)
         {
             return false;
         }
@@ -163,10 +180,10 @@ public class TrainingPlanService : ITrainingPlanService
         return true;
     }
 
-    public async Task<TrainingPlanViewModel?> GetTrainingPlanDetailsAsync(int id)
+    public async Task<TrainingPlanViewModel?> GetTrainingPlanDetailsAsync(int id, string currentUserId)
     {
         return await _dbContext.TrainingPlans
-            .Where(tp => tp.Id == id)
+            .Where(tp => tp.Id == id && tp.UserId == currentUserId)
             .Select(tp => new TrainingPlanViewModel
             {
                 Id = tp.Id,
