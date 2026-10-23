@@ -4,15 +4,15 @@ namespace SwimTrack.Services.Contracts;
 
 public interface ITrainingPlanService
 {
-    Task<IEnumerable<TrainingPlanViewModel>> GetAllTrainingPlansAsync();
+    Task<IEnumerable<TrainingPlanViewModel>> GetAllTrainingPlansAsync(string currentUserId);
 
-    Task CreateTrainingPlanAsync(TrainingPlanInputModel trainingPlanInputModel);
+    Task CreateTrainingPlanAsync(TrainingPlanInputModel trainingPlanInputModel, string currentUserId);
 
-    Task<TrainingPlanInputModel?> GetTrainingPlanForEditAsync(int id);
+    Task<TrainingPlanInputModel?> GetTrainingPlanForEditAsync(int id, string currentUserId);
 
-    Task<bool> EditTrainingPlanAsync(int id, TrainingPlanInputModel trainingPlanInputModel);
+    Task<bool> EditTrainingPlanAsync(int id, TrainingPlanInputModel trainingPlanInputModel, string currentUserId);
 
-    Task<bool> RemoveTrainingPlanAsync(int id);
+    Task<bool> RemoveTrainingPlanAsync(int id, string currentUserId);
 
-    Task<TrainingPlanViewModel?> GetTrainingPlanDetailsAsync(int id);
+    Task<TrainingPlanViewModel?> GetTrainingPlanDetailsAsync(int id, string currentUserId);
 }

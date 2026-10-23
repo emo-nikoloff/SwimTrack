@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,7 +28,8 @@ public class WorkoutController : Controller
             return BadRequest();
         }
 
-        WorkoutInputModel? workoutInputModel = await _workoutService.GetWorkoutForEditAsync(id.Value);
+        string userId = ValidateAuthorizedUserId(GetUserId());
+        WorkoutInputModel? workoutInputModel = await _workoutService.GetWorkoutForEditAsync(id.Value, userId);
         if (workoutInputModel == null)
         {
             return NotFound();
@@ -55,7 +57,8 @@ public class WorkoutController : Controller
             return View(workoutInputModel);
         }
 
-        bool requestEdit = await _workoutService.EditWorkoutAsync(id.Value, workoutInputModel);
+        string userId = ValidateAuthorizedUserId(GetUserId());
+        bool requestEdit = await _workoutService.EditWorkoutAsync(id.Value, workoutInputModel, userId);
         if (!requestEdit)
         {
             return NotFound();
@@ -80,7 +83,8 @@ public class WorkoutController : Controller
             return BadRequest();
         }
 
-        bool requestComplete = await _workoutService.CompleteWorkoutAsync(id.Value);
+        string userId = ValidateAuthorizedUserId(GetUserId());
+        bool requestComplete = await _workoutService.CompleteWorkoutAsync(id.Value, userId);
         if (!requestComplete)
         {
             return NotFound();
@@ -103,7 +107,8 @@ public class WorkoutController : Controller
             return BadRequest();
         }
 
-        bool requestSkip = await _workoutService.SkipWorkoutAsync(id.Value);
+        string userId = ValidateAuthorizedUserId(GetUserId());
+        bool requestSkip = await _workoutService.SkipWorkoutAsync(id.Value, userId);
         if (!requestSkip)
         {
             return NotFound();
@@ -113,5 +118,20 @@ public class WorkoutController : Controller
             nameof(TrainingPlanController.Details),
             "TrainingPlan",
             new { id = trainingPlanId.Value });
+    }
+
+    private string? GetUserId()
+    {
+        return User?.FindFirstValue(ClaimTypes.NameIdentifier);
+    }
+
+    private string ValidateAuthorizedUserId(string? userId)
+    {
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            throw new InvalidOperationException("General identity error occurred - id is null in authorized area!");
+        }
+
+        return userId;
     }
 }

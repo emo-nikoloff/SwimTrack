@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,7 +21,8 @@ public class TrainingPlanController : Controller
     [HttpGet]
     public async Task<IActionResult> All()
     {
-        IEnumerable<TrainingPlanViewModel> trainingPlanViewModel = await _trainingPlanService.GetAllTrainingPlansAsync();
+        string userId = ValidateAuthorizedUserId(GetUserId());
+        IEnumerable<TrainingPlanViewModel> trainingPlanViewModel = await _trainingPlanService.GetAllTrainingPlansAsync(userId);
 
         return View(trainingPlanViewModel);
     }
@@ -72,7 +74,8 @@ public class TrainingPlanController : Controller
             return View(trainingPlanInputModel);
         }
 
-        await _trainingPlanService.CreateTrainingPlanAsync(trainingPlanInputModel);
+        string userId = ValidateAuthorizedUserId(GetUserId());
+        await _trainingPlanService.CreateTrainingPlanAsync(trainingPlanInputModel, userId);
 
         return RedirectToAction(nameof(All));
     }
@@ -85,7 +88,8 @@ public class TrainingPlanController : Controller
             return BadRequest();
         }
 
-        TrainingPlanInputModel? trainingPlanInputModel = await _trainingPlanService.GetTrainingPlanForEditAsync(id.Value);
+        string userId = ValidateAuthorizedUserId(GetUserId());
+        TrainingPlanInputModel? trainingPlanInputModel = await _trainingPlanService.GetTrainingPlanForEditAsync(id.Value, userId);
         if (trainingPlanInputModel == null)
         {
             return NotFound();
@@ -146,7 +150,8 @@ public class TrainingPlanController : Controller
             return View(trainingPlanInputModel);
         }
 
-        bool requestEdit = await _trainingPlanService.EditTrainingPlanAsync(id.Value, trainingPlanInputModel);
+        string userId = ValidateAuthorizedUserId(GetUserId());
+        bool requestEdit = await _trainingPlanService.EditTrainingPlanAsync(id.Value, trainingPlanInputModel, userId);
         if (!requestEdit)
         {
             return NotFound();
@@ -163,7 +168,8 @@ public class TrainingPlanController : Controller
             return BadRequest();
         }
 
-        bool requestRemove = await _trainingPlanService.RemoveTrainingPlanAsync(id.Value);
+        string userId = ValidateAuthorizedUserId(GetUserId());
+        bool requestRemove = await _trainingPlanService.RemoveTrainingPlanAsync(id.Value, userId);
         if (!requestRemove)
         {
             return NotFound();
@@ -180,12 +186,28 @@ public class TrainingPlanController : Controller
             return BadRequest();
         }
 
-        TrainingPlanViewModel? trainingPlanViewModel = await _trainingPlanService.GetTrainingPlanDetailsAsync(id.Value);
+        string userId = ValidateAuthorizedUserId(GetUserId());
+        TrainingPlanViewModel? trainingPlanViewModel = await _trainingPlanService.GetTrainingPlanDetailsAsync(id.Value, userId);
         if (trainingPlanViewModel == null)
         {
             return NotFound();
         }
 
         return View(trainingPlanViewModel);
+    }
+
+    private string? GetUserId()
+    {
+        return User?.FindFirstValue(ClaimTypes.NameIdentifier);
+    }
+
+    private string ValidateAuthorizedUserId(string? userId)
+    {
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            throw new InvalidOperationException("General identity error occurred - id is null in authorized area!");
+        }
+
+        return userId;
     }
 }
