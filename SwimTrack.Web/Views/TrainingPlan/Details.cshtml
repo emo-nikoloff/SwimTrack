@@ -83,13 +83,13 @@
                                     </a>
                                     @if (workout.Status == WorkoutStatus.Planned)
                                     {
-                                        <form asp-controller="Workout"
-                                              asp-action="Complete"
-                                              asp-route-id="@workout.Id"
-                                              asp-route-trainingPlanId="@Model.Id"
-                                              method="post">
-                                            <button type="submit" class="btn btn-success">Complete</button>
-                                        </form>
+                                        <a asp-controller="Workout"
+                                           asp-action="Complete"
+                                           asp-route-id="@workout.Id"
+                                           asp-route-trainingPlanId="@Model.Id"
+                                           class="btn btn-success">
+                                            Complete
+                                        </a>
                                         <form asp-controller="Workout"
                                               asp-action="Skip"
                                               asp-route-id="@workout.Id"

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using SwimTrack.DTOs.Workout;
+using SwimTrack.DTOs.WorkoutResult;
 using SwimTrack.Services.Contracts;
 
 namespace SwimTrack.Web.Controllers;
@@ -72,7 +73,7 @@ public class WorkoutController : Controller
             new { id = trainingPlanId.Value });
     }
 
-    [HttpPost]
+    [HttpGet]
     public async Task<IActionResult> Complete(
         [FromRoute] int? id,
         [FromQuery] int? trainingPlanId)
@@ -84,7 +85,40 @@ public class WorkoutController : Controller
         }
 
         string userId = ValidateAuthorizedUserId(GetUserId());
-        bool requestComplete = await _workoutService.CompleteWorkoutAsync(id.Value, userId);
+        WorkoutResultInputModel? workoutResultInputModel = await _workoutService.GetWorkoutForCompletionAsync(id.Value, userId);
+        if (workoutResultInputModel == null)
+        {
+            return NotFound();
+        }
+
+        ViewData["TrainingPlanId"] = trainingPlanId.Value;
+        ViewData["WorkoutId"] = id.Value;
+
+        return View(workoutResultInputModel);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Complete(
+        [FromRoute] int? id,
+        [FromQuery] int? trainingPlanId,
+        [FromForm] WorkoutResultInputModel workoutResultInputModel)
+    {
+        if (!id.HasValue || id.Value <= 0
+            || !trainingPlanId.HasValue || trainingPlanId.Value <= 0)
+        {
+            return BadRequest();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            ViewData["TrainingPlanId"] = trainingPlanId.Value;
+            ViewData["WorkoutId"] = id.Value;
+
+            return View(workoutResultInputModel);
+        }
+
+        string userId = ValidateAuthorizedUserId(GetUserId());
+        bool requestComplete = await _workoutService.CompleteWorkoutAsync(id.Value, workoutResultInputModel, userId);
         if (!requestComplete)
         {
             return NotFound();

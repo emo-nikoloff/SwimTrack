@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SwimTrack.Data;
 using SwimTrack.Data.Models;
 using SwimTrack.DTOs.Workout;
+using SwimTrack.DTOs.WorkoutResult;
 using SwimTrack.Services.Contracts;
 using SwimTrack.Shared.Enums;
 
@@ -68,7 +69,38 @@ public class WorkoutService : IWorkoutService
         return true;
     }
 
-    public async Task<bool> CompleteWorkoutAsync(int id, string currentUserId)
+    public async Task<WorkoutResultInputModel?> GetWorkoutForCompletionAsync(int id, string currentUserId)
+    {
+        Workout? requestedWorkout = await _dbContext.Workouts
+            .Include(w => w.TrainingPlan)
+            .FirstOrDefaultAsync(w => w.Id == id);
+        if (requestedWorkout == null)
+        {
+            return null;
+        }
+
+        if (requestedWorkout.TrainingPlan.UserId != currentUserId)
+        {
+            return null;
+        }
+
+        if (requestedWorkout.Status != WorkoutStatus.Planned)
+        {
+            return null;
+        }
+
+        WorkoutResultInputModel workoutResultInputModel = new()
+        {
+            ActualDistance = requestedWorkout.PlannedDistance,
+            ActualDuration = requestedWorkout.PlannedDuration,
+            CompletedAt = DateTime.Now,
+            Notes = requestedWorkout.Notes,
+        };
+
+        return workoutResultInputModel;
+    }
+
+    public async Task<bool> CompleteWorkoutAsync(int id, WorkoutResultInputModel workoutResultInputModel, string currentUserId)
     {
         Workout? requestedWorkout = await _dbContext.Workouts
             .Include(w => w.TrainingPlan)
@@ -89,8 +121,17 @@ public class WorkoutService : IWorkoutService
         }
 
         requestedWorkout.Status = WorkoutStatus.Completed;
-        // TODO: Create a new record for WorkoutResults table
 
+        WorkoutResult workoutResult = new()
+        {
+            ActualDistance = workoutResultInputModel.ActualDistance,
+            ActualDuration = workoutResultInputModel.ActualDuration,
+            CompletedAt = workoutResultInputModel.CompletedAt,
+            Notes = workoutResultInputModel.Notes,
+            WorkoutId = requestedWorkout.Id
+        };
+
+        _dbContext.WorkoutResults.Add(workoutResult);
         await _dbContext.SaveChangesAsync();
 
         return true;
