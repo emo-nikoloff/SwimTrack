@@ -10,10 +10,10 @@ public class WorkoutInputModel
 
     public DateTime Date { get; set; }
 
-    [Range(1, int.MaxValue)]
+    [Range(DistanceMinValue, DistanceMaxValue)]
     public int PlannedDistance { get; set; }
 
-    [Range(1, int.MaxValue)]
+    [Range(DurationMinValue, DurationMaxValue)]
     public int PlannedDuration { get; set; }
 
     [MaxLength(NotesMaxLength)]

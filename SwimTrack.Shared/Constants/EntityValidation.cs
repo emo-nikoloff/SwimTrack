@@ -12,11 +12,23 @@ public static class EntityValidation
 
     public static class Workout
     {
+        public const int DistanceMinValue = 1;
+        public const int DistanceMaxValue = 20000;
+
+        public const int DurationMinValue = 1;
+        public const int DurationMaxValue = 600;
+
         public const int NotesMaxLength = 500;
     }
 
     public static class WorkoutResult
     {
+        public const int DistanceMinValue = 1;
+        public const int DistanceMaxValue = 20000;
+
+        public const int DurationMinValue = 1;
+        public const int DurationMaxValue = 600;
+
         public const int NotesMaxLength = 500;
     }
 }
