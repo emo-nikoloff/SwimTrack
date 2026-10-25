@@ -71,13 +71,10 @@ public class TrainingPlanService : ITrainingPlanService
     {
         TrainingPlan? requestedTrainingPlan = await _dbContext.TrainingPlans
             .Include(tp => tp.Workouts)
-            .FirstOrDefaultAsync(tp => tp.Id == id);
+            .FirstOrDefaultAsync(tp =>
+                tp.Id == id
+                && tp.UserId == currentUserId);
         if (requestedTrainingPlan == null)
-        {
-            return null;
-        }
-
-        if (requestedTrainingPlan.UserId != currentUserId)
         {
             return null;
         }
@@ -107,13 +104,10 @@ public class TrainingPlanService : ITrainingPlanService
     {
         TrainingPlan? requestedTrainingPlan = await _dbContext.TrainingPlans
             .Include(tp => tp.Workouts)
-            .FirstOrDefaultAsync(tp => tp.Id == id);
+            .FirstOrDefaultAsync(tp =>
+                tp.Id == id
+                && tp.UserId == currentUserId);
         if (requestedTrainingPlan == null)
-        {
-            return false;
-        }
-
-        if (requestedTrainingPlan.UserId != currentUserId)
         {
             return false;
         }
@@ -122,11 +116,6 @@ public class TrainingPlanService : ITrainingPlanService
         requestedTrainingPlan.Goal = trainingPlanInputModel.Goal;
         requestedTrainingPlan.StartDate = trainingPlanInputModel.StartDate;
         requestedTrainingPlan.EndDate = trainingPlanInputModel.EndDate;
-
-        _dbContext.Workouts.RemoveRange(
-            requestedTrainingPlan.Workouts
-                .Where(workout => trainingPlanInputModel.Workouts
-                    .All(workoutInputModel => workoutInputModel.Id != workout.Id)));
 
         foreach (WorkoutInputModel workoutInputModel in trainingPlanInputModel.Workouts)
         {
@@ -156,6 +145,10 @@ public class TrainingPlanService : ITrainingPlanService
             });
         }
 
+        _dbContext.Workouts.RemoveRange(
+            requestedTrainingPlan.Workouts
+                .Where(workout => trainingPlanInputModel.Workouts
+                    .All(workoutInputModel => workoutInputModel.Id != workout.Id)));
         await _dbContext.SaveChangesAsync();
 
         return true;
@@ -163,13 +156,11 @@ public class TrainingPlanService : ITrainingPlanService
 
     public async Task<bool> RemoveTrainingPlanAsync(int id, string currentUserId)
     {
-        TrainingPlan? requestedTrainingPlan = await _dbContext.TrainingPlans.FindAsync(id);
+        TrainingPlan? requestedTrainingPlan = await _dbContext.TrainingPlans
+            .FirstOrDefaultAsync(tp =>
+                tp.Id == id
+                && tp.UserId == currentUserId);
         if (requestedTrainingPlan == null)
-        {
-            return false;
-        }
-
-        if (requestedTrainingPlan.UserId != currentUserId)
         {
             return false;
         }
