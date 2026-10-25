@@ -14,6 +14,7 @@ public class WorkoutResult
 
     public int ActualDuration { get; set; }
 
+    [Column(TypeName = "DATE")]
     public DateTime CompletedAt { get; set; }
 
     [MaxLength(NotesMaxLength)]
