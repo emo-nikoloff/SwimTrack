@@ -58,6 +58,8 @@ public class WorkoutController : Controller
 
         if (!ModelState.IsValid)
         {
+            ViewData["TrainingPlanId"] = trainingPlanId.Value;
+
             return View(workoutInputModel);
         }
 
