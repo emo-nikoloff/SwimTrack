@@ -30,7 +30,10 @@ public class WorkoutController : Controller
         }
 
         string userId = ValidateAuthorizedUserId(GetUserId());
-        WorkoutInputModel? workoutInputModel = await _workoutService.GetWorkoutForEditAsync(id.Value, userId);
+        WorkoutInputModel? workoutInputModel = await _workoutService.GetWorkoutForEditAsync(
+            id.Value,
+            trainingPlanId.Value,
+            userId);
         if (workoutInputModel == null)
         {
             return NotFound();
@@ -59,7 +62,11 @@ public class WorkoutController : Controller
         }
 
         string userId = ValidateAuthorizedUserId(GetUserId());
-        bool requestEdit = await _workoutService.EditWorkoutAsync(id.Value, workoutInputModel, userId);
+        bool requestEdit = await _workoutService.EditWorkoutAsync(
+            id.Value,
+            trainingPlanId.Value,
+            workoutInputModel,
+            userId);
         if (!requestEdit)
         {
             return NotFound();
@@ -85,7 +92,10 @@ public class WorkoutController : Controller
         }
 
         string userId = ValidateAuthorizedUserId(GetUserId());
-        WorkoutResultInputModel? workoutResultInputModel = await _workoutService.GetWorkoutForCompletionAsync(id.Value, userId);
+        WorkoutResultInputModel? workoutResultInputModel = await _workoutService.GetWorkoutForCompletionAsync(
+            id.Value,
+            trainingPlanId.Value,
+            userId);
         if (workoutResultInputModel == null)
         {
             return NotFound();
@@ -118,7 +128,11 @@ public class WorkoutController : Controller
         }
 
         string userId = ValidateAuthorizedUserId(GetUserId());
-        bool requestComplete = await _workoutService.CompleteWorkoutAsync(id.Value, workoutResultInputModel, userId);
+        bool requestComplete = await _workoutService.CompleteWorkoutAsync(
+            id.Value,
+            trainingPlanId.Value,
+            workoutResultInputModel,
+            userId);
         if (!requestComplete)
         {
             return NotFound();
@@ -142,7 +156,10 @@ public class WorkoutController : Controller
         }
 
         string userId = ValidateAuthorizedUserId(GetUserId());
-        bool requestSkip = await _workoutService.SkipWorkoutAsync(id.Value, userId);
+        bool requestSkip = await _workoutService.SkipWorkoutAsync(
+            id.Value,
+            trainingPlanId.Value,
+            userId);
         if (!requestSkip)
         {
             return NotFound();
