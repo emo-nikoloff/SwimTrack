@@ -132,7 +132,7 @@ public class WorkoutService : IWorkoutService
         if (!isWorkoutCompletionDateValid)
         {
             throw new ValidationException(new ValidationResult(
-                WorkoutCompletionDateBeforeWorkoutDate,
+                InvalidWorkoutCompletionDate,
                 new[]
                     {
                         nameof(WorkoutResultInputModel.CompletedAt)
