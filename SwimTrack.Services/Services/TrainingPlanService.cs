@@ -4,6 +4,7 @@ using SwimTrack.Data;
 using SwimTrack.Data.Models;
 using SwimTrack.DTOs.TrainingPlan;
 using SwimTrack.DTOs.Workout;
+using SwimTrack.DTOs.WorkoutResult;
 using SwimTrack.Services.Contracts;
 
 namespace SwimTrack.Services.Services;
@@ -37,6 +38,15 @@ public class TrainingPlanService : ITrainingPlanService
                         PlannedDuration = w.PlannedDuration,
                         Notes = w.Notes,
                         Status = w.Status,
+                        Result = w.WorkoutResult == null
+                            ? null
+                            : new WorkoutResultViewModel
+                            {
+                                ActualDistance = w.WorkoutResult.ActualDistance,
+                                ActualDuration = w.WorkoutResult.ActualDuration,
+                                CompletedAt = w.WorkoutResult.CompletedAt,
+                                Notes = w.WorkoutResult.Notes,
+                            },
                     })
                     .ToArray(),
             })
@@ -185,6 +195,15 @@ public class TrainingPlanService : ITrainingPlanService
                         PlannedDuration = w.PlannedDuration,
                         Notes = w.Notes,
                         Status = w.Status,
+                        Result = w.WorkoutResult == null
+                            ? null
+                            : new WorkoutResultViewModel
+                            {
+                                ActualDistance = w.WorkoutResult.ActualDistance,
+                                ActualDuration = w.WorkoutResult.ActualDuration,
+                                CompletedAt = w.WorkoutResult.CompletedAt,
+                                Notes = w.WorkoutResult.Notes,
+                            },
                     })
                     .ToArray(),
             })
