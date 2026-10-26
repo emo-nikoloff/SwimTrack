@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using SwimTrack.DTOs.Workout;
 using SwimTrack.DTOs.WorkoutResult;
 using SwimTrack.Services.Contracts;
+using SwimTrack.Shared.Enums;
 
 namespace SwimTrack.Web.Controllers;
 
@@ -191,6 +192,33 @@ public class WorkoutController : Controller
             trainingPlanId.Value,
             userId);
         if (!requestSkip)
+        {
+            return NotFound();
+        }
+
+        return RedirectToAction(
+            nameof(TrainingPlanController.Details),
+            "TrainingPlan",
+            new { id = trainingPlanId.Value });
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> PlanAgain(
+        [FromRoute] int? id,
+        [FromQuery] int? trainingPlanId)
+    {
+        if (!id.HasValue || id.Value <= 0
+            || !trainingPlanId.HasValue || trainingPlanId.Value <= 0)
+        {
+            return BadRequest();
+        }
+
+        string userId = ValidateAuthorizedUserId(GetUserId());
+        bool requestPlanAgain = await _workoutService.PlanAgainWorkoutAsync(
+            id.Value,
+            trainingPlanId.Value,
+            userId);
+        if (!requestPlanAgain)
         {
             return NotFound();
         }

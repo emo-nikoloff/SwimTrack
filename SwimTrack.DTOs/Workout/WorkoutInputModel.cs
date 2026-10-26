@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
+using SwimTrack.Shared.Enums;
 using static SwimTrack.Shared.Constants.EntityValidation.Workout;
 
 namespace SwimTrack.DTOs.Workout;
@@ -18,4 +19,6 @@ public class WorkoutInputModel
 
     [MaxLength(NotesMaxLength)]
     public string? Notes { get; set; }
+
+    public WorkoutStatus Status { get; set; } = WorkoutStatus.Planned;
 }

@@ -38,6 +38,7 @@ public class WorkoutService : IWorkoutService
             PlannedDistance = requestedWorkout.PlannedDistance,
             PlannedDuration = requestedWorkout.PlannedDuration,
             Notes = requestedWorkout.Notes,
+            Status = requestedWorkout.Status,
         };
 
         return workoutInputModel;
@@ -56,26 +57,30 @@ public class WorkoutService : IWorkoutService
             return false;
         }
 
-        bool isWorkoutDateValid = DateValidator.ValidateWorkoutDate(
-            workoutInputModel.Date,
-            requestedWorkout.TrainingPlan.StartDate,
-            requestedWorkout.TrainingPlan.EndDate);
-        if (!isWorkoutDateValid)
-        {
-            throw new ValidationException(new ValidationResult(
-                WorkoutDateOutsidePlanPeriod,
-                new[]
-                    {
-                        nameof(WorkoutInputModel.Date)
-                    }),
-                null,
-                null);
-        }
-
-        requestedWorkout.Date = workoutInputModel.Date;
-        requestedWorkout.PlannedDistance = workoutInputModel.PlannedDistance;
-        requestedWorkout.PlannedDuration = workoutInputModel.PlannedDuration;
         requestedWorkout.Notes = workoutInputModel.Notes;
+
+        if (requestedWorkout.Status == WorkoutStatus.Planned)
+        {
+            bool isWorkoutDateValid = DateValidator.ValidateWorkoutDate(
+                workoutInputModel.Date,
+                requestedWorkout.TrainingPlan.StartDate,
+                requestedWorkout.TrainingPlan.EndDate);
+            if (!isWorkoutDateValid)
+            {
+                throw new ValidationException(new ValidationResult(
+                    WorkoutDateOutsidePlanPeriod,
+                    new[]
+                        {
+                            nameof(WorkoutInputModel.Date)
+                        }),
+                    null,
+                    null);
+            }
+
+            requestedWorkout.Date = workoutInputModel.Date;
+            requestedWorkout.PlannedDistance = workoutInputModel.PlannedDistance;
+            requestedWorkout.PlannedDuration = workoutInputModel.PlannedDuration;
+        }
 
         await _dbContext.SaveChangesAsync();
 
@@ -173,6 +178,29 @@ public class WorkoutService : IWorkoutService
         }
 
         requestedWorkout.Status = WorkoutStatus.Skipped;
+
+        await _dbContext.SaveChangesAsync();
+
+        return true;
+    }
+
+    public async Task<bool> PlanAgainWorkoutAsync(int id, int trainingPlanId, string currentUserId)
+    {
+        Workout? requestedWorkout = await _dbContext.Workouts.FirstOrDefaultAsync(w =>
+            w.Id == id
+            && w.TrainingPlanId == trainingPlanId
+            && w.TrainingPlan.UserId == currentUserId);
+        if (requestedWorkout == null)
+        {
+            return false;
+        }
+
+        if (requestedWorkout.Status != WorkoutStatus.Skipped)
+        {
+            return false;
+        }
+
+        requestedWorkout.Status = WorkoutStatus.Planned;
 
         await _dbContext.SaveChangesAsync();
 

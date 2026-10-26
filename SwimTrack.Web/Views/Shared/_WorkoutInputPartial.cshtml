@@ -1,12 +1,24 @@
-﻿@model WorkoutInputModel
+@model WorkoutInputModel
+
+@{
+    bool isReadOnly = Model.Status != WorkoutStatus.Planned;
+}
 
 <div class="card mb-3">
     <div class="card-body">
         <input asp-for="Id" type="hidden" />
+        <input asp-for="Status" type="hidden" />
 
         <div class="mb-3">
             <label asp-for="Date" class="form-label">Date</label>
-            <input asp-for="Date" type="date" class="form-control" />
+            @if (isReadOnly)
+            {
+                <input asp-for="Date" type="date" class="form-control bg-light" readonly />
+            }
+            else
+            {
+                <input asp-for="Date" type="date" class="form-control" />
+            }
             <span asp-validation-for="Date" class="text-danger"></span>
         </div>
 
@@ -14,7 +26,14 @@
             <label asp-for="PlannedDistance" class="form-label">
                 Planned distance
             </label>
-            <input asp-for="PlannedDistance" type="number" class="form-control" />
+            @if (isReadOnly)
+            {
+                <input asp-for="PlannedDistance" type="number" class="form-control bg-light" readonly />
+            }
+            else
+            {
+                <input asp-for="PlannedDistance" type="number" class="form-control" />
+            }
             <span asp-validation-for="PlannedDistance" class="text-danger"></span>
         </div>
 
@@ -22,7 +41,14 @@
             <label asp-for="PlannedDuration" class="form-label">
                 Planned duration
             </label>
-            <input asp-for="PlannedDuration" type="number" class="form-control" />
+            @if (isReadOnly)
+            {
+                <input asp-for="PlannedDuration" type="number" class="form-control bg-light" readonly />
+            }
+            else
+            {
+                <input asp-for="PlannedDuration" type="number" class="form-control" />
+            }
             <span asp-validation-for="PlannedDuration" class="text-danger"></span>
         </div>
 
