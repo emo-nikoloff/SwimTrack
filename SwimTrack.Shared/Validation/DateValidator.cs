@@ -10,5 +10,6 @@ public static class DateValidator
             && workoutDate.Date <= endDate.Date;
 
     public static bool ValidateWorkoutCompletionDate(DateTime completedAt, DateTime workoutDate)
-        => completedAt.Date >= workoutDate.Date;
+        => completedAt.Date >= workoutDate.Date
+            && completedAt.Date <= DateTime.Today;
 }
