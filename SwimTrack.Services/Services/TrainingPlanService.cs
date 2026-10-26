@@ -131,30 +131,16 @@ public class TrainingPlanService : ITrainingPlanService
 
         foreach (WorkoutInputModel workoutInputModel in trainingPlanInputModel.Workouts)
         {
-            if (workoutInputModel.Id.HasValue)
+            if (!workoutInputModel.Id.HasValue)
             {
-                Workout? existingWorkout = requestedTrainingPlan.Workouts
-                    .FirstOrDefault(workout => workout.Id == workoutInputModel.Id.Value);
-                if (existingWorkout == null)
+                requestedTrainingPlan.Workouts.Add(new Workout
                 {
-                    return false;
-                }
-
-                existingWorkout.Date = workoutInputModel.Date;
-                existingWorkout.PlannedDistance = workoutInputModel.PlannedDistance;
-                existingWorkout.PlannedDuration = workoutInputModel.PlannedDuration;
-                existingWorkout.Notes = workoutInputModel.Notes;
-
-                continue;
+                    Date = workoutInputModel.Date,
+                    PlannedDistance = workoutInputModel.PlannedDistance,
+                    PlannedDuration = workoutInputModel.PlannedDuration,
+                    Notes = workoutInputModel.Notes,
+                });
             }
-
-            requestedTrainingPlan.Workouts.Add(new Workout
-            {
-                Date = workoutInputModel.Date,
-                PlannedDistance = workoutInputModel.PlannedDistance,
-                PlannedDuration = workoutInputModel.PlannedDuration,
-                Notes = workoutInputModel.Notes,
-            });
         }
 
         await _dbContext.SaveChangesAsync();

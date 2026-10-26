@@ -1,0 +1,32 @@
+@model WorkoutViewModel
+
+@{
+    string badgeClass = Model.Status switch
+    {
+        WorkoutStatus.Completed => "text-bg-success",
+        WorkoutStatus.Skipped => "text-bg-warning",
+        _ => "text-bg-primary"
+    };
+}
+
+<div class="d-flex justify-content-between align-items-start gap-3 mb-4">
+    <h3 class="h4 mb-0">@Model.Date.ToString(DateTimeFormat)</h3>
+    <span class="badge @badgeClass">@Model.Status</span>
+</div>
+
+<dl class="row mb-4">
+    <dt class="col-7">Planned distance</dt>
+    <dd class="col-5 text-end">@Model.PlannedDistance m</dd>
+    <dt class="col-7">Planned duration</dt>
+    <dd class="col-5 text-end">@Model.PlannedDuration min</dd>
+</dl>
+
+<h4 class="h6">Notes</h4>
+@if (string.IsNullOrWhiteSpace(Model.Notes))
+{
+    <p class="text-muted mb-0">No notes.</p>
+}
+else
+{
+    <p class="mb-0">@Model.Notes</p>
+}

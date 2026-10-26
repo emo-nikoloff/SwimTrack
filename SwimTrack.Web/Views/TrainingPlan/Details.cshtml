@@ -50,35 +50,7 @@
                     <div class="col-12 col-md-6 col-xl-4">
                         <article class="card h-100 shadow-sm">
                             <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start gap-3 mb-4">
-                                    <h3 class="h4 mb-0">@workout.Date.ToString(DateTimeFormat)</h3>
-                                    @{
-                                        string badgeClass = workout.Status switch
-                                        {
-                                            WorkoutStatus.Completed => "text-bg-success",
-                                            WorkoutStatus.Skipped => "text-bg-warning",
-                                            _ => "text-bg-primary"
-                                        };
-                                    }
-                                    <span class="badge @badgeClass">@workout.Status</span>
-                                </div>
-
-                                <dl class="row mb-4">
-                                    <dt class="col-7">Planned distance</dt>
-                                    <dd class="col-5 text-end">@workout.PlannedDistance m</dd>
-                                    <dt class="col-7">Planned duration</dt>
-                                    <dd class="col-5 text-end">@workout.PlannedDuration min</dd>
-                                </dl>
-
-                                <h4 class="h6">Notes</h4>
-                                @if (string.IsNullOrWhiteSpace(workout.Notes))
-                                {
-                                    <p class="text-muted mb-0">No notes.</p>
-                                }
-                                else
-                                {
-                                    <p class="mb-0">@workout.Notes</p>
-                                }
+                                <partial name="_WorkoutDetailsPartial" model="workout" />
                             </div>
                             <div class="card-footer bg-transparent border-top">
                                 <div class="d-flex justify-content-end gap-2">
