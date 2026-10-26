@@ -40,7 +40,7 @@ public class WorkoutController : Controller
             return NotFound();
         }
 
-        ViewData["TrainingPlanId"] = trainingPlanId;
+        ViewData["TrainingPlanId"] = trainingPlanId.Value;
 
         return View(workoutInputModel);
     }
@@ -87,8 +87,6 @@ public class WorkoutController : Controller
 
             return View(workoutInputModel);
         }
-
-        ViewData["TrainingPlanId"] = trainingPlanId;
 
         return RedirectToAction(
             nameof(TrainingPlanController.Details),
@@ -165,6 +163,7 @@ public class WorkoutController : Controller
             ModelState.AddModelError(memberKey, ex.Message);
 
             ViewData["TrainingPlanId"] = trainingPlanId.Value;
+            ViewData["WorkoutId"] = id.Value;
 
             return View(workoutResultInputModel);
         }
