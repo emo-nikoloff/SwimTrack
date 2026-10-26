@@ -12,6 +12,8 @@
               asp-action="Edit"
               asp-route-trainingPlanId="@ViewData["TrainingPlanId"]"
               method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
             <partial name="_WorkoutInputPartial" model="Model" />
 
             <div class="d-flex gap-2">
@@ -26,3 +28,7 @@
         </form>
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

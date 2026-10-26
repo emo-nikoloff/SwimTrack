@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -46,6 +47,8 @@ public class TrainingPlanController : Controller
             trainingPlanWorkouts.Add(new WorkoutInputModel());
             trainingPlanInputModel.Workouts = trainingPlanWorkouts;
 
+            ModelState.Clear();
+
             return View(trainingPlanInputModel);
         }
 
@@ -61,6 +64,8 @@ public class TrainingPlanController : Controller
             trainingPlanWorkouts.RemoveAt(workoutIndex.Value);
             trainingPlanInputModel.Workouts = trainingPlanWorkouts;
 
+            ModelState.Clear();
+
             return View(trainingPlanInputModel);
         }
 
@@ -75,7 +80,17 @@ public class TrainingPlanController : Controller
         }
 
         string userId = ValidateAuthorizedUserId(GetUserId());
-        await _trainingPlanService.CreateTrainingPlanAsync(trainingPlanInputModel, userId);
+        try
+        {
+            await _trainingPlanService.CreateTrainingPlanAsync(trainingPlanInputModel, userId);
+        }
+        catch (ValidationException ex)
+        {
+            string memberKey = ex.ValidationResult?.MemberNames.FirstOrDefault() ?? string.Empty;
+            ModelState.AddModelError(memberKey, ex.Message);
+
+            return View(trainingPlanInputModel);
+        }
 
         return RedirectToAction(nameof(All));
     }
@@ -122,6 +137,8 @@ public class TrainingPlanController : Controller
             trainingPlanWorkouts.Add(new WorkoutInputModel());
             trainingPlanInputModel.Workouts = trainingPlanWorkouts;
 
+            ModelState.Clear();
+
             return View(trainingPlanInputModel);
         }
 
@@ -137,6 +154,8 @@ public class TrainingPlanController : Controller
             trainingPlanWorkouts.RemoveAt(workoutIndex.Value);
             trainingPlanInputModel.Workouts = trainingPlanWorkouts;
 
+            ModelState.Clear();
+
             return View(trainingPlanInputModel);
         }
 
@@ -151,10 +170,20 @@ public class TrainingPlanController : Controller
         }
 
         string userId = ValidateAuthorizedUserId(GetUserId());
-        bool requestEdit = await _trainingPlanService.EditTrainingPlanAsync(id.Value, trainingPlanInputModel, userId);
-        if (!requestEdit)
+        try
         {
-            return NotFound();
+            bool requestEdit = await _trainingPlanService.EditTrainingPlanAsync(id.Value, trainingPlanInputModel, userId);
+            if (!requestEdit)
+            {
+                return NotFound();
+            }
+        }
+        catch (ValidationException ex)
+        {
+            string memberKey = ex.ValidationResult?.MemberNames.FirstOrDefault() ?? string.Empty;
+            ModelState.AddModelError(memberKey, ex.Message);
+
+            return View(trainingPlanInputModel);
         }
 
         return RedirectToAction(nameof(Details), new { id = id.Value });

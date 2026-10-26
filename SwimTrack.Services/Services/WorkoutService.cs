@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 
 using SwimTrack.Data;
@@ -6,6 +7,8 @@ using SwimTrack.DTOs.Workout;
 using SwimTrack.DTOs.WorkoutResult;
 using SwimTrack.Services.Contracts;
 using SwimTrack.Shared.Enums;
+using SwimTrack.Shared.Validation;
+using static SwimTrack.Shared.Constants.ValidationMessages.DateValidation;
 
 namespace SwimTrack.Services.Services;
 
@@ -42,13 +45,31 @@ public class WorkoutService : IWorkoutService
 
     public async Task<bool> EditWorkoutAsync(int id, int trainingPlanId, WorkoutInputModel workoutInputModel, string currentUserId)
     {
-        Workout? requestedWorkout = await _dbContext.Workouts.FirstOrDefaultAsync(w =>
-            w.Id == id
-            && w.TrainingPlanId == trainingPlanId
-            && w.TrainingPlan.UserId == currentUserId);
+        Workout? requestedWorkout = await _dbContext.Workouts
+            .Include(w => w.TrainingPlan)
+            .FirstOrDefaultAsync(w =>
+                w.Id == id
+                && w.TrainingPlanId == trainingPlanId
+                && w.TrainingPlan.UserId == currentUserId);
         if (requestedWorkout == null)
         {
             return false;
+        }
+
+        bool isWorkoutDateValid = DateValidator.ValidateWorkoutDate(
+            workoutInputModel.Date,
+            requestedWorkout.TrainingPlan.StartDate,
+            requestedWorkout.TrainingPlan.EndDate);
+        if (!isWorkoutDateValid)
+        {
+            throw new ValidationException(new ValidationResult(
+                WorkoutDateOutsidePlanPeriod,
+                new[]
+                    {
+                        nameof(WorkoutInputModel.Date)
+                    }),
+                null,
+                null);
         }
 
         requestedWorkout.Date = workoutInputModel.Date;
@@ -105,6 +126,21 @@ public class WorkoutService : IWorkoutService
         }
 
         requestedWorkout.Status = WorkoutStatus.Completed;
+
+        bool isWorkoutCompletionDateValid = DateValidator.ValidateWorkoutCompletionDate(
+            workoutResultInputModel.CompletedAt,
+            requestedWorkout.Date);
+        if (!isWorkoutCompletionDateValid)
+        {
+            throw new ValidationException(new ValidationResult(
+                WorkoutCompletionDateBeforeWorkoutDate,
+                new[]
+                    {
+                        nameof(WorkoutResultInputModel.CompletedAt)
+                    }),
+                null,
+                null);
+        }
 
         WorkoutResult workoutResult = new()
         {

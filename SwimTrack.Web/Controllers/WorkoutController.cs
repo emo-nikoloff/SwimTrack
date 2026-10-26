@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -64,14 +65,27 @@ public class WorkoutController : Controller
         }
 
         string userId = ValidateAuthorizedUserId(GetUserId());
-        bool requestEdit = await _workoutService.EditWorkoutAsync(
-            id.Value,
-            trainingPlanId.Value,
-            workoutInputModel,
-            userId);
-        if (!requestEdit)
+        try
         {
-            return NotFound();
+            bool requestEdit = await _workoutService.EditWorkoutAsync(
+                id.Value,
+                trainingPlanId.Value,
+                workoutInputModel,
+                userId);
+            if (!requestEdit)
+            {
+                return NotFound();
+            }
+        }
+        catch (ValidationException ex)
+        {
+            string memberKey = ex.ValidationResult?.MemberNames.FirstOrDefault()
+                ?? nameof(WorkoutInputModel.Date);
+            ModelState.AddModelError(memberKey, ex.Message);
+
+            ViewData["TrainingPlanId"] = trainingPlanId.Value;
+
+            return View(workoutInputModel);
         }
 
         ViewData["TrainingPlanId"] = trainingPlanId;
@@ -130,14 +144,27 @@ public class WorkoutController : Controller
         }
 
         string userId = ValidateAuthorizedUserId(GetUserId());
-        bool requestComplete = await _workoutService.CompleteWorkoutAsync(
-            id.Value,
-            trainingPlanId.Value,
-            workoutResultInputModel,
-            userId);
-        if (!requestComplete)
+        try
         {
-            return NotFound();
+            bool requestComplete = await _workoutService.CompleteWorkoutAsync(
+                id.Value,
+                trainingPlanId.Value,
+                workoutResultInputModel,
+                userId);
+            if (!requestComplete)
+            {
+                return NotFound();
+            }
+        }
+        catch (ValidationException ex)
+        {
+            string memberKey = ex.ValidationResult?.MemberNames.FirstOrDefault()
+                ?? nameof(WorkoutResultInputModel.CompletedAt);
+            ModelState.AddModelError(memberKey, ex.Message);
+
+            ViewData["TrainingPlanId"] = trainingPlanId.Value;
+
+            return View(workoutResultInputModel);
         }
 
         return RedirectToAction(

@@ -19,6 +19,7 @@
                         {
                             workoutAction = "add"
                         })"
+                        formnovalidate
                         class="btn btn-outline-primary">
                     Add workout
                 </button>
@@ -36,6 +37,7 @@
                                 workoutAction = "remove",
                                 workoutIndex = i
                             })"
+                            formnovalidate
                             class="btn btn-sm btn-outline-danger">
                         Remove
                     </button>
@@ -51,3 +53,7 @@
         </form>
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

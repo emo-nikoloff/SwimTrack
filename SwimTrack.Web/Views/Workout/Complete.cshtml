@@ -13,6 +13,8 @@
               asp-route-id="@ViewData["WorkoutId"]"
               asp-route-trainingPlanId="@ViewData["TrainingPlanId"]"
               method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
             <div class="card mb-3">
                 <div class="card-body">
                     <div class="mb-3">
