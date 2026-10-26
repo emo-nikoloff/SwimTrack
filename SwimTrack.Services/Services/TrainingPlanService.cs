@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 
 using SwimTrack.Data;
@@ -6,8 +5,6 @@ using SwimTrack.Data.Models;
 using SwimTrack.DTOs.TrainingPlan;
 using SwimTrack.DTOs.Workout;
 using SwimTrack.Services.Contracts;
-using SwimTrack.Shared.Validation;
-using static SwimTrack.Shared.Constants.ValidationMessages.DateValidation;
 
 namespace SwimTrack.Services.Services;
 
@@ -48,8 +45,6 @@ public class TrainingPlanService : ITrainingPlanService
 
     public async Task CreateTrainingPlanAsync(TrainingPlanInputModel trainingPlanInputModel, string currentUserId)
     {
-        ValidateTrainingPlanDates(trainingPlanInputModel);
-
         TrainingPlan newTrainingPlan = new()
         {
             Name = trainingPlanInputModel.Name,
@@ -117,8 +112,6 @@ public class TrainingPlanService : ITrainingPlanService
         {
             return false;
         }
-
-        ValidateTrainingPlanDates(trainingPlanInputModel);
 
         requestedTrainingPlan.Name = trainingPlanInputModel.Name;
         requestedTrainingPlan.Goal = trainingPlanInputModel.Goal;
@@ -210,43 +203,5 @@ public class TrainingPlanService : ITrainingPlanService
                     .ToArray(),
             })
             .FirstOrDefaultAsync();
-    }
-
-    private static void ValidateTrainingPlanDates(TrainingPlanInputModel trainingPlanInputModel)
-    {
-        bool isTrainingPlanPeriodValid = DateValidator.ValidatePlanPeriod(
-            trainingPlanInputModel.StartDate,
-            trainingPlanInputModel.EndDate);
-        if (!isTrainingPlanPeriodValid)
-        {
-            throw new ValidationException(new ValidationResult(
-                InvalidTrainingPlanPeriod,
-                new[]
-                    {
-                        nameof(TrainingPlanInputModel.EndDate)
-                    }),
-                null,
-                null);
-        }
-
-        List<WorkoutInputModel> workouts = trainingPlanInputModel.Workouts.ToList();
-        for (int i = 0; i < workouts.Count; i++)
-        {
-            bool isWorkoutDateValid = DateValidator.ValidateWorkoutDate(
-                workouts[i].Date,
-                trainingPlanInputModel.StartDate,
-                trainingPlanInputModel.EndDate);
-            if (!isWorkoutDateValid)
-            {
-                throw new ValidationException(new ValidationResult(
-                    WorkoutDateOutsidePlanPeriod,
-                    new[]
-                        {
-                            $"{nameof(TrainingPlanInputModel.Workouts)}[{i}].{nameof(WorkoutInputModel.Date)}"
-                        }),
-                    null,
-                    null);
-            }
-        }
     }
 }

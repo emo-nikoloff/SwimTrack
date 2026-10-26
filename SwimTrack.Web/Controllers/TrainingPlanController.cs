@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -87,17 +86,7 @@ public class TrainingPlanController : Controller
         }
 
         string userId = ValidateAuthorizedUserId(GetUserId());
-        try
-        {
-            await _trainingPlanService.CreateTrainingPlanAsync(trainingPlanInputModel, userId);
-        }
-        catch (ValidationException ex)
-        {
-            string memberKey = ex.ValidationResult?.MemberNames.FirstOrDefault() ?? string.Empty;
-            ModelState.AddModelError(memberKey, ex.Message);
-
-            return View(trainingPlanInputModel);
-        }
+        await _trainingPlanService.CreateTrainingPlanAsync(trainingPlanInputModel, userId);
 
         return RedirectToAction(nameof(All));
     }
@@ -180,20 +169,10 @@ public class TrainingPlanController : Controller
         }
 
         string userId = ValidateAuthorizedUserId(GetUserId());
-        try
+        bool requestEdit = await _trainingPlanService.EditTrainingPlanAsync(id.Value, trainingPlanInputModel, userId);
+        if (!requestEdit)
         {
-            bool requestEdit = await _trainingPlanService.EditTrainingPlanAsync(id.Value, trainingPlanInputModel, userId);
-            if (!requestEdit)
-            {
-                return NotFound();
-            }
-        }
-        catch (ValidationException ex)
-        {
-            string memberKey = ex.ValidationResult?.MemberNames.FirstOrDefault() ?? string.Empty;
-            ModelState.AddModelError(memberKey, ex.Message);
-
-            return View(trainingPlanInputModel);
+            return NotFound();
         }
 
         return RedirectToAction(nameof(Details), new { id = id.Value });
