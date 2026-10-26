@@ -50,7 +50,7 @@ public class TrainingPlanController : Controller
         {
             trainingPlanWorkouts.Add(new WorkoutInputModel()
             {
-                Date = DateTime.Today,
+                Date = trainingPlanInputModel.StartDate,
             });
             trainingPlanInputModel.Workouts = trainingPlanWorkouts;
 
@@ -143,7 +143,7 @@ public class TrainingPlanController : Controller
 
             trainingPlanWorkouts.Add(new WorkoutInputModel()
             {
-                Date = DateTime.Today,
+                Date = trainingPlanInputModel.StartDate,
             });
             trainingPlanInputModel.Workouts = trainingPlanWorkouts;
 
