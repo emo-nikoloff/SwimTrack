@@ -124,6 +124,17 @@ public class TrainingPlanService : ITrainingPlanService
         requestedTrainingPlan.StartDate = trainingPlanInputModel.StartDate;
         requestedTrainingPlan.EndDate = trainingPlanInputModel.EndDate;
 
+        IEnumerable<int> submittedWorkoutIds = trainingPlanInputModel.Workouts
+            .Where(w => w.Id.HasValue)
+            .Select(w => w.Id!.Value)
+            .ToHashSet();
+
+        IEnumerable<Workout> workoutsToRemove = requestedTrainingPlan.Workouts
+            .Where(w => !submittedWorkoutIds.Contains(w.Id))
+            .ToArray();
+
+        _dbContext.Workouts.RemoveRange(workoutsToRemove);
+
         foreach (WorkoutInputModel workoutInputModel in trainingPlanInputModel.Workouts)
         {
             if (workoutInputModel.Id.HasValue)
@@ -152,10 +163,6 @@ public class TrainingPlanService : ITrainingPlanService
             });
         }
 
-        _dbContext.Workouts.RemoveRange(
-            requestedTrainingPlan.Workouts
-                .Where(workout => trainingPlanInputModel.Workouts
-                    .All(workoutInputModel => workoutInputModel.Id != workout.Id)));
         await _dbContext.SaveChangesAsync();
 
         return true;
