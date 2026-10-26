@@ -31,7 +31,11 @@ public class TrainingPlanController : Controller
     [HttpGet]
     public IActionResult Create()
     {
-        return View(new TrainingPlanInputModel());
+        return View(new TrainingPlanInputModel()
+        {
+            StartDate = DateTime.Today,
+            EndDate = DateTime.Today.AddDays(1),
+        });
     }
 
     [HttpPost]
@@ -44,7 +48,10 @@ public class TrainingPlanController : Controller
 
         if (workoutAction == "add")
         {
-            trainingPlanWorkouts.Add(new WorkoutInputModel());
+            trainingPlanWorkouts.Add(new WorkoutInputModel()
+            {
+                Date = DateTime.Today,
+            });
             trainingPlanInputModel.Workouts = trainingPlanWorkouts;
 
             ModelState.Clear();
@@ -134,7 +141,10 @@ public class TrainingPlanController : Controller
                 return BadRequest();
             }
 
-            trainingPlanWorkouts.Add(new WorkoutInputModel());
+            trainingPlanWorkouts.Add(new WorkoutInputModel()
+            {
+                Date = DateTime.Today,
+            });
             trainingPlanInputModel.Workouts = trainingPlanWorkouts;
 
             ModelState.Clear();

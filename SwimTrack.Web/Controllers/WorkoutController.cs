@@ -117,6 +117,8 @@ public class WorkoutController : Controller
             return NotFound();
         }
 
+        workoutResultInputModel.CompletedAt = DateTime.Today;
+
         ViewData["TrainingPlanId"] = trainingPlanId.Value;
         ViewData["WorkoutId"] = id.Value;
 

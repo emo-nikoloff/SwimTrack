@@ -102,7 +102,6 @@ public class WorkoutService : IWorkoutService
         {
             ActualDistance = requestedWorkout.PlannedDistance,
             ActualDuration = requestedWorkout.PlannedDuration,
-            CompletedAt = DateTime.Now,
             Notes = requestedWorkout.Notes,
         };
 
