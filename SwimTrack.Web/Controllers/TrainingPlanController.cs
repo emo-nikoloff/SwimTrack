@@ -43,15 +43,12 @@ public class TrainingPlanController : Controller
         [FromQuery] int? workoutIndex,
         [FromForm] TrainingPlanInputModel trainingPlanInputModel)
     {
-        List<WorkoutInputModel> trainingPlanWorkouts = trainingPlanInputModel.Workouts.ToList();
-
         if (workoutAction == "add")
         {
-            trainingPlanWorkouts.Add(new WorkoutInputModel()
+            trainingPlanInputModel.Workouts.Add(new WorkoutInputModel()
             {
                 Date = trainingPlanInputModel.StartDate,
             });
-            trainingPlanInputModel.Workouts = trainingPlanWorkouts;
 
             ModelState.Clear();
 
@@ -62,13 +59,12 @@ public class TrainingPlanController : Controller
         {
             if (!workoutIndex.HasValue
                 || workoutIndex.Value < 0
-                || workoutIndex.Value >= trainingPlanWorkouts.Count)
+                || workoutIndex.Value >= trainingPlanInputModel.Workouts.Count)
             {
                 return BadRequest();
             }
 
-            trainingPlanWorkouts.RemoveAt(workoutIndex.Value);
-            trainingPlanInputModel.Workouts = trainingPlanWorkouts;
+            trainingPlanInputModel.Workouts.RemoveAt(workoutIndex.Value);
 
             ModelState.Clear();
 
@@ -121,8 +117,6 @@ public class TrainingPlanController : Controller
             return BadRequest();
         }
 
-        List<WorkoutInputModel> trainingPlanWorkouts = trainingPlanInputModel.Workouts.ToList();
-
         if (workoutAction == "add")
         {
             if (workoutIndex.HasValue)
@@ -130,11 +124,10 @@ public class TrainingPlanController : Controller
                 return BadRequest();
             }
 
-            trainingPlanWorkouts.Add(new WorkoutInputModel()
+            trainingPlanInputModel.Workouts.Add(new WorkoutInputModel()
             {
                 Date = trainingPlanInputModel.StartDate,
             });
-            trainingPlanInputModel.Workouts = trainingPlanWorkouts;
 
             ModelState.Clear();
 
@@ -145,13 +138,12 @@ public class TrainingPlanController : Controller
         {
             if (!workoutIndex.HasValue
                 || workoutIndex.Value < 0
-                || workoutIndex.Value >= trainingPlanWorkouts.Count)
+                || workoutIndex.Value >= trainingPlanInputModel.Workouts.Count)
             {
                 return BadRequest();
             }
 
-            trainingPlanWorkouts.RemoveAt(workoutIndex.Value);
-            trainingPlanInputModel.Workouts = trainingPlanWorkouts;
+            trainingPlanInputModel.Workouts.RemoveAt(workoutIndex.Value);
 
             ModelState.Clear();
 

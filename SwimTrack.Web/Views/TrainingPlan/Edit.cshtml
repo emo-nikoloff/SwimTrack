@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = "Edit training plan";
-    List<WorkoutInputModel> trainingPlanWorkouts = Model.Workouts.ToList();
+    List<WorkoutInputModel> trainingPlanWorkouts = Model.Workouts;
 }
 
 <h1 class="mb-4">Edit training plan</h1>
@@ -62,12 +62,12 @@
 
                                         <partial name="_WorkoutDetailsPartial" model="workoutViewModel" />
 
-                                        <input type="hidden" name="Workouts[@i].Id" value="@currentWorkout.Id" />
-                                        <input type="hidden" name="Workouts[@i].Date" value="@currentWorkout.Date.ToString(DateTimeFormat)" />
-                                        <input type="hidden" name="Workouts[@i].PlannedDistance" value="@currentWorkout.PlannedDistance" />
-                                        <input type="hidden" name="Workouts[@i].PlannedDuration" value="@currentWorkout.PlannedDuration" />
-                                        <input type="hidden" name="Workouts[@i].Notes" value="@currentWorkout.Notes" />
-                                        <input type="hidden" name="Workouts[@i].Status" value="@currentWorkout.Status" />
+                                        <input asp-for="Workouts[i].Id" type="hidden" />
+                                        <input asp-for="Workouts[i].Date" type="hidden" />
+                                        <input asp-for="Workouts[i].PlannedDistance" type="hidden" />
+                                        <input asp-for="Workouts[i].PlannedDuration" type="hidden" />
+                                        <input asp-for="Workouts[i].Notes" type="hidden" />
+                                        <input asp-for="Workouts[i].Status" type="hidden" />
                                     }
                                     else
                                     {

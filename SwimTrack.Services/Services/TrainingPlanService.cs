@@ -105,7 +105,7 @@ public class TrainingPlanService : ITrainingPlanService
                     Notes = w.Notes,
                     Status = w.Status,
                 })
-                .ToArray(),
+                .ToList(),
         };
 
         return trainingPlanInputModel;

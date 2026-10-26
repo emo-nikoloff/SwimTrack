@@ -20,7 +20,7 @@ public class TrainingPlanInputModel : IValidatableObject
 
     public DateTime EndDate { get; set; }
 
-    public IEnumerable<WorkoutInputModel> Workouts { get; set; } = new List<WorkoutInputModel>();
+    public List<WorkoutInputModel> Workouts { get; set; } = new();
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
@@ -35,10 +35,9 @@ public class TrainingPlanInputModel : IValidatableObject
             yield break;
         }
 
-        List<WorkoutInputModel> workouts = Workouts.ToList();
-        for (int i = 0; i < workouts.Count; i++)
+        for (int i = 0; i < Workouts.Count; i++)
         {
-            if (!DateValidator.ValidateWorkoutDate(workouts[i].Date, StartDate, EndDate))
+            if (!DateValidator.ValidateWorkoutDate(Workouts[i].Date, StartDate, EndDate))
             {
                 yield return new ValidationResult(
                     WorkoutDateOutsidePlanPeriod,
