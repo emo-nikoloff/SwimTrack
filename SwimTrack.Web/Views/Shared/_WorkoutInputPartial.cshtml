@@ -4,58 +4,37 @@
     bool isReadOnly = Model.Status != WorkoutStatus.Planned;
 }
 
-<div class="card mb-3">
-    <div class="card-body">
-        <input asp-for="Id" type="hidden" />
-        <input asp-for="Status" type="hidden" />
+<input asp-for="Id" type="hidden" />
+<input asp-for="Status" type="hidden" />
 
-        <div class="mb-3">
-            <label asp-for="Date" class="form-label">Date</label>
-            @if (isReadOnly)
-            {
-                <input asp-for="Date" type="date" class="form-control bg-light" readonly />
-            }
-            else
-            {
-                <input asp-for="Date" type="date" class="form-control" />
-            }
-            <span asp-validation-for="Date" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3">
-            <label asp-for="PlannedDistance" class="form-label">
-                Planned distance
-            </label>
-            @if (isReadOnly)
-            {
-                <input asp-for="PlannedDistance" type="number" class="form-control bg-light" readonly />
-            }
-            else
-            {
-                <input asp-for="PlannedDistance" type="number" class="form-control" />
-            }
-            <span asp-validation-for="PlannedDistance" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3">
-            <label asp-for="PlannedDuration" class="form-label">
-                Planned duration
-            </label>
-            @if (isReadOnly)
-            {
-                <input asp-for="PlannedDuration" type="number" class="form-control bg-light" readonly />
-            }
-            else
-            {
-                <input asp-for="PlannedDuration" type="number" class="form-control" />
-            }
-            <span asp-validation-for="PlannedDuration" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3">
-            <label asp-for="Notes" class="form-label">Notes</label>
-            <textarea asp-for="Notes" class="form-control"></textarea>
-            <span asp-validation-for="Notes" class="text-danger"></span>
-        </div>
+<div class="g3">
+    <div class="fld">
+        <label asp-for="Date">Date</label>
+        <input asp-for="Date" type="date" readonly="@(isReadOnly ? "readonly" : null)" style="@(isReadOnly ? "background:var(--tile);" : null)" />
+        <span asp-validation-for="Date" class="er"></span>
     </div>
+
+    <div class="fld">
+        <label asp-for="PlannedDistance">Distance</label>
+        <div class="u">
+            <input asp-for="PlannedDistance" type="number" min="1" max="20000" readonly="@(isReadOnly ? "readonly" : null)" style="@(isReadOnly ? "background:var(--tile);" : null)" />
+            <span>m</span>
+        </div>
+        <span asp-validation-for="PlannedDistance" class="er"></span>
+    </div>
+
+    <div class="fld">
+        <label asp-for="PlannedDuration">Duration</label>
+        <div class="u">
+            <input asp-for="PlannedDuration" type="number" min="1" max="600" readonly="@(isReadOnly ? "readonly" : null)" style="@(isReadOnly ? "background:var(--tile);" : null)" />
+            <span>min</span>
+        </div>
+        <span asp-validation-for="PlannedDuration" class="er"></span>
+    </div>
+</div>
+
+<div class="fld">
+    <label asp-for="Notes">Notes</label>
+    <textarea asp-for="Notes" rows="2" placeholder="Sets, drills, technique focus..."></textarea>
+    <span asp-validation-for="Notes" class="er"></span>
 </div>

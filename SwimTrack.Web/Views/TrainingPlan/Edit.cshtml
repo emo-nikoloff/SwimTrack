@@ -1,114 +1,113 @@
 @model TrainingPlanInputModel
-
 @{
     ViewData["Title"] = "Edit training plan";
     List<WorkoutInputModel> trainingPlanWorkouts = Model.Workouts;
+    object? planId = ViewContext.RouteData.Values["id"];
 }
 
-<h1 class="mb-4">Edit training plan</h1>
-
-<form asp-controller="TrainingPlan"
-      asp-action="Edit"
-      asp-route-id="@ViewContext.RouteData.Values["id"]"
-      method="post">
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <partial name="_TrainingPlanInputPartial" model="Model" />
-        </div>
+<main class="wrap pg">
+    <div>
+        <p class="eb">Adjust your journey</p>
+        <h1 style="font-size:56px">Edit training plan</h1>
     </div>
 
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <div class="sticky-section-header d-flex justify-content-between align-items-center mb-3">
-                <h2 class="h5 mb-0">Workouts (@trainingPlanWorkouts.Count)</h2>
+    <form asp-controller="TrainingPlan"
+          asp-action="Edit"
+          asp-route-id="@planId"
+          method="post">
+        <div class="stack" style="gap:32px;max-width:880px">
+            <partial name="_TrainingPlanInputPartial" model="Model" />
+
+            <div class="row sp">
+                <h2>Workouts</h2>
                 <button type="submit"
                         asp-controller="TrainingPlan"
                         asp-action="Edit"
-                        asp-route-id="@ViewContext.RouteData.Values["id"]"
+                        asp-route-id="@planId"
                         asp-route-workoutAction="add"
                         formnovalidate
-                        class="btn btn-outline-primary">
-                    Add workout
+                        class="btn">
+                    + Add workout
                 </button>
             </div>
 
             @if (!trainingPlanWorkouts.Any())
             {
-                <p class="text-muted mb-0">No workouts have been added to this plan.</p>
+                <div class="card ctr">
+                    <p class="mut">No workouts in this plan. Click "+ Add workout" to schedule sessions.</p>
+                </div>
             }
             else
             {
-                <div class="row g-4">
-                    @for (int i = 0; i < trainingPlanWorkouts.Count; i++)
-                    {
-                        WorkoutInputModel currentWorkout = trainingPlanWorkouts[i];
-                        ViewDataDictionary workoutViewData = new ViewDataDictionary(ViewData);
-                        workoutViewData.TemplateInfo.HtmlFieldPrefix = $"Workouts[{i}]";
+                @for (int i = 0; i < trainingPlanWorkouts.Count; i++)
+                {
+                    WorkoutInputModel currentWorkout = trainingPlanWorkouts[i];
+                    ViewDataDictionary workoutViewData = new ViewDataDictionary(ViewData);
+                    workoutViewData.TemplateInfo.HtmlFieldPrefix = $"Workouts[{i}]";
 
-                        <div class="col-12 col-md-6 col-xl-4">
-                            <article class="card h-100 shadow-sm @(!currentWorkout.Id.HasValue ? "border-primary" : "")">
-                                <div class="card-body">
-                                    @if (currentWorkout.Id.HasValue)
-                                    {
-                                        WorkoutViewModel workoutViewModel = new()
-                                        {
-                                            Id = currentWorkout.Id.Value,
-                                            Date = currentWorkout.Date,
-                                            PlannedDistance = currentWorkout.PlannedDistance,
-                                            PlannedDuration = currentWorkout.PlannedDuration,
-                                            Notes = currentWorkout.Notes,
-                                            Status = currentWorkout.Status,
-                                        };
-
-                                        <partial name="_WorkoutDetailsPartial" model="workoutViewModel" />
-
-                                        <input asp-for="Workouts[i].Id" type="hidden" />
-                                        <input asp-for="Workouts[i].Date" type="hidden" />
-                                        <input asp-for="Workouts[i].PlannedDistance" type="hidden" />
-                                        <input asp-for="Workouts[i].PlannedDuration" type="hidden" />
-                                        <input asp-for="Workouts[i].Notes" type="hidden" />
-                                        <input asp-for="Workouts[i].Status" type="hidden" />
-                                    }
-                                    else
-                                    {
-                                        <h4 class="h6 text-primary mb-3">New Workout</h4>
-                                        <partial name="_WorkoutInputPartial"
-                                                 model="currentWorkout"
-                                                 view-data="workoutViewData" />
-                                    }
-                                </div>
-                                <div class="card-footer bg-transparent border-top">
-                                    <div class="d-flex justify-content-end">
-                                        <button type="submit"
-                                                asp-controller="TrainingPlan"
-                                                asp-action="Edit"
-                                                asp-route-id="@ViewContext.RouteData.Values["id"]"
-                                                asp-route-workoutAction="remove"
-                                                asp-route-workoutIndex="@i"
-                                                formnovalidate
-                                                class="btn btn-outline-danger">
-                                            Remove
-                                        </button>
-                                    </div>
-                                </div>
-                            </article>
+                    <div class="card stack" style="gap:16px">
+                        <div class="row sp">
+                            <div class="row" style="gap:10px">
+                                <span class="chip">@(i + 1)</span>
+                                @if (currentWorkout.Id.HasValue)
+                                {
+                                    <b>Workout @(i + 1)</b>
+                                }
+                                else
+                                {
+                                    <b>New workout</b>
+                                }
+                            </div>
+                            <button type="submit"
+                                    asp-controller="TrainingPlan"
+                                    asp-action="Edit"
+                                    asp-route-id="@planId"
+                                    asp-route-workoutAction="remove"
+                                    asp-route-workoutIndex="@i"
+                                    formnovalidate
+                                    class="btn sm dg">
+                                Remove
+                            </button>
                         </div>
-                    }
-                </div>
-            }
-        </div>
-    </div>
 
-    <div class="d-flex gap-2">
-        <button type="submit" class="btn btn-primary">Save changes</button>
-        <a asp-controller="TrainingPlan"
-           asp-action="Details"
-           asp-route-id="@ViewContext.RouteData.Values["id"]"
-           class="btn btn-secondary">
-            Cancel
-        </a>
-    </div>
-</form>
+                        @if (currentWorkout.Id.HasValue)
+                        {
+                            WorkoutViewModel workoutViewModel = new()
+                            {
+                                Id = currentWorkout.Id.Value,
+                                Date = currentWorkout.Date,
+                                PlannedDistance = currentWorkout.PlannedDistance,
+                                PlannedDuration = currentWorkout.PlannedDuration,
+                                Notes = currentWorkout.Notes,
+                                Status = currentWorkout.Status,
+                            };
+
+                            <partial name="_WorkoutDetailsPartial" model="workoutViewModel" />
+
+                            <input asp-for="Workouts[i].Id" type="hidden" />
+                            <input asp-for="Workouts[i].Date" type="hidden" />
+                            <input asp-for="Workouts[i].PlannedDistance" type="hidden" />
+                            <input asp-for="Workouts[i].PlannedDuration" type="hidden" />
+                            <input asp-for="Workouts[i].Notes" type="hidden" />
+                            <input asp-for="Workouts[i].Status" type="hidden" />
+                        }
+                        else
+                        {
+                            <partial name="_WorkoutInputPartial" model="currentWorkout" view-data="workoutViewData" />
+                        }
+                    </div>
+                }
+            }
+
+            <div asp-validation-summary="ModelOnly" class="er"></div>
+
+            <div class="row">
+                <button class="btn go" type="submit">Save changes</button>
+                <a class="btn" asp-controller="TrainingPlan" asp-action="Details" asp-route-id="@planId">Cancel</a>
+            </div>
+        </div>
+    </form>
+</main>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
