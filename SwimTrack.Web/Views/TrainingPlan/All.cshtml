@@ -25,7 +25,7 @@
     int totalCompleted = allWorkoutsWithPlan.Count(x => x.Workout.Status == WorkoutStatus.Completed);
     int totalSkipped = allWorkoutsWithPlan.Count(x => x.Workout.Status == WorkoutStatus.Skipped);
     int dueWorkouts = allWorkoutsWithPlan.Count(x => x.Workout.Date.Date <= DateTime.Today || x.Workout.Status != WorkoutStatus.Planned);
-    int completion = dueWorkouts > 0 ? (int)Math.Round((double)totalCompleted / dueWorkouts * 100) : 100;
+    int completion = dueWorkouts > 0 ? (int)Math.Round((double)totalCompleted / dueWorkouts * 100) : 0;
 
     int totalDistanceSwum = allWorkoutsWithPlan
         .Where(x => x.Workout.Status == WorkoutStatus.Completed)
