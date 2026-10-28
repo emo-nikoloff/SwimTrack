@@ -45,7 +45,7 @@
                 <div class="fld">
                     <label asp-for="ActualDistance">Actual distance</label>
                     <div class="u">
-                        <input asp-for="ActualDistance" type="number" min="1" max="20000" />
+                        <input asp-for="ActualDistance" type="number" min="50" max="20000" step="50" />
                         <span>m</span>
                     </div>
                     <span asp-validation-for="ActualDistance" class="er"></span>
