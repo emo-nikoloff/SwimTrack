@@ -2,7 +2,7 @@
 @{
     ViewData["Title"] = "Plans";
 
-    string rawName = User.Identity?.Name ?? "";
+    string rawName = User.Identity?.Name ?? "swimmer";
     string displayName = rawName.Contains("@") ? rawName.Split('@')[0] : rawName;
 
     var allWorkoutsWithPlan = Model
