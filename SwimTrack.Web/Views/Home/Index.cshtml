@@ -11,8 +11,7 @@
             <div class="row">
                 @if (User.Identity?.IsAuthenticated ?? false)
                 {
-                    <a class="btn dk" asp-controller="TrainingPlan" asp-action="All">Check your plans</a>
-                    <a class="btn go" asp-controller="TrainingPlan" asp-action="Create">Create training plan</a>
+                    <a class="btn go" asp-controller="TrainingPlan" asp-action="All">Go to your plans</a>
                 }
                 else
                 {
@@ -68,17 +67,13 @@
         </div>
     </section>
 
-    <section class="wrap">
-        <div class="band">
-            <h2 style="max-width:12em">Your next length starts with a plan.</h2>
-            @if (User.Identity?.IsAuthenticated ?? false)
-            {
-                <a class="btn go" asp-controller="TrainingPlan" asp-action="Create">Create your first plan</a>
-            }
-            else
-            {
+    @if (!(User.Identity?.IsAuthenticated ?? false))
+    {
+        <section class="wrap">
+            <div class="band">
+                <h2 style="max-width:12em">Your next length starts with a plan.</h2>
                 <a class="btn go" asp-area="Identity" asp-page="/Account/Register">Create your first plan</a>
-            }
-        </div>
-    </section>
+            </div>
+        </section>
+    }
 </main>
