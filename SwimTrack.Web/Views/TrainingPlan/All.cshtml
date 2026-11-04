@@ -22,6 +22,9 @@
         .OrderBy(x => x.Workout.Date)
         .FirstOrDefault();
 
+    bool hasPlans = Model.Any();
+    TrainingPlanViewModel? planWithoutWorkouts = Model.FirstOrDefault(p => !p.Workouts.Any());
+
     int totalCompleted = allWorkoutsWithPlan.Count(x => x.Workout.Status == WorkoutStatus.Completed);
     int totalSkipped = allWorkoutsWithPlan.Count(x => x.Workout.Status == WorkoutStatus.Skipped);
     int dueWorkouts = allWorkoutsWithPlan.Count(x => x.Workout.Date.Date <= DateTime.Today || x.Workout.Status != WorkoutStatus.Planned);
@@ -64,7 +67,7 @@
                 </div>
             </article>
         }
-        else
+        else if (!hasPlans)
         {
             <article class="next">
                 <p class="eb">Training Dashboard</p>
@@ -74,6 +77,33 @@
                 <p class="q">Create a training plan to start scheduling and logging your sessions.</p>
                 <div class="row">
                     <a class="btn go" asp-controller="TrainingPlan" asp-action="Create">Create training plan</a>
+                </div>
+            </article>
+        }
+        else if (planWithoutWorkouts != null)
+        {
+            <article class="next">
+                <p class="eb">Plan setup · @planWithoutWorkouts.Name</p>
+                <div class="big">
+                    <span>Add workouts</span>
+                </div>
+                <p class="q">“@planWithoutWorkouts.Name” has no workouts scheduled yet.</p>
+                <div class="row">
+                    <a class="btn go" asp-controller="TrainingPlan" asp-action="Edit" asp-route-id="@planWithoutWorkouts.Id">Add workouts</a>
+                    <a class="btn" asp-controller="TrainingPlan" asp-action="Details" asp-route-id="@planWithoutWorkouts.Id">Details</a>
+                </div>
+            </article>
+        }
+        else
+        {
+            <article class="next">
+                <p class="eb">Training Dashboard</p>
+                <div class="big">
+                    <span>All caught up! 🎉</span>
+                </div>
+                <p class="q">You’ve completed all scheduled workouts. Rest up or start a new training plan.</p>
+                <div class="row">
+                    <a class="btn go" asp-controller="TrainingPlan" asp-action="Create">Start new plan</a>
                 </div>
             </article>
         }
@@ -93,73 +123,83 @@
 
     <div class="row sp">
         <h2>Your plans</h2>
-        <a class="btn dk" asp-controller="TrainingPlan" asp-action="Create">Create training plan</a>
+        @if (hasPlans)
+        {
+            <a class="btn dk" asp-controller="TrainingPlan" asp-action="Create">+ New plan</a>
+        }
     </div>
 
-    <section class="g2">
-        @foreach (TrainingPlanViewModel plan in Model)
-        {
-            List<WorkoutViewModel>? workouts = plan.Workouts.OrderBy(w => w.Date).ToList();
-            int planDone = workouts.Count(w => w.Status == WorkoutStatus.Completed);
-            int planSkipped = workouts.Count(w => w.Status == WorkoutStatus.Skipped);
-            int planPlanned = workouts.Count(w => w.Status == WorkoutStatus.Planned);
-
-            string badgeClass = "bd";
-            string badgeText = "Finished";
-            if (plan.StartDate.Date <= DateTime.Today && plan.EndDate.Date >= DateTime.Today)
+    @if (!hasPlans)
+    {
+        <div class="card ctr">
+            <p class="mut">No training plans yet. Create your first plan above to get started.</p>
+        </div>
+    }
+    else
+    {
+        <section class="g2">
+            @foreach (TrainingPlanViewModel plan in Model)
             {
-                badgeClass = "bd ac";
-                badgeText = "Active";
-            }
-            else if (plan.StartDate.Date > DateTime.Today)
-            {
-                badgeClass = "bd";
-                badgeText = "Upcoming";
-            }
+                List<WorkoutViewModel>? workouts = plan.Workouts.OrderBy(w => w.Date).ToList();
+                int planDone = workouts.Count(w => w.Status == WorkoutStatus.Completed);
+                int planSkipped = workouts.Count(w => w.Status == WorkoutStatus.Skipped);
+                int planPlanned = workouts.Count(w => w.Status == WorkoutStatus.Planned);
 
-            <article class="card">
-                <div class="row sp">
-                    <div>
-                        <h3>@plan.Name</h3>
-                        <p class="mut">@plan.StartDate.ToString(DateTimeFormat) – @plan.EndDate.ToString(DateTimeFormat)</p>
+                string badgeClass = "bd";
+                string badgeText = "Finished";
+                if (plan.StartDate.Date <= DateTime.Today && plan.EndDate.Date >= DateTime.Today)
+                {
+                    badgeClass = "bd ac";
+                    badgeText = "Active";
+                }
+                else if (plan.StartDate.Date > DateTime.Today)
+                {
+                    badgeClass = "bd";
+                    badgeText = "Upcoming";
+                }
+
+                <article class="card">
+                    <div class="row sp">
+                        <div>
+                            <h3>@plan.Name</h3>
+                            <p class="mut">@plan.StartDate.ToString(DateTimeFormat) – @plan.EndDate.ToString(DateTimeFormat)</p>
+                        </div>
+                        <span class="@badgeClass">@badgeText</span>
                     </div>
-                    <span class="@badgeClass">@badgeText</span>
-                </div>
 
-                @if (!string.IsNullOrWhiteSpace(plan.Goal))
-                {
-                    <p>@plan.Goal</p>
-                }
-                else
-                {
-                    <p class="mut">No goal specified.</p>
-                }
-
-                <div class="strip" role="img" aria-label="@planDone completed, @planSkipped skipped, @planPlanned planned">
-                    @foreach (WorkoutViewModel w in workouts)
+                    @if (!string.IsNullOrWhiteSpace(plan.Goal))
                     {
-                        if (w.Status == WorkoutStatus.Completed)
-                        {
-                            <i class="d"></i>
-                        }
-                        else if (w.Status == WorkoutStatus.Skipped)
-                        {
-                            <i class="s"></i>
-                        }
-                        else
-                        {
-                            <i></i>
-                        }
+                        <p>@plan.Goal</p>
                     }
-                </div>
+                    else
+                    {
+                        <p class="mut">No goal specified.</p>
+                    }
 
-                <div class="row sp">
-                    <small>@planDone of @workouts.Count sessions done</small>
-                    <a class="btn sm" asp-controller="TrainingPlan" asp-action="Details" asp-route-id="@plan.Id">Details</a>
-                </div>
-            </article>
-        }
+                    <div class="strip" role="img" aria-label="@planDone completed, @planSkipped skipped, @planPlanned planned">
+                        @foreach (WorkoutViewModel w in workouts)
+                        {
+                            if (w.Status == WorkoutStatus.Completed)
+                            {
+                                <i class="d"></i>
+                            }
+                            else if (w.Status == WorkoutStatus.Skipped)
+                            {
+                                <i class="s"></i>
+                            }
+                            else
+                            {
+                                <i></i>
+                            }
+                        }
+                    </div>
 
-        <a class="card new" asp-controller="TrainingPlan" asp-action="Create">+ New training plan</a>
-    </section>
+                    <div class="row sp">
+                        <small>@planDone of @workouts.Count sessions done</small>
+                        <a class="btn sm" asp-controller="TrainingPlan" asp-action="Details" asp-route-id="@plan.Id">Details</a>
+                    </div>
+                </article>
+            }
+        </section>
+    }
 </main>
