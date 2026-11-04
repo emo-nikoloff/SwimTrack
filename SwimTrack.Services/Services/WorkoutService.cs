@@ -34,6 +34,7 @@ public class WorkoutService : IWorkoutService
 
         WorkoutInputModel workoutInputModel = new()
         {
+            Id = requestedWorkout.Id,
             Date = requestedWorkout.Date,
             PlannedDistance = requestedWorkout.PlannedDistance,
             PlannedDuration = requestedWorkout.PlannedDuration,
