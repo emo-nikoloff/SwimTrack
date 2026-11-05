@@ -1,6 +1,7 @@
 @model TrainingPlanInputModel
 @{
     ViewData["Title"] = "Create training plan";
+
     List<WorkoutInputModel> trainingPlanWorkouts = Model.Workouts;
 }
 
@@ -36,6 +37,7 @@
             {
                 @for (int i = 0; i < trainingPlanWorkouts.Count; i++)
                 {
+                    WorkoutInputModel currentWorkout = trainingPlanWorkouts[i];
                     ViewDataDictionary workoutViewData = new ViewDataDictionary(ViewData);
                     workoutViewData.TemplateInfo.HtmlFieldPrefix = $"Workouts[{i}]";
 
@@ -56,7 +58,7 @@
                             </button>
                         </div>
 
-                        <partial name="_WorkoutInputPartial" model="trainingPlanWorkouts[i]" view-data="workoutViewData" />
+                        <partial name="_WorkoutInputPartial" model="currentWorkout" view-data="workoutViewData" />
                     </div>
                 }
             }

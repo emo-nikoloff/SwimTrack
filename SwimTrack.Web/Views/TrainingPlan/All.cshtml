@@ -2,35 +2,35 @@
 @{
     ViewData["Title"] = "Plans";
 
-    string rawName = User.Identity?.Name ?? "swimmer";
-    string displayName = rawName.Contains("@") ? rawName.Split('@')[0] : rawName;
+    string userName = User.Identity?.Name ?? "swimmer";
+    string displayName = userName.Contains("@") ? userName.Split('@')[0] : userName;
 
-    var allWorkoutsWithPlan = Model
+    var allTrainingPlanWorkouts = Model
         .SelectMany(p => p.Workouts.Select(w => new { Plan = p, Workout = w }))
         .ToList();
 
-    var todaySession = allWorkoutsWithPlan
+    var todaySession = allTrainingPlanWorkouts
         .FirstOrDefault(x => x.Workout.Date.Date == DateTime.Today && x.Workout.Status == WorkoutStatus.Planned);
 
-    var upcomingSession = todaySession ?? allWorkoutsWithPlan
+    var upcomingSession = todaySession ?? allTrainingPlanWorkouts
         .Where(x => x.Workout.Status == WorkoutStatus.Planned && x.Workout.Date >= DateTime.Today)
         .OrderBy(x => x.Workout.Date)
         .FirstOrDefault();
 
-    var displaySession = upcomingSession ?? allWorkoutsWithPlan
+    var displaySession = upcomingSession ?? allTrainingPlanWorkouts
         .Where(x => x.Workout.Status == WorkoutStatus.Planned)
         .OrderBy(x => x.Workout.Date)
         .FirstOrDefault();
 
-    bool hasPlans = Model.Any();
-    TrainingPlanViewModel? planWithoutWorkouts = Model.FirstOrDefault(p => !p.Workouts.Any());
+    bool hasUserPlans = Model.Any();
+    TrainingPlanViewModel? trainingPlanWithoutWorkouts = Model.FirstOrDefault(p => !p.Workouts.Any());
 
-    int totalCompleted = allWorkoutsWithPlan.Count(x => x.Workout.Status == WorkoutStatus.Completed);
-    int totalSkipped = allWorkoutsWithPlan.Count(x => x.Workout.Status == WorkoutStatus.Skipped);
-    int dueWorkouts = allWorkoutsWithPlan.Count(x => x.Workout.Date.Date <= DateTime.Today || x.Workout.Status != WorkoutStatus.Planned);
-    int completion = dueWorkouts > 0 ? (int)Math.Round((double)totalCompleted / dueWorkouts * 100) : 0;
+    int totalCompletedWorkouts = allTrainingPlanWorkouts.Count(x => x.Workout.Status == WorkoutStatus.Completed);
+    int totalSkippedWorkouts = allTrainingPlanWorkouts.Count(x => x.Workout.Status == WorkoutStatus.Skipped);
+    int dueWorkouts = allTrainingPlanWorkouts.Count(x => x.Workout.Date.Date <= DateTime.Today || x.Workout.Status != WorkoutStatus.Planned);
+    int completionPercent = dueWorkouts > 0 ? (int)Math.Round((double)totalCompletedWorkouts / dueWorkouts * 100) : 0;
 
-    int totalDistanceSwum = allWorkoutsWithPlan
+    int totalDistanceSwum = allTrainingPlanWorkouts
         .Where(x => x.Workout.Status == WorkoutStatus.Completed)
         .Sum(x => x.Workout.Result?.ActualDistance ?? x.Workout.PlannedDistance);
 }
@@ -67,7 +67,7 @@
                 </div>
             </article>
         }
-        else if (!hasPlans)
+        else if (!hasUserPlans)
         {
             <article class="next">
                 <p class="eb">Training Dashboard</p>
@@ -80,17 +80,17 @@
                 </div>
             </article>
         }
-        else if (planWithoutWorkouts != null)
+        else if (trainingPlanWithoutWorkouts != null)
         {
             <article class="next">
-                <p class="eb">Plan setup · @planWithoutWorkouts.Name</p>
+                <p class="eb">Plan setup · @trainingPlanWithoutWorkouts.Name</p>
                 <div class="big">
                     <span>Add workouts</span>
                 </div>
-                <p class="q">“@planWithoutWorkouts.Name” has no workouts scheduled yet.</p>
+                <p class="q">“@trainingPlanWithoutWorkouts.Name” has no workouts scheduled yet.</p>
                 <div class="row">
-                    <a class="btn go" asp-controller="TrainingPlan" asp-action="Edit" asp-route-id="@planWithoutWorkouts.Id">Add workouts</a>
-                    <a class="btn" asp-controller="TrainingPlan" asp-action="Details" asp-route-id="@planWithoutWorkouts.Id">Details</a>
+                    <a class="btn go" asp-controller="TrainingPlan" asp-action="Edit" asp-route-id="@trainingPlanWithoutWorkouts.Id">Add workouts</a>
+                    <a class="btn" asp-controller="TrainingPlan" asp-action="Details" asp-route-id="@trainingPlanWithoutWorkouts.Id">Details</a>
                 </div>
             </article>
         }
@@ -109,27 +109,27 @@
         }
 
         <aside class="card ctr">
-            <div class="ring" style="--p:@completion"><b>@completion%</b></div>
+            <div class="ring" style="--p:@completionPercent"><b>@completionPercent%</b></div>
             <strong>Completion</strong>
-            <small>@totalCompleted of @dueWorkouts due sessions done</small>
+            <small>@totalCompletedWorkouts of @dueWorkouts due sessions done</small>
         </aside>
 
         <aside class="card ctr">
             <span class="n">@totalDistanceSwum</span>
             <strong>metres swum</strong>
-            <small>@totalCompleted completed sessions</small>
+            <small>@totalCompletedWorkouts completed sessions</small>
         </aside>
     </section>
 
     <div class="row sp">
         <h2>Your plans</h2>
-        @if (hasPlans)
+        @if (hasUserPlans)
         {
             <a class="btn dk" asp-controller="TrainingPlan" asp-action="Create">+ New plan</a>
         }
     </div>
 
-    @if (!hasPlans)
+    @if (!hasUserPlans)
     {
         <div class="card ctr">
             <p class="mut">No training plans yet. Create your first plan above to get started.</p>
@@ -138,52 +138,52 @@
     else
     {
         <section class="g2">
-            @foreach (TrainingPlanViewModel plan in Model)
+            @foreach (TrainingPlanViewModel trainingPlan in Model)
             {
-                List<WorkoutViewModel>? workouts = plan.Workouts.OrderBy(w => w.Date).ToList();
-                int planDone = workouts.Count(w => w.Status == WorkoutStatus.Completed);
-                int planSkipped = workouts.Count(w => w.Status == WorkoutStatus.Skipped);
-                int planPlanned = workouts.Count(w => w.Status == WorkoutStatus.Planned);
+                List<WorkoutViewModel>? workouts = trainingPlan.Workouts.OrderBy(w => w.Date).ToList();
+                int trainingPlanCompleted = workouts.Count(w => w.Status == WorkoutStatus.Completed);
+                int trainingPlanSkipped = workouts.Count(w => w.Status == WorkoutStatus.Skipped);
+                int trainingPlanPlanned = workouts.Count(w => w.Status == WorkoutStatus.Planned);
 
-                string badgeClass = "bd";
-                string badgeText = "Finished";
-                if (plan.StartDate.Date <= DateTime.Today && plan.EndDate.Date >= DateTime.Today)
+                string trainingPlanStatusClass = "bd";
+                string trainingPlanStatusText = "Finished";
+                if (trainingPlan.StartDate.Date <= DateTime.Today && trainingPlan.EndDate.Date >= DateTime.Today)
                 {
-                    badgeClass = "bd ac";
-                    badgeText = "Active";
+                    trainingPlanStatusClass = "bd ac";
+                    trainingPlanStatusText = "Active";
                 }
-                else if (plan.StartDate.Date > DateTime.Today)
+                else if (trainingPlan.StartDate.Date > DateTime.Today)
                 {
-                    badgeClass = "bd";
-                    badgeText = "Upcoming";
+                    trainingPlanStatusClass = "bd";
+                    trainingPlanStatusText = "Upcoming";
                 }
 
                 <article class="card">
                     <div class="row sp">
                         <div>
-                            <h3>@plan.Name</h3>
-                            <p class="mut">@plan.StartDate.ToString(DateTimeFormat) – @plan.EndDate.ToString(DateTimeFormat)</p>
+                            <h3>@trainingPlan.Name</h3>
+                            <p class="mut">@trainingPlan.StartDate.ToString(DateTimeFormat) – @trainingPlan.EndDate.ToString(DateTimeFormat)</p>
                         </div>
-                        <span class="@badgeClass">@badgeText</span>
+                        <span class="@trainingPlanStatusClass">@trainingPlanStatusText</span>
                     </div>
 
-                    @if (!string.IsNullOrWhiteSpace(plan.Goal))
+                    @if (!string.IsNullOrWhiteSpace(trainingPlan.Goal))
                     {
-                        <p>@plan.Goal</p>
+                        <p>@trainingPlan.Goal</p>
                     }
                     else
                     {
                         <p class="mut">No goal specified.</p>
                     }
 
-                    <div class="strip" role="img" aria-label="@planDone completed, @planSkipped skipped, @planPlanned planned">
-                        @foreach (WorkoutViewModel w in workouts)
+                    <div class="strip" role="img" aria-label="@trainingPlanCompleted completed, @trainingPlanSkipped skipped, @trainingPlanPlanned planned">
+                        @foreach (WorkoutViewModel workout in workouts)
                         {
-                            if (w.Status == WorkoutStatus.Completed)
+                            if (workout.Status == WorkoutStatus.Completed)
                             {
                                 <i class="d"></i>
                             }
-                            else if (w.Status == WorkoutStatus.Skipped)
+                            else if (workout.Status == WorkoutStatus.Skipped)
                             {
                                 <i class="s"></i>
                             }
@@ -195,8 +195,8 @@
                     </div>
 
                     <div class="row sp">
-                        <small>@planDone of @workouts.Count sessions done</small>
-                        <a class="btn sm" asp-controller="TrainingPlan" asp-action="Details" asp-route-id="@plan.Id">Details</a>
+                        <small>@trainingPlanCompleted of @workouts.Count sessions done</small>
+                        <a class="btn sm" asp-controller="TrainingPlan" asp-action="Details" asp-route-id="@trainingPlan.Id">Details</a>
                     </div>
                 </article>
             }

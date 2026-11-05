@@ -2,13 +2,13 @@
 @{
     ViewData["Title"] = Model.Name;
 
-    int totalCount = Model.Workouts.Count();
-    int doneCount = Model.Workouts.Count(w => w.Status == WorkoutStatus.Completed);
-    int skippedCount = Model.Workouts.Count(w => w.Status == WorkoutStatus.Skipped);
-    int plannedCount = Model.Workouts.Count(w => w.Status == WorkoutStatus.Planned);
-    int percent = totalCount > 0 ? (int)Math.Round((double)doneCount / totalCount * 100) : 0;
+    int totalWorkoutsCount = Model.Workouts.Count();
+    int doneWorkoutsCount = Model.Workouts.Count(w => w.Status == WorkoutStatus.Completed);
+    int skippedWorkoutsCount = Model.Workouts.Count(w => w.Status == WorkoutStatus.Skipped);
+    int plannedWorkoutsCount = Model.Workouts.Count(w => w.Status == WorkoutStatus.Planned);
+    int doneWorkoutsPercent = totalWorkoutsCount > 0 ? (int)Math.Round((double)doneWorkoutsCount / totalWorkoutsCount * 100) : 0;
 
-    int totalSwum = Model.Workouts
+    int totalSwumDistance = Model.Workouts
         .Where(w => w.Status == WorkoutStatus.Completed)
         .Sum(w => w.Result?.ActualDistance ?? w.PlannedDistance);
 
@@ -28,7 +28,7 @@
         <div class="stack" style="max-width:640px">
             <p class="eb">Training plan</p>
             <h1 style="font-size:64px">@Model.Name</h1>
-            <p class="mut">@Model.StartDate.ToString(DateTimeFormat) – @Model.EndDate.ToString(DateTimeFormat) · @totalCount workouts</p>
+            <p class="mut">@Model.StartDate.ToString(DateTimeFormat) – @Model.EndDate.ToString(DateTimeFormat) · @totalWorkoutsCount workouts</p>
             @if (!string.IsNullOrWhiteSpace(Model.Goal))
             {
                 <blockquote class="goal">“@Model.Goal”</blockquote>
@@ -39,23 +39,23 @@
         </div>
 
         <div class="card" style="grid-auto-flow:column;gap:32px;align-items:center">
-            <div class="ring" style="--p:@percent"><b>@doneCount/@totalCount</b></div>
+            <div class="ring" style="--p:@doneWorkoutsPercent"><b>@doneWorkoutsCount/@totalWorkoutsCount</b></div>
             <div class="stack" style="gap:6px">
-                <span class="n">@totalSwum m</span>
+                <span class="n">@totalSwumDistance m</span>
                 <small>swum so far</small>
-                <small>@skippedCount skipped · @plannedCount to go</small>
+                <small>@skippedWorkoutsCount skipped · @plannedWorkoutsCount to go</small>
             </div>
         </div>
     </section>
 
-    <div class="strip" role="img" aria-label="@doneCount completed, @skippedCount skipped, @plannedCount planned">
-        @foreach (WorkoutViewModel w in sortedWorkouts)
+    <div class="strip" role="img" aria-label="@doneWorkoutsCount completed, @skippedWorkoutsCount skipped, @plannedWorkoutsCount planned">
+        @foreach (WorkoutViewModel workout in sortedWorkouts)
         {
-            if (w.Status == WorkoutStatus.Completed)
+            if (workout.Status == WorkoutStatus.Completed)
             {
                 <i class="d"></i>
             }
-            else if (w.Status == WorkoutStatus.Skipped)
+            else if (workout.Status == WorkoutStatus.Skipped)
             {
                 <i class="s"></i>
             }
@@ -77,78 +77,79 @@
     {
         @foreach (IGrouping<DateTime, WorkoutViewModel> week in weekGroups)
         {
-            int weekNum = Math.Max(1, ((int)(week.Key - planStartMonday).TotalDays / 7) + 1);
+            int weekNumber = Math.Max(1, ((int)(week.Key - planStartMonday).TotalDays / 7) + 1);
             DateTime weekEnd = week.Key.AddDays(6);
 
             <section class="stack">
-                <div class="wl eb">Week @weekNum · @week.Key.ToString(DateTimeFormat) – @weekEnd.ToString(DateTimeFormat)</div>
+                <div class="wl eb">Week @weekNumber · @week.Key.ToString(DateTimeFormat) – @weekEnd.ToString(DateTimeFormat)</div>
                 <div class="g3">
-                    @foreach (WorkoutViewModel w in week)
+                    @foreach (WorkoutViewModel workout in week)
                     {
-                        if (w.Status == WorkoutStatus.Skipped)
+                        if (workout.Status == WorkoutStatus.Skipped)
                         {
                             <article class="wk sk">
                                 <div class="row sp">
                                     <div class="dt">
-                                        <b style="font-size:24px">@w.Date.ToString(DateTimeFormat)</b>
+                                        <b style="font-size:24px">@workout.Date.ToString(DateTimeFormat)</b>
                                     </div>
                                     <span class="bd sk">Skipped</span>
                                 </div>
                                 <div class="kv">
                                     <span>Planned</span>
-                                    <b>@w.PlannedDistance m · @w.PlannedDuration min</b>
+                                    <b>@workout.PlannedDistance m · @workout.PlannedDuration min</b>
                                 </div>
-                                <p class="note">@(string.IsNullOrWhiteSpace(w.Notes) ? "No notes." : w.Notes)</p>
+                                <p class="note">@(string.IsNullOrWhiteSpace(workout.Notes) ? "No notes." : workout.Notes)</p>
                                 <footer>
-                                    <a class="btn sm" asp-controller="Workout" asp-action="Edit" asp-route-id="@w.Id" asp-route-trainingPlanId="@Model.Id">Edit notes</a>
-                                    <form asp-controller="Workout" asp-action="PlanAgain" asp-route-id="@w.Id" asp-route-trainingPlanId="@Model.Id" method="post" style="display:inline;margin:0;">
+                                    <a class="btn sm" asp-controller="Workout" asp-action="Edit" asp-route-id="@workout.Id" asp-route-trainingPlanId="@Model.Id">Edit notes</a>
+                                    <form asp-controller="Workout" asp-action="PlanAgain" asp-route-id="@workout.Id" asp-route-trainingPlanId="@Model.Id" method="post" style="display:inline;margin:0;">
                                         <button class="btn sm go" type="submit">Plan again</button>
                                     </form>
                                 </footer>
                             </article>
                         }
-                        else if (w.Status == WorkoutStatus.Completed)
+                        else if (workout.Status == WorkoutStatus.Completed)
                         {
-                            int plW = Math.Min(100, Math.Max(15, (int)Math.Round((double)w.PlannedDistance / 2000.0 * 100)));
-                            int actDist = w.Result?.ActualDistance ?? w.PlannedDistance;
-                            int actDur = w.Result?.ActualDuration ?? w.PlannedDuration;
-                            int actW = Math.Min(100, Math.Max(15, (int)Math.Round((double)actDist / 2000.0 * 100)));
-                            string noteText = !string.IsNullOrWhiteSpace(w.Result?.Notes) ? w.Result.Notes : (!string.IsNullOrWhiteSpace(w.Notes) ? w.Notes : "No notes.");
+                            int actualDistance = workout.Result?.ActualDistance ?? workout.PlannedDistance;
+                            int actualDuration = workout.Result?.ActualDuration ?? workout.PlannedDuration;
+                            string noteText = !string.IsNullOrWhiteSpace(workout.Result?.Notes) ? workout.Result.Notes : (!string.IsNullOrWhiteSpace(workout.Notes) ? workout.Notes : "No notes.");
+
+                            int plannedDistancePercent = Math.Min(100, Math.Max(15, (int)Math.Round((double)workout.PlannedDistance / 2000.0 * 100)));
+                            int actualDistancePercent = Math.Min(100, Math.Max(15, (int)Math.Round((double)actualDistance / 2000.0 * 100)));
 
                             <article class="wk">
                                 <div class="row sp">
                                     <div class="dt">
-                                        <b style="font-size:24px">@w.Date.ToString(DateTimeFormat)</b>
+                                        <b style="font-size:24px">@workout.Date.ToString(DateTimeFormat)</b>
                                     </div>
                                     <span class="bd dn">Completed</span>
                                 </div>
                                 <div class="stack" style="gap:8px">
                                     <div class="kv">
                                         <span>Planned</span>
-                                        <b>@w.PlannedDistance m · @w.PlannedDuration min</b>
+                                        <b>@workout.PlannedDistance m · @workout.PlannedDuration min</b>
                                     </div>
-                                    <div class="bar pl"><i style="--w:@plW"></i></div>
+                                    <div class="bar pl"><i style="--w:@plannedDistancePercent"></i></div>
                                     <div class="kv">
                                         <span>Actual</span>
-                                        <b>@actDist m · @actDur min</b>
+                                        <b>@actualDistance m · @actualDuration min</b>
                                     </div>
-                                    <div class="bar"><i style="--w:@actW"></i></div>
+                                    <div class="bar"><i style="--w:@actualDistancePercent"></i></div>
                                 </div>
                                 <p class="note">@noteText</p>
                                 <footer>
-                                    <a class="btn sm" asp-controller="Workout" asp-action="Edit" asp-route-id="@w.Id" asp-route-trainingPlanId="@Model.Id">Edit notes</a>
+                                    <a class="btn sm" asp-controller="Workout" asp-action="Edit" asp-route-id="@workout.Id" asp-route-trainingPlanId="@Model.Id">Edit notes</a>
                                 </footer>
                             </article>
                         }
                         else
                         {
-                            bool isToday = w.Date.Date == DateTime.Today;
-                            int plW = Math.Min(100, Math.Max(15, (int)Math.Round((double)w.PlannedDistance / 2000.0 * 100)));
+                            bool isToday = workout.Date.Date == DateTime.Today;
+                            int plannedDistancePercent = Math.Min(100, Math.Max(15, (int)Math.Round((double)workout.PlannedDistance / 2000.0 * 100)));
 
                             <article class="wk @(isToday ? "tdy" : "")">
                                 <div class="row sp">
                                     <div class="dt">
-                                        <b style="font-size:24px">@w.Date.ToString(DateTimeFormat)</b>
+                                        <b style="font-size:24px">@workout.Date.ToString(DateTimeFormat)</b>
                                         @if (isToday)
                                         {
                                             <span>Today</span>
@@ -159,17 +160,17 @@
                                 <div class="stack" style="gap:8px">
                                     <div class="kv">
                                         <span>Planned</span>
-                                        <b>@w.PlannedDistance m · @w.PlannedDuration min</b>
+                                        <b>@workout.PlannedDistance m · @workout.PlannedDuration min</b>
                                     </div>
-                                    <div class="bar pl"><i style="--w:@plW"></i></div>
+                                    <div class="bar pl"><i style="--w:@plannedDistancePercent"></i></div>
                                 </div>
-                                <p class="note">@(string.IsNullOrWhiteSpace(w.Notes) ? "Steady pace." : w.Notes)</p>
+                                <p class="note">@(string.IsNullOrWhiteSpace(workout.Notes) ? "Steady pace." : workout.Notes)</p>
                                 <footer>
-                                    <a class="btn sm go" asp-controller="Workout" asp-action="Complete" asp-route-id="@w.Id" asp-route-trainingPlanId="@Model.Id">Complete</a>
-                                    <form asp-controller="Workout" asp-action="Skip" asp-route-id="@w.Id" asp-route-trainingPlanId="@Model.Id" method="post" style="display:inline;margin:0;">
+                                    <a class="btn sm go" asp-controller="Workout" asp-action="Complete" asp-route-id="@workout.Id" asp-route-trainingPlanId="@Model.Id">Complete</a>
+                                    <form asp-controller="Workout" asp-action="Skip" asp-route-id="@workout.Id" asp-route-trainingPlanId="@Model.Id" method="post" style="display:inline;margin:0;">
                                         <button class="btn sm sk" type="submit">Skip</button>
                                     </form>
-                                    <a class="btn sm" asp-controller="Workout" asp-action="Edit" asp-route-id="@w.Id" asp-route-trainingPlanId="@Model.Id">Edit</a>
+                                    <a class="btn sm" asp-controller="Workout" asp-action="Edit" asp-route-id="@workout.Id" asp-route-trainingPlanId="@Model.Id">Edit</a>
                                 </footer>
                             </article>
                         }
@@ -182,7 +183,7 @@
     <section class="card row sp" style="display:flex">
         <div>
             <h3>Remove this plan</h3>
-            <small>All @totalCount workouts and results are deleted with it.</small>
+            <small>All @totalWorkoutsCount workouts and results are deleted with it.</small>
         </div>
         <button class="btn dg" type="button" popovertarget="rm">Remove</button>
         <div class="pop" id="rm" popover="">

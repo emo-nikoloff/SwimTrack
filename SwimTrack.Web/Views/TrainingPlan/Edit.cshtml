@@ -1,6 +1,7 @@
 @model TrainingPlanInputModel
 @{
     ViewData["Title"] = "Edit training plan";
+
     List<WorkoutInputModel> trainingPlanWorkouts = Model.Workouts;
     object? planId = ViewContext.RouteData.Values["id"];
 }

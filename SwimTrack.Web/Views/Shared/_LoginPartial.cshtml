@@ -5,8 +5,8 @@
 
 @if (SignInManager.IsSignedIn(User))
 {
-    string rawName = UserManager.GetUserName(User) ?? User.Identity?.Name ?? "swimmer";
-    string displayName = rawName.Contains("@") ? rawName.Split('@')[0] : rawName;
+    string userName = UserManager.GetUserName(User) ?? User.Identity?.Name ?? "swimmer";
+    string displayName = userName.Contains("@") ? userName.Split('@')[0] : userName;
 
     <span>Hello, @displayName</span>
     <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post" style="display:inline;margin:0;">
