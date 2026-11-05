@@ -99,7 +99,7 @@ public class WorkoutService : IWorkoutService
             return null;
         }
 
-        if (requestedWorkout.Status != WorkoutStatus.Planned)
+        if (requestedWorkout.Status != WorkoutStatus.Planned || requestedWorkout.Date.Date > DateTime.Today)
         {
             return null;
         }
@@ -125,7 +125,7 @@ public class WorkoutService : IWorkoutService
             return false;
         }
 
-        if (requestedWorkout.Status != WorkoutStatus.Planned)
+        if (requestedWorkout.Status != WorkoutStatus.Planned || requestedWorkout.Date.Date > DateTime.Today)
         {
             return false;
         }
@@ -173,7 +173,7 @@ public class WorkoutService : IWorkoutService
             return false;
         }
 
-        if (requestedWorkout.Status != WorkoutStatus.Planned)
+        if (requestedWorkout.Status != WorkoutStatus.Planned || requestedWorkout.Date.Date > DateTime.Today)
         {
             return false;
         }

@@ -166,10 +166,13 @@
                                 </div>
                                 <p class="note">@(string.IsNullOrWhiteSpace(workout.Notes) ? "Steady pace." : workout.Notes)</p>
                                 <footer>
-                                    <a class="btn sm go" asp-controller="Workout" asp-action="Complete" asp-route-id="@workout.Id" asp-route-trainingPlanId="@Model.Id">Complete</a>
-                                    <form asp-controller="Workout" asp-action="Skip" asp-route-id="@workout.Id" asp-route-trainingPlanId="@Model.Id" method="post" style="display:inline;margin:0;">
-                                        <button class="btn sm sk" type="submit">Skip</button>
-                                    </form>
+                                    @if (workout.Date.Date <= DateTime.Today)
+                                    {
+                                        <a class="btn sm go" asp-controller="Workout" asp-action="Complete" asp-route-id="@workout.Id" asp-route-trainingPlanId="@Model.Id">Complete</a>
+                                        <form asp-controller="Workout" asp-action="Skip" asp-route-id="@workout.Id" asp-route-trainingPlanId="@Model.Id" method="post" style="display:inline;margin:0;">
+                                            <button class="btn sm sk" type="submit">Skip</button>
+                                        </form>
+                                    }
                                     <a class="btn sm" asp-controller="Workout" asp-action="Edit" asp-route-id="@workout.Id" asp-route-trainingPlanId="@Model.Id">Edit</a>
                                 </footer>
                             </article>
