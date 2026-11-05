@@ -145,17 +145,32 @@
                 int trainingPlanSkipped = workouts.Count(w => w.Status == WorkoutStatus.Skipped);
                 int trainingPlanPlanned = workouts.Count(w => w.Status == WorkoutStatus.Planned);
 
-                string trainingPlanStatusClass = "bd";
-                string trainingPlanStatusText = "Finished";
-                if (trainingPlan.StartDate.Date <= DateTime.Today && trainingPlan.EndDate.Date >= DateTime.Today)
+                bool hasWorkouts = workouts.Any();
+                bool allWorkoutsResolved = hasWorkouts && trainingPlanPlanned == 0;
+                bool isPlanExpired = trainingPlan.EndDate.Date < DateTime.Today;
+
+                string trainingPlanStatusClass;
+                string trainingPlanStatusText;
+
+                if (allWorkoutsResolved)
                 {
-                    trainingPlanStatusClass = "bd ac";
-                    trainingPlanStatusText = "Active";
+                    trainingPlanStatusClass = "bd dn";
+                    trainingPlanStatusText = "Finished";
+                }
+                else if (isPlanExpired)
+                {
+                    trainingPlanStatusClass = "bd";
+                    trainingPlanStatusText = "Expired";
                 }
                 else if (trainingPlan.StartDate.Date > DateTime.Today)
                 {
                     trainingPlanStatusClass = "bd";
                     trainingPlanStatusText = "Upcoming";
+                }
+                else
+                {
+                    trainingPlanStatusClass = "bd ac";
+                    trainingPlanStatusText = "Active";
                 }
 
                 <article class="card">
