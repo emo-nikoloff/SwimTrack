@@ -131,8 +131,6 @@ public class WorkoutService : IWorkoutService
             return false;
         }
 
-        requestedWorkout.Status = WorkoutStatus.Completed;
-
         bool isWorkoutCompletionDateValid = DateValidator.ValidateWorkoutCompletionDate(
             workoutResultInputModel.CompletedAt,
             requestedWorkout.Date);
@@ -147,6 +145,8 @@ public class WorkoutService : IWorkoutService
                 null,
                 null);
         }
+
+        requestedWorkout.Status = WorkoutStatus.Completed;
 
         WorkoutResult workoutResult = new()
         {
