@@ -311,8 +311,7 @@ a.text-muted:hover {
     0 3px 0 var(--color-teal),
     0 4px 0 var(--color-teal),
     0 5px 0 var(--color-teal),
-    0 6px 0 var(--color-teal),
-    0 7px 0 var(--color-teal);
+    0 6px 0 var(--color-teal);
 }
 
 .button--warning {
@@ -328,8 +327,7 @@ a.text-muted:hover {
     0 3px 0 var(--color-danger),
     0 4px 0 var(--color-danger),
     0 5px 0 var(--color-danger),
-    0 6px 0 var(--color-danger),
-    0 7px 0 var(--color-danger);
+    0 6px 0 var(--color-danger);
 }
 
 .button--dark {
@@ -345,8 +343,7 @@ a.text-muted:hover {
     0 3px 0 #1D3D5B,
     0 4px 0 #1D3D5B,
     0 5px 0 #1D3D5B,
-    0 6px 0 #1D3D5B,
-    0 7px 0 #1D3D5B;
+    0 6px 0 #1D3D5B;
 }
 
 .button--danger {
