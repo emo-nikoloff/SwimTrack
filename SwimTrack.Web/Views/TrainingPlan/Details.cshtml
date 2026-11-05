@@ -117,9 +117,13 @@
                             int actualDistancePercent = Math.Min(100, Math.Max(15, (int)Math.Round((double)actualDistance / 2000.0 * 100)));
 
                             <article class="wk">
-                                <div class="row sp">
-                                    <div class="dt">
+                                <div class="row sp" style="align-items:flex-start">
+                                    <div>
                                         <b style="font-size:24px">@workout.Date.ToString(DateTimeFormat)</b>
+                                        @if (workout.Result != null && workout.Result.CompletedAt.Date != workout.Date.Date)
+                                        {
+                                            <small class="mut" style="display:block;margin-top:2px">Swum @workout.Result.CompletedAt.ToString(DateTimeFormat)</small>
+                                        }
                                     </div>
                                     <span class="bd dn">Completed</span>
                                 </div>
