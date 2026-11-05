@@ -58,112 +58,112 @@
         .Sum(x => x.Workout.Result?.ActualDistance ?? x.Workout.PlannedDistance);
 }
 
-<main class="wrap pg">
+<main class="container page-content">
     <div>
-        <p class="eb">@DateTime.Today.ToString(DateTimeFormat)</p>
+        <p class="eyebrow-heading">@DateTime.Today.ToString(DateTimeFormat)</p>
         <h1 style="font-size:56px">Good to see you, @displayName.</h1>
     </div>
 
-    <section class="dash">
+    <section class="dashboard-grid">
         @if (displaySession != null)
         {
-            <article class="next">
-                <p class="eb">@sessionPrefix · @displaySession.Plan.Name</p>
-                <div class="big">
-                    <span class="val"><b>@displaySession.Workout.PlannedDistance</b><span>m</span></span>
-                    <span class="val"><b>@displaySession.Workout.PlannedDuration</b><span>min</span></span>
+            <article class="dashboard-hero-card">
+                <p class="eyebrow-heading">@sessionPrefix · @displaySession.Plan.Name</p>
+                <div class="metric-large">
+                    <span class="metric-large-value"><b>@displaySession.Workout.PlannedDistance</b><span>m</span></span>
+                    <span class="metric-large-value"><b>@displaySession.Workout.PlannedDuration</b><span>min</span></span>
                 </div>
                 @if (!string.IsNullOrWhiteSpace(displaySession.Workout.Notes))
                 {
-                    <p class="q">“@displaySession.Workout.Notes”</p>
+                    <p class="dashboard-card-quote">“@displaySession.Workout.Notes”</p>
                 }
                 else
                 {
-                    <p class="q">“Stay consistent. Enjoy the swim.”</p>
+                    <p class="dashboard-card-quote">“Stay consistent. Enjoy the swim.”</p>
                 }
-                <div class="row">
+                <div class="flex-row">
                     @if (displaySession.Workout.Date.Date <= DateTime.Today)
                     {
-                        <a class="btn go" asp-controller="Workout" asp-action="Complete" asp-route-id="@displaySession.Workout.Id" asp-route-trainingPlanId="@displaySession.Plan.Id">Complete</a>
+                        <a class="button button--primary" asp-controller="Workout" asp-action="Complete" asp-route-id="@displaySession.Workout.Id" asp-route-trainingPlanId="@displaySession.Plan.Id">Complete</a>
                         <form asp-controller="Workout" asp-action="Skip" asp-route-id="@displaySession.Workout.Id" asp-route-trainingPlanId="@displaySession.Plan.Id" method="post" style="display:inline;margin:0;">
-                            <button class="btn sk" type="submit">Skip</button>
+                            <button class="button button--warning" type="submit">Skip</button>
                         </form>
                     }
-                    <a class="btn" asp-controller="Workout" asp-action="Edit" asp-route-id="@displaySession.Workout.Id" asp-route-trainingPlanId="@displaySession.Plan.Id">Edit</a>
+                    <a class="button" asp-controller="Workout" asp-action="Edit" asp-route-id="@displaySession.Workout.Id" asp-route-trainingPlanId="@displaySession.Plan.Id">Edit</a>
                 </div>
             </article>
         }
         else if (!hasUserPlans)
         {
-            <article class="next">
-                <p class="eb">Training Dashboard</p>
-                <div class="big">
+            <article class="dashboard-hero-card">
+                <p class="eyebrow-heading">Training Dashboard</p>
+                <div class="metric-large">
                     <span>Ready to swim?</span>
                 </div>
-                <p class="q">Create a training plan to start scheduling and logging your sessions.</p>
-                <div class="row">
-                    <a class="btn go" asp-controller="TrainingPlan" asp-action="Create">Create training plan</a>
+                <p class="dashboard-card-quote">Create a training plan to start scheduling and logging your sessions.</p>
+                <div class="flex-row">
+                    <a class="button button--primary" asp-controller="TrainingPlan" asp-action="Create">Create training plan</a>
                 </div>
             </article>
         }
         else if (trainingPlanWithoutWorkouts != null)
         {
-            <article class="next">
-                <p class="eb">Plan setup · @trainingPlanWithoutWorkouts.Name</p>
-                <div class="big">
+            <article class="dashboard-hero-card">
+                <p class="eyebrow-heading">Plan setup · @trainingPlanWithoutWorkouts.Name</p>
+                <div class="metric-large">
                     <span>Add workouts</span>
                 </div>
-                <p class="q">“@trainingPlanWithoutWorkouts.Name” has no workouts scheduled yet.</p>
-                <div class="row">
-                    <a class="btn go" asp-controller="TrainingPlan" asp-action="Edit" asp-route-id="@trainingPlanWithoutWorkouts.Id">Add workouts</a>
-                    <a class="btn" asp-controller="TrainingPlan" asp-action="Details" asp-route-id="@trainingPlanWithoutWorkouts.Id">Details</a>
+                <p class="dashboard-card-quote">“@trainingPlanWithoutWorkouts.Name” has no workouts scheduled yet.</p>
+                <div class="flex-row">
+                    <a class="button button--primary" asp-controller="TrainingPlan" asp-action="Edit" asp-route-id="@trainingPlanWithoutWorkouts.Id">Add workouts</a>
+                    <a class="button" asp-controller="TrainingPlan" asp-action="Details" asp-route-id="@trainingPlanWithoutWorkouts.Id">Details</a>
                 </div>
             </article>
         }
         else
         {
-            <article class="next">
-                <p class="eb">Training Dashboard</p>
-                <div class="big">
+            <article class="dashboard-hero-card">
+                <p class="eyebrow-heading">Training Dashboard</p>
+                <div class="metric-large">
                     <span>All caught up! 🎉</span>
                 </div>
-                <p class="q">You’ve completed all scheduled workouts. Rest up or start a new training plan.</p>
-                <div class="row">
-                    <a class="btn go" asp-controller="TrainingPlan" asp-action="Create">Start new plan</a>
+                <p class="dashboard-card-quote">You’ve completed all scheduled workouts. Rest up or start a new training plan.</p>
+                <div class="flex-row">
+                    <a class="button button--primary" asp-controller="TrainingPlan" asp-action="Create">Start new plan</a>
                 </div>
             </article>
         }
 
-        <aside class="card ctr">
-            <div class="ring" style="--p:@completionPercent"><b>@completionPercent%</b></div>
+        <aside class="card card--center">
+            <div class="progress-ring" style="--p:@completionPercent"><b>@completionPercent%</b></div>
             <strong>Completion</strong>
             <small>@totalCompletedWorkouts done · @totalSkippedWorkouts skipped of @dueWorkouts due</small>
         </aside>
 
-        <aside class="card ctr">
-            <span class="n">@totalDistanceSwum</span>
+        <aside class="card card--center">
+            <span class="stat-number">@totalDistanceSwum</span>
             <strong>metres swum</strong>
             <small>@totalCompletedWorkouts completed sessions</small>
         </aside>
     </section>
 
-    <div class="row sp">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-12">
         <h2>Your plans</h2>
         @if (hasUserPlans)
         {
-            <a class="btn dk" asp-controller="TrainingPlan" asp-action="Create">+ New plan</a>
+            <a class="button button--dark" asp-controller="TrainingPlan" asp-action="Create">+ New plan</a>
         }
     </div>
 
     @if (!hasUserPlans)
     {
-        <div class="card ctr">
-            <p class="mut">No training plans yet. Create your first plan above to get started.</p>
+        <div class="card card--center">
+            <p class="text-muted">No training plans yet. Create your first plan above to get started.</p>
         </div>
     }
     else
     {
-        <section class="g2">
+        <section class="grid-2-columns">
             @foreach (TrainingPlanViewModel trainingPlan in Model)
             {
                 List<WorkoutViewModel>? workouts = trainingPlan.Workouts.OrderBy(w => w.Date).ToList();
@@ -180,30 +180,30 @@
 
                 if (allWorkoutsResolved)
                 {
-                    trainingPlanStatusClass = "bd dn";
+                    trainingPlanStatusClass = "badge badge--completed";
                     trainingPlanStatusText = "Finished";
                 }
                 else if (isPlanExpired)
                 {
-                    trainingPlanStatusClass = "bd";
+                    trainingPlanStatusClass = "badge";
                     trainingPlanStatusText = "Expired";
                 }
                 else if (trainingPlan.StartDate.Date > DateTime.Today)
                 {
-                    trainingPlanStatusClass = "bd";
+                    trainingPlanStatusClass = "badge";
                     trainingPlanStatusText = "Upcoming";
                 }
                 else
                 {
-                    trainingPlanStatusClass = "bd ac";
+                    trainingPlanStatusClass = "badge badge--active";
                     trainingPlanStatusText = "Active";
                 }
 
                 <article class="card">
-                    <div class="row sp">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-12">
                         <div>
                             <h3>@trainingPlan.Name</h3>
-                            <p class="mut">@trainingPlan.StartDate.ToString(DateTimeFormat) – @trainingPlan.EndDate.ToString(DateTimeFormat)</p>
+                            <p class="text-muted">@trainingPlan.StartDate.ToString(DateTimeFormat) – @trainingPlan.EndDate.ToString(DateTimeFormat)</p>
                         </div>
                         <span class="@trainingPlanStatusClass">@trainingPlanStatusText</span>
                     </div>
@@ -214,30 +214,30 @@
                     }
                     else
                     {
-                        <p class="mut">No goal specified.</p>
+                        <p class="text-muted">No goal specified.</p>
                     }
 
-                    <div class="strip" role="img" aria-label="@trainingPlanCompleted completed, @trainingPlanSkipped skipped, @trainingPlanPlanned planned">
+                    <div class="workout-strip" role="img" aria-label="@trainingPlanCompleted completed, @trainingPlanSkipped skipped, @trainingPlanPlanned planned">
                         @foreach (WorkoutViewModel workout in workouts)
                         {
                             if (workout.Status == WorkoutStatus.Completed)
                             {
-                                <i class="d"></i>
+                                <i class="workout-strip-item workout-strip-item--completed"></i>
                             }
                             else if (workout.Status == WorkoutStatus.Skipped)
                             {
-                                <i class="s"></i>
+                                <i class="workout-strip-item workout-strip-item--skipped"></i>
                             }
                             else
                             {
-                                <i></i>
+                                <i class="workout-strip-item"></i>
                             }
                         }
                     </div>
 
-                    <div class="row sp">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-12">
                         <small>@trainingPlanCompleted of @workouts.Count sessions done</small>
-                        <a class="btn sm" asp-controller="TrainingPlan" asp-action="Details" asp-route-id="@trainingPlan.Id">Details</a>
+                        <a class="button button--small" asp-controller="TrainingPlan" asp-action="Details" asp-route-id="@trainingPlan.Id">Details</a>
                     </div>
                 </article>
             }

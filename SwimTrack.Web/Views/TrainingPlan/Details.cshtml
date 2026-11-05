@@ -21,56 +21,56 @@
         .ToList();
 }
 
-<main class="wrap pg">
-    <a class="mut" asp-controller="TrainingPlan" asp-action="All">← Back to plans</a>
+<main class="container page-content">
+    <a class="text-muted" asp-controller="TrainingPlan" asp-action="All">← Back to plans</a>
 
-    <section class="row sp" style="gap:32px;align-items:flex-start">
+    <section class="d-flex flex-wrap align-items-start justify-content-between gap-32">
         <div class="stack" style="max-width:640px">
-            <p class="eb">Training plan</p>
+            <p class="eyebrow-heading">Training plan</p>
             <h1 style="font-size:64px">@Model.Name</h1>
-            <p class="mut">@Model.StartDate.ToString(DateTimeFormat) – @Model.EndDate.ToString(DateTimeFormat) · @totalWorkoutsCount workouts</p>
+            <p class="text-muted">@Model.StartDate.ToString(DateTimeFormat) – @Model.EndDate.ToString(DateTimeFormat) · @totalWorkoutsCount workouts</p>
             @if (!string.IsNullOrWhiteSpace(Model.Goal))
             {
-                <blockquote class="goal">“@Model.Goal”</blockquote>
+                <blockquote class="plan-goal-card">“@Model.Goal”</blockquote>
             }
-            <div class="row">
-                <a class="btn dk" asp-controller="TrainingPlan" asp-action="Edit" asp-route-id="@Model.Id">Edit plan & workouts</a>
+            <div class="flex-row">
+                <a class="button button--dark" asp-controller="TrainingPlan" asp-action="Edit" asp-route-id="@Model.Id">Edit plan & workouts</a>
             </div>
         </div>
 
         <div class="card" style="grid-auto-flow:column;gap:32px;align-items:center">
-            <div class="ring" style="--p:@doneWorkoutsPercent"><b>@doneWorkoutsCount/@totalWorkoutsCount</b></div>
+            <div class="progress-ring" style="--p:@doneWorkoutsPercent"><b>@doneWorkoutsCount/@totalWorkoutsCount</b></div>
             <div class="stack" style="gap:6px">
-                <span class="n">@totalSwumDistance m</span>
+                <span class="stat-number">@totalSwumDistance m</span>
                 <small>swum so far</small>
                 <small>@skippedWorkoutsCount skipped · @plannedWorkoutsCount to go</small>
             </div>
         </div>
     </section>
 
-    <div class="strip" role="img" aria-label="@doneWorkoutsCount completed, @skippedWorkoutsCount skipped, @plannedWorkoutsCount planned">
+    <div class="workout-strip" role="img" aria-label="@doneWorkoutsCount completed, @skippedWorkoutsCount skipped, @plannedWorkoutsCount planned">
         @foreach (WorkoutViewModel workout in sortedWorkouts)
         {
             if (workout.Status == WorkoutStatus.Completed)
             {
-                <i class="d"></i>
+                <i class="workout-strip-item workout-strip-item--completed"></i>
             }
             else if (workout.Status == WorkoutStatus.Skipped)
             {
-                <i class="s"></i>
+                <i class="workout-strip-item workout-strip-item--skipped"></i>
             }
             else
             {
-                <i></i>
+                <i class="workout-strip-item"></i>
             }
         }
     </div>
 
     @if (!sortedWorkouts.Any())
     {
-        <div class="card ctr">
-            <p class="mut">No workouts planned yet.</p>
-            <a class="btn sm go" asp-action="Edit" asp-route-id="@Model.Id">Add workouts to plan</a>
+        <div class="card card--center">
+            <p class="text-muted">No workouts planned yet.</p>
+            <a class="button button--small button--primary" asp-action="Edit" asp-route-id="@Model.Id">Add workouts to plan</a>
         </div>
     }
     else
@@ -81,28 +81,28 @@
             DateTime weekEnd = week.Key.AddDays(6);
 
             <section class="stack">
-                <div class="wl eb">Week @weekNumber · @week.Key.ToString(DateTimeFormat) – @weekEnd.ToString(DateTimeFormat)</div>
-                <div class="g3">
+                <div class="week-divider eyebrow-heading">Week @weekNumber · @week.Key.ToString(DateTimeFormat) – @weekEnd.ToString(DateTimeFormat)</div>
+                <div class="grid-3-columns">
                     @foreach (WorkoutViewModel workout in week)
                     {
                         if (workout.Status == WorkoutStatus.Skipped)
                         {
-                            <article class="wk sk">
-                                <div class="row sp">
-                                    <div class="dt">
+                            <article class="workout-card workout-card--skipped">
+                                <div class="d-flex align-items-center justify-content-between gap-12">
+                                    <div class="workout-card-date">
                                         <b style="font-size:24px">@workout.Date.ToString(DateTimeFormat)</b>
                                     </div>
-                                    <span class="bd sk">Skipped</span>
+                                    <span class="badge badge--skipped">Skipped</span>
                                 </div>
-                                <div class="kv">
+                                <div class="key-value-row">
                                     <span>Planned</span>
                                     <b>@workout.PlannedDistance m · @workout.PlannedDuration min</b>
                                 </div>
-                                <p class="note">@(string.IsNullOrWhiteSpace(workout.Notes) ? "No notes." : workout.Notes)</p>
+                                <p class="workout-card-note">@(string.IsNullOrWhiteSpace(workout.Notes) ? "No notes." : workout.Notes)</p>
                                 <footer>
-                                    <a class="btn sm" asp-controller="Workout" asp-action="Edit" asp-route-id="@workout.Id" asp-route-trainingPlanId="@Model.Id">Edit notes</a>
+                                    <a class="button button--small" asp-controller="Workout" asp-action="Edit" asp-route-id="@workout.Id" asp-route-trainingPlanId="@Model.Id">Edit notes</a>
                                     <form asp-controller="Workout" asp-action="PlanAgain" asp-route-id="@workout.Id" asp-route-trainingPlanId="@Model.Id" method="post" style="display:inline;margin:0;">
-                                        <button class="btn sm go" type="submit">Plan again</button>
+                                        <button class="button button--small button--primary" type="submit">Plan again</button>
                                     </form>
                                 </footer>
                             </article>
@@ -116,32 +116,32 @@
                             int plannedDistancePercent = Math.Min(100, Math.Max(15, (int)Math.Round((double)workout.PlannedDistance / 2000.0 * 100)));
                             int actualDistancePercent = Math.Min(100, Math.Max(15, (int)Math.Round((double)actualDistance / 2000.0 * 100)));
 
-                            <article class="wk">
-                                <div class="row sp" style="align-items:flex-start">
+                            <article class="workout-card">
+                                <div class="d-flex align-items-start justify-content-between gap-12">
                                     <div>
                                         <b style="font-size:24px">@workout.Date.ToString(DateTimeFormat)</b>
                                         @if (workout.Result != null && workout.Result.CompletedAt.Date != workout.Date.Date)
                                         {
-                                            <small class="mut" style="display:block;margin-top:2px">Swum @workout.Result.CompletedAt.ToString(DateTimeFormat)</small>
+                                            <small class="text-muted" style="display:block;margin-top:2px">Swum @workout.Result.CompletedAt.ToString(DateTimeFormat)</small>
                                         }
                                     </div>
-                                    <span class="bd dn">Completed</span>
+                                    <span class="badge badge--completed">Completed</span>
                                 </div>
                                 <div class="stack" style="gap:8px">
-                                    <div class="kv">
+                                    <div class="key-value-row">
                                         <span>Planned</span>
                                         <b>@workout.PlannedDistance m · @workout.PlannedDuration min</b>
                                     </div>
-                                    <div class="bar pl"><i style="--w:@plannedDistancePercent"></i></div>
-                                    <div class="kv">
+                                    <div class="progress-bar progress-bar--planned"><i style="--w:@plannedDistancePercent"></i></div>
+                                    <div class="key-value-row">
                                         <span>Actual</span>
                                         <b>@actualDistance m · @actualDuration min</b>
                                     </div>
-                                    <div class="bar"><i style="--w:@actualDistancePercent"></i></div>
+                                    <div class="progress-bar"><i style="--w:@actualDistancePercent"></i></div>
                                 </div>
-                                <p class="note">@noteText</p>
+                                <p class="workout-card-note">@noteText</p>
                                 <footer>
-                                    <a class="btn sm" asp-controller="Workout" asp-action="Edit" asp-route-id="@workout.Id" asp-route-trainingPlanId="@Model.Id">Edit notes</a>
+                                    <a class="button button--small" asp-controller="Workout" asp-action="Edit" asp-route-id="@workout.Id" asp-route-trainingPlanId="@Model.Id">Edit notes</a>
                                 </footer>
                             </article>
                         }
@@ -150,34 +150,34 @@
                             bool isToday = workout.Date.Date == DateTime.Today;
                             int plannedDistancePercent = Math.Min(100, Math.Max(15, (int)Math.Round((double)workout.PlannedDistance / 2000.0 * 100)));
 
-                            <article class="wk @(isToday ? "tdy" : "")">
-                                <div class="row sp">
-                                    <div class="dt">
+                            <article class="workout-card @(isToday ? "workout-card--today" : "")">
+                                <div class="d-flex align-items-center justify-content-between gap-12">
+                                    <div class="workout-card-date">
                                         <b style="font-size:24px">@workout.Date.ToString(DateTimeFormat)</b>
                                         @if (isToday)
                                         {
                                             <span>Today</span>
                                         }
                                     </div>
-                                    <span class="bd">Planned</span>
+                                    <span class="badge">Planned</span>
                                 </div>
                                 <div class="stack" style="gap:8px">
-                                    <div class="kv">
+                                    <div class="key-value-row">
                                         <span>Planned</span>
                                         <b>@workout.PlannedDistance m · @workout.PlannedDuration min</b>
                                     </div>
-                                    <div class="bar pl"><i style="--w:@plannedDistancePercent"></i></div>
+                                    <div class="progress-bar progress-bar--planned"><i style="--w:@plannedDistancePercent"></i></div>
                                 </div>
-                                <p class="note">@(string.IsNullOrWhiteSpace(workout.Notes) ? "Steady pace." : workout.Notes)</p>
+                                <p class="workout-card-note">@(string.IsNullOrWhiteSpace(workout.Notes) ? "Steady pace." : workout.Notes)</p>
                                 <footer>
                                     @if (workout.Date.Date <= DateTime.Today)
                                     {
-                                        <a class="btn sm go" asp-controller="Workout" asp-action="Complete" asp-route-id="@workout.Id" asp-route-trainingPlanId="@Model.Id">Complete</a>
+                                        <a class="button button--small button--primary" asp-controller="Workout" asp-action="Complete" asp-route-id="@workout.Id" asp-route-trainingPlanId="@Model.Id">Complete</a>
                                         <form asp-controller="Workout" asp-action="Skip" asp-route-id="@workout.Id" asp-route-trainingPlanId="@Model.Id" method="post" style="display:inline;margin:0;">
-                                            <button class="btn sm sk" type="submit">Skip</button>
+                                            <button class="button button--small button--warning" type="submit">Skip</button>
                                         </form>
                                     }
-                                    <a class="btn sm" asp-controller="Workout" asp-action="Edit" asp-route-id="@workout.Id" asp-route-trainingPlanId="@Model.Id">Edit</a>
+                                    <a class="button button--small" asp-controller="Workout" asp-action="Edit" asp-route-id="@workout.Id" asp-route-trainingPlanId="@Model.Id">Edit</a>
                                 </footer>
                             </article>
                         }
@@ -187,20 +187,20 @@
         }
     }
 
-    <section class="card row sp" style="display:flex">
+    <section class="card card--horizontal">
         <div>
             <h3>Remove this plan</h3>
             <small>All @totalWorkoutsCount workouts and results are deleted with it.</small>
         </div>
-        <button class="btn dg" type="button" popovertarget="rm">Remove</button>
-        <div class="pop" id="rm" popover="">
+        <button class="button button--danger" type="button" popovertarget="rm">Remove</button>
+        <div class="popover-dialog" id="rm" popover="">
             <h3>Remove “@Model.Name”?</h3>
-            <p class="mut" style="margin:10px 0 20px">This cannot be undone.</p>
-            <div class="row">
+            <p class="text-muted" style="margin:10px 0 20px">This cannot be undone.</p>
+            <div class="flex-row">
                 <form asp-controller="TrainingPlan" asp-action="Remove" asp-route-id="@Model.Id" method="post" style="display:inline;margin:0;">
-                    <button class="btn dg" type="submit">Yes, remove</button>
+                    <button class="button button--danger" type="submit">Yes, remove</button>
                 </form>
-                <button class="btn" type="button" popovertarget="rm" popovertargetaction="hide">Keep it</button>
+                <button class="button" type="button" popovertarget="rm" popovertargetaction="hide">Keep it</button>
             </div>
         </div>
     </section>

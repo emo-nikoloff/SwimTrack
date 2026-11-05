@@ -5,9 +5,9 @@
     List<WorkoutInputModel> trainingPlanWorkouts = Model.Workouts;
 }
 
-<main class="wrap pg">
+<main class="container page-content">
     <div>
-        <p class="eb">Start your journey</p>
+        <p class="eyebrow-heading">Start your journey</p>
         <h1 style="font-size:56px">Create training plan</h1>
     </div>
 
@@ -15,22 +15,22 @@
         <div class="stack" style="gap:32px;max-width:880px">
             <partial name="_TrainingPlanInputPartial" model="Model" />
 
-            <div class="row sp">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-12">
                 <h2>Workouts</h2>
                 <button type="submit"
                         asp-controller="TrainingPlan"
                         asp-action="Create"
                         asp-route-workoutAction="add"
                         formnovalidate
-                        class="btn">
+                        class="button">
                     + Add workout
                 </button>
             </div>
 
             @if (!trainingPlanWorkouts.Any())
             {
-                <div class="card ctr">
-                    <p class="mut">No workouts added yet. Click "+ Add workout" to plan sessions.</p>
+                <div class="card card--center">
+                    <p class="text-muted">No workouts added yet. Click "+ Add workout" to plan sessions.</p>
                 </div>
             }
             else
@@ -42,9 +42,9 @@
                     workoutViewData.TemplateInfo.HtmlFieldPrefix = $"Workouts[{i}]";
 
                     <div class="card stack" style="gap:16px">
-                        <div class="row sp">
-                            <div class="row" style="gap:10px">
-                                <span class="chip">@(i + 1)</span>
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-12">
+                            <div class="flex-row" style="gap:10px">
+                                <span class="index-chip">@(i + 1)</span>
                                 <b>Workout @(i + 1)</b>
                             </div>
                             <button type="submit"
@@ -53,7 +53,7 @@
                                     asp-route-workoutAction="remove"
                                     asp-route-workoutIndex="@i"
                                     formnovalidate
-                                    class="btn sm dg">
+                                    class="button button--small button--danger">
                                 Remove
                             </button>
                         </div>
@@ -63,11 +63,11 @@
                 }
             }
 
-            <div asp-validation-summary="ModelOnly" class="er"></div>
+            <div asp-validation-summary="ModelOnly" class="field-validation-error"></div>
 
-            <div class="row">
-                <button class="btn go" type="submit">Save</button>
-                <a class="btn" asp-controller="TrainingPlan" asp-action="All">Cancel</a>
+            <div class="flex-row">
+                <button class="button button--primary" type="submit">Save</button>
+                <a class="button" asp-controller="TrainingPlan" asp-action="All">Cancel</a>
             </div>
         </div>
     </form>
