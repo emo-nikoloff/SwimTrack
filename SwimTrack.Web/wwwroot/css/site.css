@@ -402,6 +402,22 @@ a.text-muted:hover {
 
 .badge--active {
   background-color: var(--color-aqua);
+  color: var(--color-ink);
+}
+
+.badge--upcoming {
+  background-color: #FBBF24;
+  color: var(--color-ink);
+}
+
+.badge--expired {
+  background-color: var(--color-danger);
+  color: #fff;
+}
+
+.badge--planned {
+  background-color: #fff;
+  color: var(--color-ink);
 }
 
 .badge--completed {
@@ -834,6 +850,7 @@ a.text-muted:hover {
    6. RESPONSIVE STYLES
    ========================================================================== */
 @media (max-width: 860px) {
+
   .grid-2-columns,
   .grid-3-columns,
   .hero-section,

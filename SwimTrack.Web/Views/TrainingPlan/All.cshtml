@@ -185,12 +185,12 @@
                 }
                 else if (isPlanExpired)
                 {
-                    trainingPlanStatusClass = "badge";
+                    trainingPlanStatusClass = "badge badge--expired";
                     trainingPlanStatusText = "Expired";
                 }
                 else if (trainingPlan.StartDate.Date > DateTime.Today)
                 {
-                    trainingPlanStatusClass = "badge";
+                    trainingPlanStatusClass = "badge badge--upcoming";
                     trainingPlanStatusText = "Upcoming";
                 }
                 else
