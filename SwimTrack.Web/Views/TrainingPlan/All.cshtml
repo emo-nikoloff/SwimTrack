@@ -12,15 +12,38 @@
     var todaySession = allTrainingPlanWorkouts
         .FirstOrDefault(x => x.Workout.Date.Date == DateTime.Today && x.Workout.Status == WorkoutStatus.Planned);
 
-    var upcomingSession = todaySession ?? allTrainingPlanWorkouts
-        .Where(x => x.Workout.Status == WorkoutStatus.Planned && x.Workout.Date >= DateTime.Today)
+    var overdueSession = todaySession != null ? null : allTrainingPlanWorkouts
+        .Where(x => x.Workout.Status == WorkoutStatus.Planned && x.Workout.Date.Date < DateTime.Today)
         .OrderBy(x => x.Workout.Date)
         .FirstOrDefault();
 
-    var displaySession = upcomingSession ?? allTrainingPlanWorkouts
-        .Where(x => x.Workout.Status == WorkoutStatus.Planned)
+    var upcomingSession = (todaySession ?? overdueSession) != null ? null : allTrainingPlanWorkouts
+        .Where(x => x.Workout.Status == WorkoutStatus.Planned && x.Workout.Date.Date > DateTime.Today)
         .OrderBy(x => x.Workout.Date)
         .FirstOrDefault();
+
+    var displaySession = todaySession ?? overdueSession ?? upcomingSession;
+
+    string sessionPrefix = string.Empty;
+    if (displaySession != null)
+    {
+        if (todaySession != null)
+        {
+            sessionPrefix = "Today’s session";
+        }
+        else if (overdueSession != null)
+        {
+            sessionPrefix = $"Overdue · {overdueSession.Workout.Date.ToString(DateTimeFormat)}";
+        }
+        else if (displaySession.Workout.Date.Date == DateTime.Today.AddDays(1))
+        {
+            sessionPrefix = $"Tomorrow · {displaySession.Workout.Date.ToString(DateTimeFormat)}";
+        }
+        else
+        {
+            sessionPrefix = $"Next session · {displaySession.Workout.Date.ToString(DateTimeFormat)}";
+        }
+    }
 
     bool hasUserPlans = Model.Any();
     TrainingPlanViewModel? trainingPlanWithoutWorkouts = Model.FirstOrDefault(p => !p.Workouts.Any());
@@ -45,7 +68,7 @@
         @if (displaySession != null)
         {
             <article class="next">
-                <p class="eb">@(todaySession != null ? "Today’s session" : "Next session") · @displaySession.Plan.Name</p>
+                <p class="eb">@sessionPrefix · @displaySession.Plan.Name</p>
                 <div class="big">
                     <span class="val"><b>@displaySession.Workout.PlannedDistance</b><span>m</span></span>
                     <span class="val"><b>@displaySession.Workout.PlannedDuration</b><span>min</span></span>
