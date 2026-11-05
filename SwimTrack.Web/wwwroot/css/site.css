@@ -255,11 +255,6 @@ a.text-muted:hover {
   font-size: 15px;
 }
 
-.navbar .button {
-  border-color: #fff;
-  color: #fff;
-}
-
 /* Button Component */
 .button {
   display: inline-flex;
@@ -298,22 +293,60 @@ a.text-muted:hover {
   font-size: 15px;
 }
 
+:where(.navbar, .dashboard-hero-card) .button {
+  border-color: #fff;
+  color: #fff;
+}
+
 .button--primary {
   background-color: var(--color-aqua);
   color: var(--color-ink);
-  border-color: var(--color-ink);
+  border: none;
+}
+
+.button--primary:hover {
+  box-shadow:
+    0 1px 0 var(--color-teal),
+    0 2px 0 var(--color-teal),
+    0 3px 0 var(--color-teal),
+    0 4px 0 var(--color-teal),
+    0 5px 0 var(--color-teal),
+    0 6px 0 var(--color-teal),
+    0 7px 0 var(--color-teal);
 }
 
 .button--warning {
   background-color: var(--color-coral);
   color: var(--color-ink);
-  border-color: var(--color-ink);
+  border: none;
+}
+
+.button--warning:hover {
+  box-shadow:
+    0 1px 0 var(--color-danger),
+    0 2px 0 var(--color-danger),
+    0 3px 0 var(--color-danger),
+    0 4px 0 var(--color-danger),
+    0 5px 0 var(--color-danger),
+    0 6px 0 var(--color-danger),
+    0 7px 0 var(--color-danger);
 }
 
 .button--dark {
   background-color: var(--color-ink);
   color: #fff;
-  border-color: var(--color-ink);
+  border: none;
+}
+
+.button--dark:hover {
+  box-shadow:
+    0 1px 0 #1D3D5B,
+    0 2px 0 #1D3D5B,
+    0 3px 0 #1D3D5B,
+    0 4px 0 #1D3D5B,
+    0 5px 0 #1D3D5B,
+    0 6px 0 #1D3D5B,
+    0 7px 0 #1D3D5B;
 }
 
 .button--danger {
@@ -763,22 +796,6 @@ a.text-muted:hover {
 
 .dashboard-hero-card .eyebrow-heading {
   color: var(--color-aqua);
-}
-
-.dashboard-hero-card .button {
-  border-color: #fff;
-  color: #fff;
-}
-
-.dashboard-hero-card .button--primary {
-  color: var(--color-ink);
-  border-color: var(--color-aqua);
-}
-
-.dashboard-hero-card .button--warning {
-  color: var(--color-ink);
-  background-color: var(--color-coral);
-  border-color: var(--color-coral);
 }
 
 .metric-large {
