@@ -7,34 +7,34 @@
 <input asp-for="Id" type="hidden" />
 <input asp-for="Status" type="hidden" />
 
-<div class="g3">
-    <div class="fld">
+<div class="grid-3-columns">
+    <div class="form-field">
         <label asp-for="Date">Date</label>
-        <input asp-for="Date" type="date" readonly="@(isReadOnly ? "readonly" : null)" style="@(isReadOnly ? "background:var(--tile);" : null)" />
-        <span asp-validation-for="Date" class="er"></span>
+        <input asp-for="Date" type="date" readonly="@(isReadOnly ? "readonly" : null)" style="@(isReadOnly ? "background:var(--color-page-bg);" : null)" />
+        <span asp-validation-for="Date" class="field-validation-error"></span>
     </div>
 
-    <div class="fld">
+    <div class="form-field">
         <label asp-for="PlannedDistance">Distance</label>
-        <div class="u">
-            <input asp-for="PlannedDistance" type="number" min="1" max="20000" readonly="@(isReadOnly ? "readonly" : null)" style="@(isReadOnly ? "background:var(--tile);" : null)" />
+        <div class="input-unit-wrapper">
+            <input asp-for="PlannedDistance" type="number" min="50" max="20000" step="50" readonly="@(isReadOnly ? "readonly" : null)" style="@(isReadOnly ? "background:var(--color-page-bg);" : null)" />
             <span>m</span>
         </div>
-        <span asp-validation-for="PlannedDistance" class="er"></span>
+        <span asp-validation-for="PlannedDistance" class="field-validation-error"></span>
     </div>
 
-    <div class="fld">
+    <div class="form-field">
         <label asp-for="PlannedDuration">Duration</label>
-        <div class="u">
-            <input asp-for="PlannedDuration" type="number" min="1" max="600" readonly="@(isReadOnly ? "readonly" : null)" style="@(isReadOnly ? "background:var(--tile);" : null)" />
+        <div class="input-unit-wrapper">
+            <input asp-for="PlannedDuration" type="number" min="1" max="600" readonly="@(isReadOnly ? "readonly" : null)" style="@(isReadOnly ? "background:var(--color-page-bg);" : null)" />
             <span>min</span>
         </div>
-        <span asp-validation-for="PlannedDuration" class="er"></span>
+        <span asp-validation-for="PlannedDuration" class="field-validation-error"></span>
     </div>
 </div>
 
-<div class="fld">
+<div class="form-field">
     <label asp-for="Notes">Notes</label>
     <textarea asp-for="Notes" rows="2" placeholder="Sets, drills, technique focus..."></textarea>
-    <span asp-validation-for="Notes" class="er"></span>
+    <span asp-validation-for="Notes" class="field-validation-error"></span>
 </div>

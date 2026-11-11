@@ -14,15 +14,15 @@
 
 <body>
     <div class="app">
-        <header class="nav">
-            <div class="wrap">
-                <a class="brand" asp-area="" asp-controller="Home" asp-action="Index">
+        <header class="navbar">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
                     <svg width="30" height="30" viewBox="0 0 32 32" fill="none" stroke="#3DD9D0" stroke-width="3" stroke-linecap="round" aria-hidden="true">
                         <path d="M3 11c4-5 6 5 10 0s6 5 10 0 5 2 6 1M3 22c4-5 6 5 10 0s6 5 10 0 5 2 6 1"></path>
                     </svg>
                     SwimTrack
                 </a>
-                <nav aria-label="Main">
+                <nav class="navbar-nav" aria-label="Main">
                     <a asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                     @if (User.Identity?.IsAuthenticated ?? false)
                     {
@@ -30,7 +30,7 @@
                         <a asp-area="" asp-controller="TrainingPlan" asp-action="Create">New plan</a>
                     }
                 </nav>
-                <div class="me">
+                <div class="navbar-user">
                     <partial name="_LoginPartial" />
                 </div>
             </div>
@@ -38,7 +38,7 @@
 
         @RenderBody()
 
-        <footer class="wrap foot">
+        <footer class="container app-footer">
             <small>&copy; @DateTime.Today.Year – SwimTrack</small>
         </footer>
     </div>

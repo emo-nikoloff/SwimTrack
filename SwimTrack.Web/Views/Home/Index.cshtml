@@ -3,82 +3,89 @@
 }
 
 <main>
-    <section class="wrap hero">
+    <section class="container hero-section">
         <div class="stack">
-            <p class="eb">Swim training journal</p>
+            <p class="eyebrow-heading">Swim training journal</p>
             <h1>Plan the swim. Log every length.</h1>
-            <p class="lead">SwimTrack turns a goal into a block of sessions, then shows how the water really went.</p>
-            <div class="row">
+            <p class="text-lead">SwimTrack turns a goal into a block of sessions, then shows how the water really went.</p>
+            <div class="flex-row">
                 @if (User.Identity?.IsAuthenticated ?? false)
                 {
-                    <a class="btn dk" asp-controller="TrainingPlan" asp-action="All">Check your plans</a>
-                    <a class="btn go" asp-controller="TrainingPlan" asp-action="Create">Create training plan</a>
+                    <a class="button button--primary" asp-controller="TrainingPlan" asp-action="All">Go to your plans</a>
                 }
                 else
                 {
-                    <a class="btn dk" asp-area="Identity" asp-page="/Account/Register">Start your journey</a>
-                    <a class="btn" asp-area="Identity" asp-page="/Account/Login">I have an account</a>
+                    <a class="button button--dark" asp-area="Identity" asp-page="/Account/Register">Start your journey</a>
+                    <a class="button" asp-area="Identity" asp-page="/Account/Login">I have an account</a>
                 }
             </div>
-            <div class="rope"></div>
-            <div class="row">
-                <span class="bd">Planned</span>
-                <span class="bd dn">Completed</span>
-                <span class="bd sk">Skipped</span>
+            <div class="lane-rope-divider"></div>
+            <div class="flex-row">
+                <span class="badge badge--planned">Planned</span>
+                <span class="badge badge--completed">Completed</span>
+                <span class="badge badge--skipped">Skipped</span>
                 <small>Every session has a state.</small>
             </div>
         </div>
-        <div class="pool" role="img" aria-label="A pool seen from above with five lanes">
-            <div class="ln"><b>1</b></div>
-            <div class="ln"><b>2</b></div>
-            <div class="ln"><b>3</b></div>
-            <div class="ln"><b>4</b></div>
-            <div class="ln"><b>5</b></div>
-            <div class="tag">
-                <span class="eb">Today’s session</span>
+        <div class="pool-visual" role="img" aria-label="A pool seen from above with five lanes">
+            <div class="pool-lane"><b>1</b></div>
+            <div class="pool-lane"><b>2</b></div>
+            <div class="pool-lane"><b>3</b></div>
+            <div class="pool-lane"><b>4</b></div>
+            <div class="pool-lane"><b>5</b></div>
+            <div class="pool-tag">
+                <span class="eyebrow-heading">Today’s session</span>
                 <strong>1500 m · 45 min</strong>
             </div>
         </div>
     </section>
 
-    <section class="wrap how">
+    <section class="container how-it-works-section">
         <div>
-            <p class="eb">How it works</p>
+            <p class="eyebrow-heading">How it works</p>
             <h2>Three moves per session</h2>
         </div>
-        <div class="g3">
+        <div class="grid-3-columns">
             <article class="card">
-                <span class="num">01</span>
-                <h3>Plan</h3>
-                <p class="mut">Name the block, set the dates and the goal, then add sessions with distance, duration and notes.</p>
-                <span class="bd" style="justify-self:start">Planned</span>
+                <header>
+                    <span class="step-number">01</span>
+                    <h3>Plan</h3>
+                </header>
+                <p class="text-muted">Name the block, set the dates and the goal, then add sessions with distance, duration and notes.</p>
+                <footer>
+                    <span class="badge badge--planned">Planned</span>
+                </footer>
             </article>
             <article class="card">
-                <span class="num">02</span>
-                <h3>Swim</h3>
-                <p class="mut">Log what really happened: actual metres, minutes and how it felt.</p>
-                <span class="bd dn" style="justify-self:start">Completed</span>
+                <header>
+                    <span class="step-number">02</span>
+                    <h3>Swim</h3>
+                </header>
+                <p class="text-muted">Log what really happened: actual metres, minutes and how it felt.</p>
+                <footer>
+                    <span class="badge badge--completed">Completed</span>
+                </footer>
             </article>
             <article class="card">
-                <span class="num">03</span>
-                <h3>Adjust</h3>
-                <p class="mut">Missed a day? Skip it, then plan it again when the week allows.</p>
-                <span class="bd sk" style="justify-self:start">Skipped</span>
+                <header>
+                    <span class="step-number">03</span>
+                    <h3>Adjust</h3>
+                </header>
+                <p class="text-muted">Missed a day? Skip it, then plan it again when the week allows.</p>
+                <footer>
+                    <span class="badge badge--skipped">Skipped</span>
+                </footer>
             </article>
         </div>
     </section>
 
-    <section class="wrap">
-        <div class="band">
-            <h2 style="max-width:12em">Your next length starts with a plan.</h2>
-            @if (User.Identity?.IsAuthenticated ?? false)
-            {
-                <a class="btn go" asp-controller="TrainingPlan" asp-action="Create">Create your first plan</a>
-            }
-            else
-            {
-                <a class="btn go" asp-area="Identity" asp-page="/Account/Register">Create your first plan</a>
-            }
-        </div>
-    </section>
+    @if (!(User.Identity?.IsAuthenticated ?? false))
+    {
+        <section class="container">
+            <div class="cta-banner">
+                <h2 style="max-width:12em">Your next length starts with a plan.</h2>
+                <a class="button button--primary" asp-area="Identity" asp-page="/Account/Register">Create your first plan</a>
+            </div>
+        </section>
+    }
 </main>

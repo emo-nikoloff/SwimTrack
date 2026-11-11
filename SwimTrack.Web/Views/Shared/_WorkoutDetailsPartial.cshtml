@@ -1,56 +1,56 @@
 @model WorkoutViewModel
 
 <div class="stack" style="gap:12px">
-    <div class="row sp">
+    <div class="d-flex align-items-center justify-content-between gap-12">
         <b>@Model.Date.ToString(DateTimeFormat)</b>
         @if (Model.Status == WorkoutStatus.Completed)
         {
-            <span class="bd dn">Completed</span>
+            <span class="badge badge--completed">Completed</span>
         }
         else if (Model.Status == WorkoutStatus.Skipped)
         {
-            <span class="bd sk">Skipped</span>
+            <span class="badge badge--skipped">Skipped</span>
         }
         else
         {
-            <span class="bd">Planned</span>
+            <span class="badge badge--planned">Planned</span>
         }
     </div>
 
-    <div class="kv">
+    <div class="key-value-row">
         <span>Planned distance</span>
         <b>@Model.PlannedDistance m</b>
     </div>
-    <div class="kv">
+    <div class="key-value-row">
         <span>Planned duration</span>
         <b>@Model.PlannedDuration min</b>
     </div>
 
     <div>
         <small style="font-weight:700">Notes</small>
-        <p class="mut" style="margin-top:2px">@(string.IsNullOrWhiteSpace(Model.Notes) ? "No notes." : Model.Notes)</p>
+        <p class="text-muted" style="margin-top:2px">@(string.IsNullOrWhiteSpace(Model.Notes) ? "No notes." : Model.Notes)</p>
     </div>
 
     @if (Model.Result != null)
     {
-        <div class="rope"></div>
+        <div class="lane-rope-divider"></div>
         <div class="stack" style="gap:8px">
-            <span class="eb">Result</span>
-            <div class="kv">
+            <span class="eyebrow-heading">Result</span>
+            <div class="key-value-row">
                 <span>Actual distance</span>
                 <b>@Model.Result.ActualDistance m</b>
             </div>
-            <div class="kv">
+            <div class="key-value-row">
                 <span>Actual duration</span>
                 <b>@Model.Result.ActualDuration min</b>
             </div>
-            <div class="kv">
+            <div class="key-value-row">
                 <span>Completed on</span>
                 <b>@Model.Result.CompletedAt.ToString(DateTimeFormat)</b>
             </div>
             @if (!string.IsNullOrWhiteSpace(Model.Result.Notes))
             {
-                <p class="mut">@Model.Result.Notes</p>
+                <p class="text-muted">@Model.Result.Notes</p>
             }
         </div>
     }

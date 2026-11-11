@@ -34,6 +34,7 @@ public class WorkoutService : IWorkoutService
 
         WorkoutInputModel workoutInputModel = new()
         {
+            Id = requestedWorkout.Id,
             Date = requestedWorkout.Date,
             PlannedDistance = requestedWorkout.PlannedDistance,
             PlannedDuration = requestedWorkout.PlannedDuration,
@@ -98,7 +99,7 @@ public class WorkoutService : IWorkoutService
             return null;
         }
 
-        if (requestedWorkout.Status != WorkoutStatus.Planned)
+        if (requestedWorkout.Status != WorkoutStatus.Planned || requestedWorkout.Date.Date > DateTime.Today)
         {
             return null;
         }
@@ -107,6 +108,7 @@ public class WorkoutService : IWorkoutService
         {
             ActualDistance = requestedWorkout.PlannedDistance,
             ActualDuration = requestedWorkout.PlannedDuration,
+            CompletedAt = requestedWorkout.Date,
             Notes = requestedWorkout.Notes,
         };
 
@@ -124,12 +126,10 @@ public class WorkoutService : IWorkoutService
             return false;
         }
 
-        if (requestedWorkout.Status != WorkoutStatus.Planned)
+        if (requestedWorkout.Status != WorkoutStatus.Planned || requestedWorkout.Date.Date > DateTime.Today)
         {
             return false;
         }
-
-        requestedWorkout.Status = WorkoutStatus.Completed;
 
         bool isWorkoutCompletionDateValid = DateValidator.ValidateWorkoutCompletionDate(
             workoutResultInputModel.CompletedAt,
@@ -145,6 +145,8 @@ public class WorkoutService : IWorkoutService
                 null,
                 null);
         }
+
+        requestedWorkout.Status = WorkoutStatus.Completed;
 
         WorkoutResult workoutResult = new()
         {
@@ -172,7 +174,7 @@ public class WorkoutService : IWorkoutService
             return false;
         }
 
-        if (requestedWorkout.Status != WorkoutStatus.Planned)
+        if (requestedWorkout.Status != WorkoutStatus.Planned || requestedWorkout.Date.Date > DateTime.Today)
         {
             return false;
         }

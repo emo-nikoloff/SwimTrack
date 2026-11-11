@@ -1,44 +1,43 @@
 @page
 @model LoginModel
-
 @{
     ViewData["Title"] = "Log in";
 }
 
-<main class="wrap pg">
-    <div class="auth-box">
+<main class="container page-content">
+    <div class="auth-container">
         <form id="account" class="card" method="post">
             <div>
-                <p class="eb">Welcome back</p>
+                <p class="eyebrow-heading">Welcome back</p>
                 <h1 style="font-size:40px;margin-top:4px">Log in to SwimTrack</h1>
             </div>
 
-            <div class="rope"></div>
+            <div class="lane-rope-divider"></div>
 
-            <div asp-validation-summary="ModelOnly" class="er" role="alert"></div>
+            <div asp-validation-summary="ModelOnly" class="field-validation-error" role="alert"></div>
 
-            <div class="fld">
+            <div class="form-field">
                 <label asp-for="Input.Email">Email address</label>
                 <input asp-for="Input.Email" type="email" autocomplete="username" placeholder="name@example.com" required />
-                <span asp-validation-for="Input.Email" class="er"></span>
+                <span asp-validation-for="Input.Email" class="field-validation-error"></span>
             </div>
 
-            <div class="fld">
+            <div class="form-field">
                 <label asp-for="Input.Password">Password</label>
                 <input asp-for="Input.Password" type="password" autocomplete="current-password" placeholder="••••••••" required />
-                <span asp-validation-for="Input.Password" class="er"></span>
+                <span asp-validation-for="Input.Password" class="field-validation-error"></span>
             </div>
 
-            <div class="checkbox-row">
+            <div class="form-checkbox-row">
                 <input asp-for="Input.RememberMe" type="checkbox" id="RememberMe" />
                 <label for="RememberMe">Remember this browser</label>
             </div>
 
             <div class="stack" style="gap:14px;margin-top:6px">
-                <button id="login-submit" type="submit" class="btn go" style="width:100%">Log in</button>
-                <p class="mut" style="text-align:center;font-size:15px;margin:0">
+                <button id="login-submit" type="submit" class="button button--primary" style="width:100%">Log in</button>
+                <p class="text-muted text-center" style="font-size:15px;margin:0">
                     New to SwimTrack?
-                    <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" style="color:var(--teal);font-weight:700;text-decoration:none">Register here</a>
+                    <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" style="color:var(--color-teal);font-weight:700;text-decoration:none">Register here</a>
                 </p>
             </div>
         </form>

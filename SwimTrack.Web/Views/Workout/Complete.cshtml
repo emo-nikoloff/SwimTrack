@@ -6,29 +6,29 @@
     int workoutId = (int)(ViewData["WorkoutId"] ?? 0);
 }
 
-<main class="wrap pg">
+<main class="container page-content">
     <div class="stack" style="gap:12px">
-        <a class="mut" asp-controller="TrainingPlan" asp-action="Details" asp-route-id="@trainingPlanId">← Back to plan</a>
+        <a class="text-muted" asp-controller="TrainingPlan" asp-action="Details" asp-route-id="@trainingPlanId">← Back to plan</a>
         <h1 style="font-size:56px">How did it go?</h1>
     </div>
 
-    <div class="split side-left">
-        <article class="next">
-            <p class="eb">Target session</p>
-            <div class="big">
-                <span class="val"><b>@Model.ActualDistance</b><span>m</span></span>
-                <span class="val"><b>@Model.ActualDuration</b><span>min</span></span>
+    <div class="layout-split layout-split--sidebar-left">
+        <article class="dashboard-hero-card">
+            <p class="eyebrow-heading">Target session</p>
+            <div class="metric-large">
+                <span class="metric-large-value"><b>@Model.ActualDistance</b><span>m</span></span>
+                <span class="metric-large-value"><b>@Model.ActualDuration</b><span>min</span></span>
             </div>
             @if (!string.IsNullOrWhiteSpace(Model.Notes))
             {
-                <p class="q">“@Model.Notes”</p>
+                <p class="dashboard-card-quote">“@Model.Notes”</p>
             }
             else
             {
-                <p class="q">“Planned swim session.”</p>
+                <p class="dashboard-card-quote">“Planned swim session.”</p>
             }
-            <div class="rope"></div>
-            <p class="q"><span class="bd" style="color:var(--ink)">Log your results</span></p>
+            <div class="lane-rope-divider"></div>
+            <p class="dashboard-card-quote"><span class="badge" style="color:var(--color-ink)">Log your results</span></p>
         </article>
 
         <form class="card"
@@ -37,45 +37,45 @@
               asp-route-id="@workoutId"
               asp-route-trainingPlanId="@trainingPlanId"
               method="post">
-            <div asp-validation-summary="ModelOnly" class="er"></div>
+            <div asp-validation-summary="ModelOnly" class="field-validation-error"></div>
 
             <h3>Your result</h3>
 
-            <div class="g2">
-                <div class="fld">
+            <div class="grid-2-columns">
+                <div class="form-field">
                     <label asp-for="ActualDistance">Actual distance</label>
-                    <div class="u">
-                        <input asp-for="ActualDistance" type="number" min="1" max="20000" />
+                    <div class="input-unit-wrapper">
+                        <input asp-for="ActualDistance" type="number" min="50" max="20000" step="50" />
                         <span>m</span>
                     </div>
-                    <span asp-validation-for="ActualDistance" class="er"></span>
+                    <span asp-validation-for="ActualDistance" class="field-validation-error"></span>
                 </div>
-                <div class="fld">
+                <div class="form-field">
                     <label asp-for="ActualDuration">Actual duration</label>
-                    <div class="u">
+                    <div class="input-unit-wrapper">
                         <input asp-for="ActualDuration" type="number" min="1" max="600" />
                         <span>min</span>
                     </div>
-                    <span asp-validation-for="ActualDuration" class="er"></span>
+                    <span asp-validation-for="ActualDuration" class="field-validation-error"></span>
                 </div>
             </div>
 
-            <div class="fld">
+            <div class="form-field">
                 <label asp-for="CompletedAt">Completion date</label>
                 <input asp-for="CompletedAt" type="date" />
                 <small>Between the workout date and today.</small>
-                <span asp-validation-for="CompletedAt" class="er"></span>
+                <span asp-validation-for="CompletedAt" class="field-validation-error"></span>
             </div>
 
-            <div class="fld">
+            <div class="form-field">
                 <label asp-for="Notes">Notes</label>
                 <textarea asp-for="Notes" rows="4" placeholder="How did it feel? Pace, drills, rhythm..."></textarea>
-                <span asp-validation-for="Notes" class="er"></span>
+                <span asp-validation-for="Notes" class="field-validation-error"></span>
             </div>
 
-            <div class="row">
-                <button class="btn go" type="submit">Complete workout</button>
-                <a class="btn" asp-controller="TrainingPlan" asp-action="Details" asp-route-id="@trainingPlanId">Cancel</a>
+            <div class="flex-row">
+                <button class="button button--primary" type="submit">Complete workout</button>
+                <a class="button" asp-controller="TrainingPlan" asp-action="Details" asp-route-id="@trainingPlanId">Cancel</a>
             </div>
         </form>
     </div>

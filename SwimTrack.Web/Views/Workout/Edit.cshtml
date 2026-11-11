@@ -1,32 +1,33 @@
 @model WorkoutInputModel
 @{
     ViewData["Title"] = "Edit workout";
+
     int trainingPlanId = (int)(ViewData["TrainingPlanId"] ?? 0);
 }
 
-<main class="wrap pg">
+<main class="container page-content">
     <div class="stack" style="gap:12px">
-        <a class="mut" asp-controller="TrainingPlan" asp-action="Details" asp-route-id="@trainingPlanId">← Back to plan</a>
+        <a class="text-muted" asp-controller="TrainingPlan" asp-action="Details" asp-route-id="@trainingPlanId">← Back to plan</a>
         <h1 style="font-size:56px">Edit workout</h1>
     </div>
 
-    <div class="split side-left">
+    <div class="layout-split layout-split--sidebar-left">
         <aside class="card">
-            <p class="eb">Workout status</p>
+            <p class="eyebrow-heading">Workout status</p>
             @if (Model.Status == WorkoutStatus.Completed)
             {
-                <span class="bd dn">Completed</span>
-                <p class="mut">This workout is already logged as completed. Only notes can be adjusted.</p>
+                <span class="badge badge--completed">Completed</span>
+                <p class="text-muted">This workout is already logged as completed. Only notes can be adjusted.</p>
             }
             else if (Model.Status == WorkoutStatus.Skipped)
             {
-                <span class="bd sk">Skipped</span>
-                <p class="mut">This workout was skipped. Only notes can be adjusted, or use "Plan again" from the plan details page.</p>
+                <span class="badge badge--skipped">Skipped</span>
+                <p class="text-muted">This workout was skipped. Only notes can be adjusted, or use "Plan again" from the plan details page.</p>
             }
             else
             {
-                <span class="bd">Planned</span>
-                <p class="mut">Adjust the scheduled date, target distance, duration, or workout focus notes.</p>
+                <span class="badge badge--planned">Planned</span>
+                <p class="text-muted">Adjust the scheduled date, target distance, duration, or workout focus notes.</p>
             }
         </aside>
 
@@ -36,15 +37,15 @@
               asp-route-id="@Model.Id"
               asp-route-trainingPlanId="@trainingPlanId"
               method="post">
-            <div asp-validation-summary="ModelOnly" class="er"></div>
+            <div asp-validation-summary="ModelOnly" class="field-validation-error"></div>
 
             <h3>Workout details</h3>
 
             <partial name="_WorkoutInputPartial" model="Model" />
 
-            <div class="row" style="margin-top:16px">
-                <button class="btn go" type="submit">Save changes</button>
-                <a class="btn" asp-controller="TrainingPlan" asp-action="Details" asp-route-id="@trainingPlanId">Cancel</a>
+            <div class="flex-row" style="margin-top:16px">
+                <button class="button button--primary" type="submit">Save changes</button>
+                <a class="button" asp-controller="TrainingPlan" asp-action="Details" asp-route-id="@trainingPlanId">Cancel</a>
             </div>
         </form>
     </div>

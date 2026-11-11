@@ -3,24 +3,24 @@
     ViewData["Title"] = "Error";
 }
 
-<main class="wrap pg">
-    <div class="auth-box" style="max-width:600px">
+<main class="container page-content">
+    <div class="auth-container" style="max-width:600px">
         <div class="card">
-            <p class="eb" style="color:var(--cd)">Error</p>
+            <p class="eyebrow-heading" style="color:var(--color-danger)">Error</p>
             <h1 style="font-size:36px">Something went wrong</h1>
-            <div class="rope"></div>
-            <p class="mut">An error occurred while processing your request.</p>
+            <div class="lane-rope-divider"></div>
+            <p class="text-muted">An error occurred while processing your request.</p>
 
             @if (Model.ShowRequestId)
             {
-                <div class="fld">
+                <div class="form-field">
                     <label>Request ID</label>
-                    <code style="padding:8px 12px;background:var(--tile);border-radius:8px;border:1px solid var(--line);font-size:14px">@Model.RequestId</code>
+                    <code style="padding:8px 12px;background:var(--color-page-bg);border-radius:8px;border:1px solid var(--color-border);font-size:14px">@Model.RequestId</code>
                 </div>
             }
 
-            <div class="row" style="margin-top:12px">
-                <a class="btn go" asp-controller="Home" asp-action="Index">Back to Home</a>
+            <div class="flex-row" style="margin-top:12px">
+                <a class="button button--primary" asp-controller="Home" asp-action="Index">Back to Home</a>
             </div>
         </div>
     </div>
