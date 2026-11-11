@@ -375,6 +375,28 @@ a.text-muted:hover {
   gap: 12px;
 }
 
+.plan-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.plan-card header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.plan-card footer {
+  margin-top: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .plan-goal-card {
   margin: 0;
   padding: 20px 24px;
@@ -434,13 +456,20 @@ a.text-muted:hover {
 
 /* Workout Card Component */
 .workout-card {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 14px;
   padding: 24px;
   border-radius: var(--radius-card);
   background-color: #fff;
   border: 2px solid var(--color-ink);
-  align-content: start;
+}
+
+.workout-card header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .workout-card--skipped {
@@ -474,7 +503,9 @@ a.text-muted:hover {
 .workout-card footer {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 8px;
+  margin-top: auto;
 }
 
 /* Status & Visual Indicators */
@@ -775,6 +806,22 @@ a.text-muted:hover {
   gap: 24px;
 }
 
+.how-it-works-section .card {
+  display: flex;
+  flex-direction: column;
+}
+
+.how-it-works-section .card header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.how-it-works-section .card footer {
+  display: flex;
+  margin-top: auto;
+}
+
 .cta-banner {
   display: flex;
   flex-wrap: wrap;
@@ -796,15 +843,27 @@ a.text-muted:hover {
 }
 
 .dashboard-hero-card {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 18px;
-  align-content: start;
   padding: 32px;
   border-radius: var(--radius-card);
   background-color: var(--color-ink);
   color: #fff;
   min-width: 0;
   overflow: hidden;
+}
+
+.dashboard-hero-card header {
+  display: block;
+}
+
+.dashboard-hero-card footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
 }
 
 .dashboard-hero-card .eyebrow-heading {
