@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 
-using static SwimTrack.Shared.Constants.EntityValidation.TrainingPlan;
+using static SwimTrack.Data.Common.EntityValidation.TrainingPlan;
 
 namespace SwimTrack.Data.Models;
 

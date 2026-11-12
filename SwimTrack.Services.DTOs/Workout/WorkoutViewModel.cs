@@ -1,7 +1,7 @@
 using SwimTrack.Shared.Enums;
-using SwimTrack.DTOs.WorkoutResult;
+using SwimTrack.Services.DTOs.WorkoutResult;
 
-namespace SwimTrack.DTOs.Workout;
+namespace SwimTrack.Services.DTOs.Workout;
 
 public class WorkoutViewModel
 {

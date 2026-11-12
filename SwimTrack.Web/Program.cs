@@ -1,3 +1,7 @@
+using SwimTrack.Data.Extensions;
+using SwimTrack.Services.Extensions;
+using SwimTrack.Web.Infrastructure.Extensions;
+
 namespace SwimTrack.Web;
 
 public class Program

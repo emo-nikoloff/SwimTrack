@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 
 using SwimTrack.Data;
 using static SwimTrack.Shared.Constants.ApplicationDefaults.Identity;
 
-namespace Microsoft.Extensions.DependencyInjection;
+namespace SwimTrack.Web.Infrastructure.Extensions;
 
 public static class ServiceCollectionExtension
 {

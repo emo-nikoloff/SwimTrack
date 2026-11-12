@@ -8,7 +8,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SwimTrack.Data\SwimTrack.Data.csproj" />
-    <ProjectReference Include="..\SwimTrack.DTOs\SwimTrack.DTOs.csproj" />
+    <ProjectReference Include="..\SwimTrack.Data.Models\SwimTrack.Data.Models.csproj" />
+    <ProjectReference Include="..\SwimTrack.Services.Common\SwimTrack.Services.Common.csproj" />
+    <ProjectReference Include="..\SwimTrack.Services.DTOs\SwimTrack.Services.DTOs.csproj" />
     <ProjectReference Include="..\SwimTrack.Shared\SwimTrack.Shared.csproj" />
   </ItemGroup>
 

@@ -3,8 +3,8 @@ using Microsoft.EntityFrameworkCore;
 
 using SwimTrack.Data;
 using SwimTrack.Data.Models;
-using SwimTrack.DTOs.Workout;
-using SwimTrack.DTOs.WorkoutResult;
+using SwimTrack.Services.DTOs.Workout;
+using SwimTrack.Services.DTOs.WorkoutResult;
 using SwimTrack.Services.Contracts;
 using SwimTrack.Shared.Enums;
 using SwimTrack.Shared.Validation;

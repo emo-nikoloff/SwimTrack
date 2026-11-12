@@ -1,4 +1,4 @@
-namespace SwimTrack.DTOs.WorkoutResult;
+namespace SwimTrack.Services.DTOs.WorkoutResult;
 
 public class WorkoutResultViewModel
 {

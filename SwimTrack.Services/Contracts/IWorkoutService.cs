@@ -1,5 +1,5 @@
-using SwimTrack.DTOs.Workout;
-using SwimTrack.DTOs.WorkoutResult;
+using SwimTrack.Services.DTOs.Workout;
+using SwimTrack.Services.DTOs.WorkoutResult;
 
 namespace SwimTrack.Services.Contracts;
 

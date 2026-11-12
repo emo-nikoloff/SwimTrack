@@ -3,8 +3,8 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-using SwimTrack.DTOs.Workout;
-using SwimTrack.DTOs.WorkoutResult;
+using SwimTrack.Services.DTOs.Workout;
+using SwimTrack.Services.DTOs.WorkoutResult;
 using SwimTrack.Services.Contracts;
 using SwimTrack.Shared.Enums;
 

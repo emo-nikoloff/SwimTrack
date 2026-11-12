@@ -1,11 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 
-using SwimTrack.DTOs.Workout;
+using SwimTrack.Services.DTOs.Workout;
 using SwimTrack.Shared.Validation;
 using static SwimTrack.Shared.Constants.EntityValidation.TrainingPlan;
 using static SwimTrack.Shared.Constants.ValidationMessages.DateValidation;
 
-namespace SwimTrack.DTOs.TrainingPlan;
+namespace SwimTrack.Services.DTOs.TrainingPlan;
 
 public class TrainingPlanInputModel : IValidatableObject
 {

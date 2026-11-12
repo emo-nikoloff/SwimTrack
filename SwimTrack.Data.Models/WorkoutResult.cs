@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-using static SwimTrack.Shared.Constants.EntityValidation.WorkoutResult;
+using static SwimTrack.Data.Common.EntityValidation.WorkoutResult;
 
 namespace SwimTrack.Data.Models;
 

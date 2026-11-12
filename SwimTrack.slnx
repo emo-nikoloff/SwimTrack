@@ -1,8 +1,23 @@
 <Solution>
-  <Project Path="SwimTrack.Data.Models/SwimTrack.Data.Models.csproj" />
-  <Project Path="SwimTrack.Data/SwimTrack.Data.csproj" />
-  <Project Path="SwimTrack.DTOs/SwimTrack.DTOs.csproj" />
-  <Project Path="SwimTrack.Services/SwimTrack.Services.csproj" />
-  <Project Path="SwimTrack.Shared/SwimTrack.Shared.csproj" />
-  <Project Path="SwimTrack.Web/SwimTrack.Web.csproj" />
+  <Folder Name="/Data/">
+    <Project Path="SwimTrack.Data/SwimTrack.Data.csproj" />
+    <Project Path="SwimTrack.Data.Common/SwimTrack.Data.Common.csproj" />
+    <Project Path="SwimTrack.Data.Models/SwimTrack.Data.Models.csproj" />
+  </Folder>
+
+  <Folder Name="/Services/">
+    <Project Path="SwimTrack.Services/SwimTrack.Services.csproj" />
+    <Project Path="SwimTrack.Services.Common/SwimTrack.Services.Common.csproj" />
+    <Project Path="SwimTrack.Services.DTOs/SwimTrack.Services.DTOs.csproj" />
+  </Folder>
+
+  <Folder Name="/Web/">
+    <Project Path="SwimTrack.Web/SwimTrack.Web.csproj" />
+    <Project Path="SwimTrack.Web.Infrastructure/SwimTrack.Web.Infrastructure.csproj" />
+    <Project Path="SwimTrack.Web.ViewModels/SwimTrack.Web.ViewModels.csproj" />
+  </Folder>
+
+  <Folder Name="/Shared/">
+    <Project Path="SwimTrack.Shared/SwimTrack.Shared.csproj" />
+  </Folder>
 </Solution>

@@ -1,4 +1,4 @@
-using SwimTrack.DTOs.TrainingPlan;
+using SwimTrack.Services.DTOs.TrainingPlan;
 
 namespace SwimTrack.Services.Contracts;
 

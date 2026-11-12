@@ -2,8 +2,8 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-using SwimTrack.DTOs.TrainingPlan;
-using SwimTrack.DTOs.Workout;
+using SwimTrack.Services.DTOs.TrainingPlan;
+using SwimTrack.Services.DTOs.Workout;
 using SwimTrack.Services.Contracts;
 
 namespace SwimTrack.Web.Controllers;

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using SwimTrack.Shared.Enums;
 using static SwimTrack.Shared.Constants.EntityValidation.Workout;
 
-namespace SwimTrack.DTOs.Workout;
+namespace SwimTrack.Services.DTOs.Workout;
 
 public class WorkoutInputModel
 {

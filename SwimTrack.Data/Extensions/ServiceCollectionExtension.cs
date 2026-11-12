@@ -1,9 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
-using SwimTrack.Data;
-
-namespace Microsoft.Extensions.DependencyInjection;
+namespace SwimTrack.Data.Extensions;
 
 public static class ServiceCollectionExtension
 {

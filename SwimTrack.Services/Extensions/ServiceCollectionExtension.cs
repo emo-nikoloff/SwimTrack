@@ -1,7 +1,9 @@
+using Microsoft.Extensions.DependencyInjection;
+
 using SwimTrack.Services.Contracts;
 using SwimTrack.Services.Services;
 
-namespace Microsoft.Extensions.DependencyInjection;
+namespace SwimTrack.Services.Extensions;
 
 public static class ServiceCollectionExtension
 {

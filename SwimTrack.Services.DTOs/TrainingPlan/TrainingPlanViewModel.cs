@@ -1,6 +1,6 @@
-using SwimTrack.DTOs.Workout;
+using SwimTrack.Services.DTOs.Workout;
 
-namespace SwimTrack.DTOs.TrainingPlan;
+namespace SwimTrack.Services.DTOs.TrainingPlan;
 
 public class TrainingPlanViewModel
 {

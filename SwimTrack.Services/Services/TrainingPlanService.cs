@@ -2,9 +2,9 @@ using Microsoft.EntityFrameworkCore;
 
 using SwimTrack.Data;
 using SwimTrack.Data.Models;
-using SwimTrack.DTOs.TrainingPlan;
-using SwimTrack.DTOs.Workout;
-using SwimTrack.DTOs.WorkoutResult;
+using SwimTrack.Services.DTOs.TrainingPlan;
+using SwimTrack.Services.DTOs.Workout;
+using SwimTrack.Services.DTOs.WorkoutResult;
 using SwimTrack.Services.Contracts;
 
 namespace SwimTrack.Services.Services;

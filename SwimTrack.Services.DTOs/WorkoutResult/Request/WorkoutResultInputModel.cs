@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 using static SwimTrack.Shared.Constants.EntityValidation.WorkoutResult;
 
-namespace SwimTrack.DTOs.WorkoutResult;
+namespace SwimTrack.Services.DTOs.WorkoutResult;
 
 public class WorkoutResultInputModel
 {
