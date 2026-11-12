@@ -9,8 +9,8 @@
     string displayName = userName.Contains("@") ? userName.Split('@')[0] : userName;
 
     <span>Hello, @displayName</span>
-    <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post" style="display:inline;margin:0;">
-        <button type="submit" class="button button--small">Logout</button>
+    <form class="inline-form" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post">
+        <button class="button button--small" type="submit">Logout</button>
     </form>
 }
 else

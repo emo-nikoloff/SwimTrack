@@ -25,9 +25,9 @@
     <a class="text-muted" asp-controller="TrainingPlan" asp-action="All">← Back to plans</a>
 
     <section class="d-flex flex-wrap align-items-start justify-content-between gap-32">
-        <div class="stack" style="max-width:640px">
+        <div class="stack plan-details-intro">
             <p class="eyebrow-heading">Training plan</p>
-            <h1 style="font-size:64px">@Model.Name</h1>
+            <h1 class="plan-title">@Model.Name</h1>
             <p class="text-muted">@Model.StartDate.ToString(DateTimeFormat) – @Model.EndDate.ToString(DateTimeFormat) · @totalWorkoutsCount workouts</p>
             @if (!string.IsNullOrWhiteSpace(Model.Goal))
             {
@@ -38,9 +38,9 @@
             </div>
         </div>
 
-        <div class="card" style="grid-auto-flow:column;gap:32px;align-items:center">
+        <div class="card plan-progress-card">
             <div class="progress-ring" style="--p:@doneWorkoutsPercent"><b>@doneWorkoutsCount/@totalWorkoutsCount</b></div>
-            <div class="stack" style="gap:6px">
+            <div class="stack plan-progress-details">
                 <span class="stat-number">@totalSwumDistance m</span>
                 <small>swum so far</small>
                 <small>@skippedWorkoutsCount skipped · @plannedWorkoutsCount to go</small>
@@ -90,7 +90,7 @@
                             <article class="workout-card workout-card--skipped">
                                 <header>
                                     <div class="workout-card-date">
-                                        <b style="font-size:24px">@workout.Date.ToString(DateTimeFormat)</b>
+                                        <b class="workout-date-heading">@workout.Date.ToString(DateTimeFormat)</b>
                                     </div>
                                     <span class="badge badge--skipped">Skipped</span>
                                 </header>
@@ -101,7 +101,7 @@
                                 <p class="workout-card-note">@(string.IsNullOrWhiteSpace(workout.Notes) ? "No notes." : workout.Notes)</p>
                                 <footer>
                                     <a class="button button--small" asp-controller="Workout" asp-action="Edit" asp-route-id="@workout.Id" asp-route-trainingPlanId="@Model.Id">Edit notes</a>
-                                    <form asp-controller="Workout" asp-action="PlanAgain" asp-route-id="@workout.Id" asp-route-trainingPlanId="@Model.Id" method="post" style="display:inline;margin:0;">
+                                    <form class="inline-form" asp-controller="Workout" asp-action="PlanAgain" asp-route-id="@workout.Id" asp-route-trainingPlanId="@Model.Id" method="post">
                                         <button class="button button--small button--primary" type="submit">Plan again</button>
                                     </form>
                                 </footer>
@@ -119,15 +119,15 @@
                             <article class="workout-card">
                                 <header>
                                     <div>
-                                        <b style="font-size:24px">@workout.Date.ToString(DateTimeFormat)</b>
+                                        <b class="workout-date-heading">@workout.Date.ToString(DateTimeFormat)</b>
                                         @if (workout.Result != null && workout.Result.CompletedAt.Date != workout.Date.Date)
                                         {
-                                            <small class="text-muted" style="display:block;margin-top:2px">Swum @workout.Result.CompletedAt.ToString(DateTimeFormat)</small>
+                                            <small class="text-muted workout-completed-date">Swum @workout.Result.CompletedAt.ToString(DateTimeFormat)</small>
                                         }
                                     </div>
                                     <span class="badge badge--completed">Completed</span>
                                 </header>
-                                <div class="stack" style="gap:8px">
+                                <div class="stack stack--tight">
                                     <div class="key-value-row">
                                         <span>Planned</span>
                                         <b>@workout.PlannedDistance m · @workout.PlannedDuration min</b>
@@ -153,7 +153,7 @@
                             <article class="workout-card @(isToday ? "workout-card--today" : "")">
                                 <header>
                                     <div class="workout-card-date">
-                                        <b style="font-size:24px">@workout.Date.ToString(DateTimeFormat)</b>
+                                        <b class="workout-date-heading">@workout.Date.ToString(DateTimeFormat)</b>
                                         @if (isToday)
                                         {
                                             <span>Today</span>
@@ -161,7 +161,7 @@
                                     </div>
                                     <span class="badge badge--planned">Planned</span>
                                 </header>
-                                <div class="stack" style="gap:8px">
+                                <div class="stack stack--tight">
                                     <div class="key-value-row">
                                         <span>Planned</span>
                                         <b>@workout.PlannedDistance m · @workout.PlannedDuration min</b>
@@ -173,7 +173,7 @@
                                     @if (workout.Date.Date <= DateTime.Today)
                                     {
                                         <a class="button button--small button--primary" asp-controller="Workout" asp-action="Complete" asp-route-id="@workout.Id" asp-route-trainingPlanId="@Model.Id">Complete</a>
-                                        <form asp-controller="Workout" asp-action="Skip" asp-route-id="@workout.Id" asp-route-trainingPlanId="@Model.Id" method="post" style="display:inline;margin:0;">
+                                        <form class="inline-form" asp-controller="Workout" asp-action="Skip" asp-route-id="@workout.Id" asp-route-trainingPlanId="@Model.Id" method="post">
                                             <button class="button button--small button--warning" type="submit">Skip</button>
                                         </form>
                                     }
@@ -195,9 +195,9 @@
         <button class="button button--danger" type="button" popovertarget="rm">Remove</button>
         <div class="popover-dialog" id="rm" popover="">
             <h3>Remove “@Model.Name”?</h3>
-            <p class="text-muted" style="margin:10px 0 20px">This cannot be undone.</p>
+            <p class="text-muted remove-plan-warning">This cannot be undone.</p>
             <div class="flex-row">
-                <form asp-controller="TrainingPlan" asp-action="Remove" asp-route-id="@Model.Id" method="post" style="display:inline;margin:0;">
+                <form class="inline-form" asp-controller="TrainingPlan" asp-action="Remove" asp-route-id="@Model.Id" method="post">
                     <button class="button button--danger" type="submit">Yes, remove</button>
                 </form>
                 <button class="button" type="button" popovertarget="rm" popovertargetaction="hide">Keep it</button>

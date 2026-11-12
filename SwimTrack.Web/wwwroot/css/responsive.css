@@ -1,0 +1,22 @@
+/* ==========================================================================
+ RESPONSIVE STYLES
+ ========================================================================== */
+
+@media (max-width: 860px) {
+  .grid-2-columns,
+  .grid-3-columns,
+  .hero-section,
+  .dashboard-grid,
+  .layout-split,
+  .layout-split--sidebar-left {
+    grid-template-columns: 1fr;
+  }
+
+  .pool-visual {
+    min-height: 340px;
+  }
+
+  .container {
+    padding: 0 20px;
+  }
+}

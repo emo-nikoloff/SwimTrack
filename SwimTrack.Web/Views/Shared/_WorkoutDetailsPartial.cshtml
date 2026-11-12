@@ -1,6 +1,6 @@
 @model WorkoutViewModel
 
-<div class="stack" style="gap:12px">
+<div class="stack stack--compact">
     <div class="d-flex align-items-center justify-content-between gap-12">
         <b>@Model.Date.ToString(DateTimeFormat)</b>
         @if (Model.Status == WorkoutStatus.Completed)
@@ -27,14 +27,14 @@
     </div>
 
     <div>
-        <small style="font-weight:700">Notes</small>
-        <p class="text-muted" style="margin-top:2px">@(string.IsNullOrWhiteSpace(Model.Notes) ? "No notes." : Model.Notes)</p>
+        <small class="workout-details-label">Notes</small>
+        <p class="text-muted workout-details-note">@(string.IsNullOrWhiteSpace(Model.Notes) ? "No notes." : Model.Notes)</p>
     </div>
 
     @if (Model.Result != null)
     {
         <div class="lane-rope-divider"></div>
-        <div class="stack" style="gap:8px">
+        <div class="stack stack--tight">
             <span class="eyebrow-heading">Result</span>
             <div class="key-value-row">
                 <span>Actual distance</span>

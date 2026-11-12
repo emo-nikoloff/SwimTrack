@@ -1,0 +1,98 @@
+/* ==========================================================================
+   LAYOUT & UTILITIES
+   ========================================================================== */
+
+.container {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* Flexbox Utilities */
+.d-flex {
+  display: flex;
+}
+
+.flex-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.align-items-start {
+  align-items: flex-start;
+}
+
+.justify-content-between {
+  justify-content: space-between;
+}
+
+.gap-12 {
+  gap: 12px;
+}
+
+.gap-32 {
+  gap: 32px;
+}
+
+/* Grid Layouts */
+.stack {
+  display: grid;
+  gap: 24px;
+  align-content: start;
+}
+
+.stack--compact {
+  gap: 12px;
+}
+
+.stack--tight {
+  gap: 8px;
+}
+
+.grid-2-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.grid-3-columns {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.layout-split {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 32px;
+  align-items: start;
+}
+
+.layout-split--sidebar-left {
+  grid-template-columns: 400px 1fr;
+}
+
+/* Shared page layout */
+.page-content {
+  padding-block: 40px 64px;
+  display: grid;
+  gap: 32px;
+}
+
+.app-footer {
+  padding-block: 32px;
+  color: var(--color-text-muted);
+  font-size: 14px;
+  margin-top: auto;
+}

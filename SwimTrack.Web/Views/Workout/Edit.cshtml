@@ -6,9 +6,9 @@
 }
 
 <main class="container page-content">
-    <div class="stack" style="gap:12px">
+    <div class="stack stack--compact">
         <a class="text-muted" asp-controller="TrainingPlan" asp-action="Details" asp-route-id="@trainingPlanId">← Back to plan</a>
-        <h1 style="font-size:56px">Edit workout</h1>
+        <h1 class="page-title">Edit workout</h1>
     </div>
 
     <div class="layout-split layout-split--sidebar-left">
@@ -37,13 +37,13 @@
               asp-route-id="@Model.Id"
               asp-route-trainingPlanId="@trainingPlanId"
               method="post">
-            <div asp-validation-summary="ModelOnly" class="field-validation-error"></div>
+            <div class="field-validation-error" asp-validation-summary="ModelOnly"></div>
 
             <h3>Workout details</h3>
 
             <partial name="_WorkoutInputPartial" model="Model" />
 
-            <div class="flex-row" style="margin-top:16px">
+            <div class="flex-row form-actions--spaced">
                 <button class="button button--primary" type="submit">Save changes</button>
                 <a class="button" asp-controller="TrainingPlan" asp-action="Details" asp-route-id="@trainingPlanId">Cancel</a>
             </div>

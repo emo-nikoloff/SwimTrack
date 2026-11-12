@@ -61,7 +61,7 @@
 <main class="container page-content">
     <div>
         <p class="eyebrow-heading">@DateTime.Today.ToString(DateTimeFormat)</p>
-        <h1 style="font-size:56px">Good to see you, @displayName.</h1>
+        <h1 class="page-title">Good to see you, @displayName.</h1>
     </div>
 
     <section class="dashboard-grid">
@@ -87,7 +87,7 @@
                     @if (displaySession.Workout.Date.Date <= DateTime.Today)
                     {
                         <a class="button button--primary" asp-controller="Workout" asp-action="Complete" asp-route-id="@displaySession.Workout.Id" asp-route-trainingPlanId="@displaySession.Plan.Id">Complete</a>
-                        <form asp-controller="Workout" asp-action="Skip" asp-route-id="@displaySession.Workout.Id" asp-route-trainingPlanId="@displaySession.Plan.Id" method="post" style="display:inline;margin:0;">
+                        <form class="inline-form" asp-controller="Workout" asp-action="Skip" asp-route-id="@displaySession.Workout.Id" asp-route-trainingPlanId="@displaySession.Plan.Id" method="post">
                             <button class="button button--warning" type="submit">Skip</button>
                         </form>
                     }
