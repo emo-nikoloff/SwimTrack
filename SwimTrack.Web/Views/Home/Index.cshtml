@@ -9,15 +9,8 @@
             <h1>Plan the swim. Log every length.</h1>
             <p class="text-lead">SwimTrack turns a goal into a block of sessions, then shows how the water really went.</p>
             <div class="flex-row">
-                @if (User.Identity?.IsAuthenticated ?? false)
-                {
-                    <a class="button button--primary" asp-controller="TrainingPlan" asp-action="All">Go to your plans</a>
-                }
-                else
-                {
-                    <a class="button button--dark" asp-area="Identity" asp-page="/Account/Register">Start your journey</a>
-                    <a class="button" asp-area="Identity" asp-page="/Account/Login">I have an account</a>
-                }
+                <a class="button button--dark" asp-area="Identity" asp-page="/Account/Register">Start your journey</a>
+                <a class="button" asp-area="Identity" asp-page="/Account/Login">I have an account</a>
             </div>
             <div class="lane-rope-divider"></div>
             <div class="flex-row">
@@ -79,13 +72,10 @@
         </div>
     </section>
 
-    @if (!(User.Identity?.IsAuthenticated ?? false))
-    {
-        <section class="container">
-            <div class="cta-banner">
-                <h2>Your next length starts with a plan.</h2>
-                <a class="button button--primary" asp-area="Identity" asp-page="/Account/Register">Create your first plan</a>
-            </div>
-        </section>
-    }
+    <section class="container">
+        <div class="cta-banner">
+            <h2>Your next length starts with a plan.</h2>
+            <a class="button button--primary" asp-area="Identity" asp-page="/Account/Register">Create your first plan</a>
+        </div>
+    </section>
 </main>

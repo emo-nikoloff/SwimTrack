@@ -27,11 +27,14 @@
                     SwimTrack
                 </a>
                 <nav class="navbar-nav" aria-label="Main">
-                    <a asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                     @if (User.Identity?.IsAuthenticated ?? false)
                     {
                         <a asp-area="" asp-controller="TrainingPlan" asp-action="All">Plans</a>
                         <a asp-area="" asp-controller="TrainingPlan" asp-action="Create">New plan</a>
+                    }
+                    else
+                    {
+                        <a asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                     }
                 </nav>
                 <div class="navbar-user">
