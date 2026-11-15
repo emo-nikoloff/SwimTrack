@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using SwimTrack.Data.Contracts;
 using SwimTrack.Data.Models;
 using SwimTrack.Data.Repository.Contracts;
+using SwimTrack.Services.Common.Utilities;
 using SwimTrack.Services.Contracts;
 using SwimTrack.Services.DTOs.Workout.Request;
 using SwimTrack.Services.DTOs.Workout.Response;
@@ -23,11 +24,14 @@ public class WorkoutService : IWorkoutService
 
     private readonly IUnitOfWork _unitOfWork;
 
+    private readonly BasicModelValidator _modelValidator;
+
     public WorkoutService(IWorkoutRepository workoutRepository, IWorkoutResultRepository workoutResultRepository, IUnitOfWork unitOfWork)
     {
         _workoutRepository = workoutRepository;
         _workoutResultRepository = workoutResultRepository;
         _unitOfWork = unitOfWork;
+        _modelValidator = new();
     }
 
     public async Task<EditWorkoutResponseModel?> GetWorkoutForEditAsync(int id, int trainingPlanId, string currentUserId)
@@ -58,6 +62,12 @@ public class WorkoutService : IWorkoutService
 
     public async Task<bool> EditWorkoutAsync(int trainingPlanId, EditWorkoutRequestModel request, string currentUserId)
     {
+        bool isInputValid = _modelValidator.IsValid(request);
+        if (!isInputValid)
+        {
+            return false;
+        }
+
         Workout? requestedWorkout =
             await _workoutRepository.All()
                 .Include(w => w.TrainingPlan)
@@ -130,6 +140,12 @@ public class WorkoutService : IWorkoutService
 
     public async Task<bool> CompleteWorkoutAsync(int id, int trainingPlanId, CreateWorkoutResultRequestModel request, string currentUserId)
     {
+        bool isInputValid = _modelValidator.IsValid(request);
+        if (!isInputValid)
+        {
+            return false;
+        }
+
         Workout? requestedWorkout =
             await _workoutRepository.All()
                 .FirstOrDefaultAsync(w =>

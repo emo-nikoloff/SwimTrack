@@ -37,6 +37,11 @@ public class TrainingPlanFormInputModel : IValidatableObject
             yield break;
         }
 
+        if (Workouts == null)
+        {
+            yield break;
+        }
+
         for (int i = 0; i < Workouts.Count; i++)
         {
             if (!DateValidator.ValidateWorkoutDate(Workouts[i].Date, StartDate, EndDate))

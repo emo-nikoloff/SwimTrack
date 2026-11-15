@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SwimTrack.Data.Contracts;
 using SwimTrack.Data.Models;
 using SwimTrack.Data.Repository.Contracts;
+using SwimTrack.Services.Common.Utilities;
 using SwimTrack.Services.Contracts;
 using SwimTrack.Services.DTOs.TrainingPlan.Request;
 using SwimTrack.Services.DTOs.TrainingPlan.Response;
@@ -20,11 +21,14 @@ public class TrainingPlanService : ITrainingPlanService
 
     private readonly IUnitOfWork _unitOfWork;
 
+    private readonly BasicModelValidator _modelValidator;
+
     public TrainingPlanService(ITrainingPlanRepository trainingPlanRepository, IWorkoutRepository workoutRepository, IUnitOfWork unitOfWork)
     {
         _trainingPlanRepository = trainingPlanRepository;
         _workoutRepository = workoutRepository;
         _unitOfWork = unitOfWork;
+        _modelValidator = new();
     }
 
     public async Task<IEnumerable<AllTrainingPlansResponseModel>> GetAllTrainingPlansAsync(string currentUserId)
@@ -64,6 +68,19 @@ public class TrainingPlanService : ITrainingPlanService
 
     public async Task CreateTrainingPlanAsync(CreateTrainingPlanRequestModel request, string currentUserId)
     {
+        bool isInputValid = _modelValidator.IsValid(request);
+        if (!isInputValid)
+        {
+            return;
+        }
+
+        bool hasInvalidWorkoutInput = request.Workouts
+            .Any(w => !_modelValidator.IsValid(w));
+        if (hasInvalidWorkoutInput)
+        {
+            return;
+        }
+
         TrainingPlan newTrainingPlan = new()
         {
             Name = request.Name,
@@ -124,6 +141,19 @@ public class TrainingPlanService : ITrainingPlanService
 
     public async Task<bool> EditTrainingPlanAsync(EditTrainingPlanRequestModel request, string currentUserId)
     {
+        bool isInputValid = _modelValidator.IsValid(request);
+        if (!isInputValid)
+        {
+            return false;
+        }
+
+        bool hasInvalidWorkoutInput = request.NewWorkouts
+            .Any(w => !_modelValidator.IsValid(w));
+        if (hasInvalidWorkoutInput)
+        {
+            return false;
+        }
+
         TrainingPlan? requestedTrainingPlan =
             await _trainingPlanRepository.All()
                 .Include(tp => tp.Workouts)
