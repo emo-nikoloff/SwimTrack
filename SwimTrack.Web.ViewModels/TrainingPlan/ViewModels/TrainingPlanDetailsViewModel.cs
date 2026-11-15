@@ -1,8 +1,8 @@
-using SwimTrack.Services.DTOs.Workout;
+using SwimTrack.Web.ViewModels.Workout.ViewModels;
 
-namespace SwimTrack.Services.DTOs.TrainingPlan;
+namespace SwimTrack.Web.ViewModels.TrainingPlan.ViewModels;
 
-public class TrainingPlanViewModel
+public class TrainingPlanDetailsViewModel
 {
     public int Id { get; set; }
 

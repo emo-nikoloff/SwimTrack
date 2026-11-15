@@ -1,9 +1,8 @@
-@model TrainingPlanInputModel
+@model TrainingPlanFormInputModel
 @{
     ViewData["Title"] = "Edit training plan";
 
-    List<WorkoutInputModel> trainingPlanWorkouts = Model.Workouts;
-    object? planId = ViewContext.RouteData.Values["id"];
+    List<WorkoutFormInputModel> trainingPlanWorkouts = Model.Workouts;
 }
 
 <main class="container page-content">
@@ -14,7 +13,7 @@
 
     <form asp-controller="TrainingPlan"
           asp-action="Edit"
-          asp-route-id="@planId"
+          asp-route-id="@Model.Id"
           method="post">
         <div class="stack form-page-stack">
             <partial name="_TrainingPlanInputPartial" model="Model" />
@@ -24,7 +23,7 @@
                 <button class="button" type="submit"
                         asp-controller="TrainingPlan"
                         asp-action="Edit"
-                        asp-route-id="@planId"
+                        asp-route-id="@Model.Id"
                         asp-route-workoutAction="add"
                         formnovalidate
                        >
@@ -42,7 +41,7 @@
             {
                 @for (int i = 0; i < trainingPlanWorkouts.Count; i++)
                 {
-                    WorkoutInputModel currentWorkout = trainingPlanWorkouts[i];
+                    WorkoutFormInputModel currentWorkout = trainingPlanWorkouts[i];
                     ViewDataDictionary workoutViewData = new ViewDataDictionary(ViewData);
                     workoutViewData.TemplateInfo.HtmlFieldPrefix = $"Workouts[{i}]";
 
@@ -62,7 +61,7 @@
                             <button class="button button--small button--danger" type="submit"
                                     asp-controller="TrainingPlan"
                                     asp-action="Edit"
-                                    asp-route-id="@planId"
+                                    asp-route-id="@Model.Id"
                                     asp-route-workoutAction="remove"
                                     asp-route-workoutIndex="@i"
                                     formnovalidate
@@ -104,7 +103,7 @@
 
             <div class="flex-row">
                 <button class="button button--primary" type="submit">Save changes</button>
-                <a class="button" asp-controller="TrainingPlan" asp-action="Details" asp-route-id="@planId">Cancel</a>
+                <a class="button" asp-controller="TrainingPlan" asp-action="Details" asp-route-id="@Model.Id">Cancel</a>
             </div>
         </div>
     </form>

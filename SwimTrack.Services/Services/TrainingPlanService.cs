@@ -2,10 +2,12 @@ using Microsoft.EntityFrameworkCore;
 
 using SwimTrack.Data;
 using SwimTrack.Data.Models;
-using SwimTrack.Services.DTOs.TrainingPlan;
-using SwimTrack.Services.DTOs.Workout;
-using SwimTrack.Services.DTOs.WorkoutResult;
+using SwimTrack.Services.DTOs.TrainingPlan.Request;
+using SwimTrack.Services.DTOs.Workout.Request;
 using SwimTrack.Services.Contracts;
+using SwimTrack.Services.DTOs.TrainingPlan.Response;
+using SwimTrack.Services.DTOs.Workout.Response;
+using SwimTrack.Services.DTOs.WorkoutResult.Response;
 
 namespace SwimTrack.Services.Services;
 
@@ -18,11 +20,11 @@ public class TrainingPlanService : ITrainingPlanService
         _dbContext = dbContext;
     }
 
-    public async Task<IEnumerable<TrainingPlanViewModel>> GetAllTrainingPlansAsync(string currentUserId)
+    public async Task<IEnumerable<AllTrainingPlansResponseModel>> GetAllTrainingPlansAsync(string currentUserId)
     {
         return await _dbContext.TrainingPlans
             .Where(tp => tp.UserId == currentUserId)
-            .Select(tp => new TrainingPlanViewModel
+            .Select(tp => new AllTrainingPlansResponseModel
             {
                 Id = tp.Id,
                 Name = tp.Name,
@@ -30,7 +32,7 @@ public class TrainingPlanService : ITrainingPlanService
                 StartDate = tp.StartDate,
                 EndDate = tp.EndDate,
                 Workouts = tp.Workouts
-                    .Select(w => new WorkoutViewModel
+                    .Select(w => new WorkoutResponseModel
                     {
                         Id = w.Id,
                         Date = w.Date,
@@ -40,7 +42,7 @@ public class TrainingPlanService : ITrainingPlanService
                         Status = w.Status,
                         Result = w.WorkoutResult == null
                             ? null
-                            : new WorkoutResultViewModel
+                            : new WorkoutResultResponseModel
                             {
                                 ActualDistance = w.WorkoutResult.ActualDistance,
                                 ActualDuration = w.WorkoutResult.ActualDuration,
@@ -53,15 +55,15 @@ public class TrainingPlanService : ITrainingPlanService
             .ToArrayAsync();
     }
 
-    public async Task CreateTrainingPlanAsync(TrainingPlanInputModel trainingPlanInputModel, string currentUserId)
+    public async Task CreateTrainingPlanAsync(CreateTrainingPlanRequestModel request, string currentUserId)
     {
         TrainingPlan newTrainingPlan = new()
         {
-            Name = trainingPlanInputModel.Name,
-            Goal = trainingPlanInputModel.Goal,
-            StartDate = trainingPlanInputModel.StartDate,
-            EndDate = trainingPlanInputModel.EndDate,
-            Workouts = trainingPlanInputModel.Workouts
+            Name = request.Name,
+            Goal = request.Goal,
+            StartDate = request.StartDate,
+            EndDate = request.EndDate,
+            Workouts = request.Workouts
                 .Select(workoutInputModel => new Workout
                 {
                     Date = workoutInputModel.Date,
@@ -69,7 +71,7 @@ public class TrainingPlanService : ITrainingPlanService
                     PlannedDuration = workoutInputModel.PlannedDuration,
                     Notes = workoutInputModel.Notes,
                 })
-                .ToList(),
+                .ToArray(),
             UserId = currentUserId,
         };
 
@@ -77,26 +79,28 @@ public class TrainingPlanService : ITrainingPlanService
         await _dbContext.SaveChangesAsync();
     }
 
-    public async Task<TrainingPlanInputModel?> GetTrainingPlanForEditAsync(int id, string currentUserId)
+    public async Task<EditTrainingPlanResponseModel?> GetTrainingPlanForEditAsync(int id, string currentUserId)
     {
-        TrainingPlan? requestedTrainingPlan = await _dbContext.TrainingPlans
-            .Include(tp => tp.Workouts)
-            .FirstOrDefaultAsync(tp =>
-                tp.Id == id
-                && tp.UserId == currentUserId);
+        TrainingPlan? requestedTrainingPlan =
+            await _dbContext.TrainingPlans
+                .Include(tp => tp.Workouts)
+                .FirstOrDefaultAsync(tp =>
+                    tp.Id == id
+                    && tp.UserId == currentUserId);
         if (requestedTrainingPlan == null)
         {
             return null;
         }
 
-        TrainingPlanInputModel trainingPlanInputModel = new()
+        EditTrainingPlanResponseModel editTrainingPlanResponse = new()
         {
+            Id = requestedTrainingPlan.Id,
             Name = requestedTrainingPlan.Name,
             Goal = requestedTrainingPlan.Goal,
             StartDate = requestedTrainingPlan.StartDate,
             EndDate = requestedTrainingPlan.EndDate,
             Workouts = requestedTrainingPlan.Workouts
-                .Select(w => new WorkoutInputModel
+                .Select(w => new EditWorkoutResponseModel
                 {
                     Id = w.Id,
                     Date = w.Date,
@@ -105,52 +109,62 @@ public class TrainingPlanService : ITrainingPlanService
                     Notes = w.Notes,
                     Status = w.Status,
                 })
-                .ToList(),
+                .ToArray(),
         };
 
-        return trainingPlanInputModel;
+        return editTrainingPlanResponse;
     }
 
-    public async Task<bool> EditTrainingPlanAsync(int id, TrainingPlanInputModel trainingPlanInputModel, string currentUserId)
+    public async Task<bool> EditTrainingPlanAsync(EditTrainingPlanRequestModel request, string currentUserId)
     {
-        TrainingPlan? requestedTrainingPlan = await _dbContext.TrainingPlans
-            .Include(tp => tp.Workouts)
-            .FirstOrDefaultAsync(tp =>
-                tp.Id == id
-                && tp.UserId == currentUserId);
+        TrainingPlan? requestedTrainingPlan =
+            await _dbContext.TrainingPlans
+                .Include(tp => tp.Workouts)
+                .FirstOrDefaultAsync(tp =>
+                    tp.Id == request.Id
+                    && tp.UserId == currentUserId);
         if (requestedTrainingPlan == null)
         {
             return false;
         }
 
-        requestedTrainingPlan.Name = trainingPlanInputModel.Name;
-        requestedTrainingPlan.Goal = trainingPlanInputModel.Goal;
-        requestedTrainingPlan.StartDate = trainingPlanInputModel.StartDate;
-        requestedTrainingPlan.EndDate = trainingPlanInputModel.EndDate;
-
-        IEnumerable<int> submittedWorkoutIds = trainingPlanInputModel.Workouts
-            .Where(w => w.Id.HasValue)
-            .Select(w => w.Id!.Value)
+        HashSet<int> workoutIdsToKeep = request.WorkoutIdsToKeep
             .ToHashSet();
 
+        if (workoutIdsToKeep.Count != request.WorkoutIdsToKeep.Count)
+        {
+            return false;
+        }
+
+        HashSet<int> existingWorkoutIds = requestedTrainingPlan.Workouts
+            .Select(w => w.Id)
+            .ToHashSet();
+
+        if (!workoutIdsToKeep.IsSubsetOf(existingWorkoutIds))
+        {
+            return false;
+        }
+
         IEnumerable<Workout> workoutsToRemove = requestedTrainingPlan.Workouts
-            .Where(w => !submittedWorkoutIds.Contains(w.Id))
+            .Where(w => !workoutIdsToKeep.Contains(w.Id))
             .ToArray();
+
+        requestedTrainingPlan.Name = request.Name;
+        requestedTrainingPlan.Goal = request.Goal;
+        requestedTrainingPlan.StartDate = request.StartDate;
+        requestedTrainingPlan.EndDate = request.EndDate;
 
         _dbContext.Workouts.RemoveRange(workoutsToRemove);
 
-        foreach (WorkoutInputModel workoutInputModel in trainingPlanInputModel.Workouts)
+        foreach (CreateWorkoutRequestModel workoutRequest in request.NewWorkouts)
         {
-            if (!workoutInputModel.Id.HasValue)
+            requestedTrainingPlan.Workouts.Add(new Workout
             {
-                requestedTrainingPlan.Workouts.Add(new Workout
-                {
-                    Date = workoutInputModel.Date,
-                    PlannedDistance = workoutInputModel.PlannedDistance,
-                    PlannedDuration = workoutInputModel.PlannedDuration,
-                    Notes = workoutInputModel.Notes,
-                });
-            }
+                Date = workoutRequest.Date,
+                PlannedDistance = workoutRequest.PlannedDistance,
+                PlannedDuration = workoutRequest.PlannedDuration,
+                Notes = workoutRequest.Notes,
+            });
         }
 
         await _dbContext.SaveChangesAsync();
@@ -160,10 +174,11 @@ public class TrainingPlanService : ITrainingPlanService
 
     public async Task<bool> RemoveTrainingPlanAsync(int id, string currentUserId)
     {
-        TrainingPlan? requestedTrainingPlan = await _dbContext.TrainingPlans
-            .FirstOrDefaultAsync(tp =>
-                tp.Id == id
-                && tp.UserId == currentUserId);
+        TrainingPlan? requestedTrainingPlan =
+            await _dbContext.TrainingPlans
+                .FirstOrDefaultAsync(tp =>
+                    tp.Id == id
+                    && tp.UserId == currentUserId);
         if (requestedTrainingPlan == null)
         {
             return false;
@@ -175,11 +190,11 @@ public class TrainingPlanService : ITrainingPlanService
         return true;
     }
 
-    public async Task<TrainingPlanViewModel?> GetTrainingPlanDetailsAsync(int id, string currentUserId)
+    public async Task<TrainingPlanDetailsResponseModel?> GetTrainingPlanDetailsAsync(int id, string currentUserId)
     {
         return await _dbContext.TrainingPlans
             .Where(tp => tp.Id == id && tp.UserId == currentUserId)
-            .Select(tp => new TrainingPlanViewModel
+            .Select(tp => new TrainingPlanDetailsResponseModel
             {
                 Id = tp.Id,
                 Name = tp.Name,
@@ -187,7 +202,7 @@ public class TrainingPlanService : ITrainingPlanService
                 StartDate = tp.StartDate,
                 EndDate = tp.EndDate,
                 Workouts = tp.Workouts
-                    .Select(w => new WorkoutViewModel
+                    .Select(w => new WorkoutResponseModel
                     {
                         Id = w.Id,
                         Date = w.Date,
@@ -197,7 +212,7 @@ public class TrainingPlanService : ITrainingPlanService
                         Status = w.Status,
                         Result = w.WorkoutResult == null
                             ? null
-                            : new WorkoutResultViewModel
+                            : new WorkoutResultResponseModel
                             {
                                 ActualDistance = w.WorkoutResult.ActualDistance,
                                 ActualDuration = w.WorkoutResult.ActualDuration,

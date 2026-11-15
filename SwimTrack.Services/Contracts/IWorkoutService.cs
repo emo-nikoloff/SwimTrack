@@ -1,17 +1,19 @@
-using SwimTrack.Services.DTOs.Workout;
-using SwimTrack.Services.DTOs.WorkoutResult;
+using SwimTrack.Services.DTOs.Workout.Request;
+using SwimTrack.Services.DTOs.Workout.Response;
+using SwimTrack.Services.DTOs.WorkoutResult.Request;
+using SwimTrack.Services.DTOs.WorkoutResult.Response;
 
 namespace SwimTrack.Services.Contracts;
 
 public interface IWorkoutService
 {
-    Task<WorkoutInputModel?> GetWorkoutForEditAsync(int id, int trainingPlanId, string currentUserId);
+    Task<EditWorkoutResponseModel?> GetWorkoutForEditAsync(int id, int trainingPlanId, string currentUserId);
 
-    Task<bool> EditWorkoutAsync(int id, int trainingPlanId, WorkoutInputModel workoutInputModel, string currentUserId);
+    Task<bool> EditWorkoutAsync(int trainingPlanId, EditWorkoutRequestModel request, string currentUserId);
 
-    Task<WorkoutResultInputModel?> GetWorkoutForCompletionAsync(int id, int trainingPlanId, string currentUserId);
+    Task<WorkoutResultResponseModel?> GetWorkoutForCompletionAsync(int id, int trainingPlanId, string currentUserId);
 
-    Task<bool> CompleteWorkoutAsync(int id, int trainingPlanId, WorkoutResultInputModel workoutResultInputModel, string currentUserId);
+    Task<bool> CompleteWorkoutAsync(int id, int trainingPlanId, CreateWorkoutResultRequestModel request, string currentUserId);
 
     Task<bool> SkipWorkoutAsync(int id, int trainingPlanId, string currentUserId);
 

@@ -3,10 +3,13 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-using SwimTrack.Services.DTOs.Workout;
-using SwimTrack.Services.DTOs.WorkoutResult;
+using SwimTrack.Services.DTOs.Workout.Request;
+using SwimTrack.Services.DTOs.WorkoutResult.Request;
 using SwimTrack.Services.Contracts;
-using SwimTrack.Shared.Enums;
+using SwimTrack.Services.DTOs.Workout.Response;
+using SwimTrack.Web.ViewModels.Workout.InputModels;
+using SwimTrack.Services.DTOs.WorkoutResult.Response;
+using SwimTrack.Web.ViewModels.WorkoutResult.InputModels;
 
 namespace SwimTrack.Web.Controllers;
 
@@ -32,25 +35,35 @@ public class WorkoutController : Controller
         }
 
         string userId = ValidateAuthorizedUserId(GetUserId());
-        WorkoutInputModel? workoutInputModel = await _workoutService.GetWorkoutForEditAsync(
-            id.Value,
-            trainingPlanId.Value,
-            userId);
-        if (workoutInputModel == null)
+        EditWorkoutResponseModel? editWorkoutResponse =
+            await _workoutService.GetWorkoutForEditAsync(
+                id.Value,
+                trainingPlanId.Value,
+                userId);
+        if (editWorkoutResponse == null)
         {
             return NotFound();
         }
 
-        ViewData["TrainingPlanId"] = trainingPlanId.Value;
+        WorkoutFormInputModel inputModel = new()
+        {
+            Id = editWorkoutResponse.Id,
+            Date = editWorkoutResponse.Date,
+            PlannedDistance = editWorkoutResponse.PlannedDistance,
+            PlannedDuration = editWorkoutResponse.PlannedDuration,
+            Notes = editWorkoutResponse.Notes,
+            Status = editWorkoutResponse.Status,
+            TrainingPlanId = trainingPlanId.Value,
+        };
 
-        return View(workoutInputModel);
+        return View(inputModel);
     }
 
     [HttpPost]
     public async Task<IActionResult> Edit(
         [FromRoute] int? id,
         [FromQuery] int? trainingPlanId,
-        [FromForm] WorkoutInputModel workoutInputModel)
+        [FromForm] WorkoutFormInputModel inputModel)
     {
         if (!id.HasValue || id.Value <= 0
             || !trainingPlanId.HasValue || trainingPlanId.Value <= 0)
@@ -58,22 +71,31 @@ public class WorkoutController : Controller
             return BadRequest();
         }
 
+        inputModel.Id = id.Value;
+        inputModel.TrainingPlanId = trainingPlanId.Value;
+
         if (!ModelState.IsValid)
         {
-            ViewData["TrainingPlanId"] = trainingPlanId.Value;
-
-            return View(workoutInputModel);
+            return View(inputModel);
         }
+
+        EditWorkoutRequestModel editWorkoutRequest = new()
+        {
+            Id = id.Value,
+            Date = inputModel.Date,
+            PlannedDistance = inputModel.PlannedDistance,
+            PlannedDuration = inputModel.PlannedDuration,
+            Notes = inputModel.Notes,
+        };
 
         string userId = ValidateAuthorizedUserId(GetUserId());
         try
         {
-            bool requestEdit = await _workoutService.EditWorkoutAsync(
-                id.Value,
+            bool isEditSuccessful = await _workoutService.EditWorkoutAsync(
                 trainingPlanId.Value,
-                workoutInputModel,
+                editWorkoutRequest,
                 userId);
-            if (!requestEdit)
+            if (!isEditSuccessful)
             {
                 return NotFound();
             }
@@ -81,12 +103,10 @@ public class WorkoutController : Controller
         catch (ValidationException ex)
         {
             string memberKey = ex.ValidationResult?.MemberNames.FirstOrDefault()
-                ?? nameof(WorkoutInputModel.Date);
+                ?? nameof(WorkoutFormInputModel.Date);
             ModelState.AddModelError(memberKey, ex.Message);
 
-            ViewData["TrainingPlanId"] = trainingPlanId.Value;
-
-            return View(workoutInputModel);
+            return View(inputModel);
         }
 
         return RedirectToAction(
@@ -107,26 +127,33 @@ public class WorkoutController : Controller
         }
 
         string userId = ValidateAuthorizedUserId(GetUserId());
-        WorkoutResultInputModel? workoutResultInputModel = await _workoutService.GetWorkoutForCompletionAsync(
+        WorkoutResultResponseModel? workoutResultResponse = await _workoutService.GetWorkoutForCompletionAsync(
             id.Value,
             trainingPlanId.Value,
             userId);
-        if (workoutResultInputModel == null)
+        if (workoutResultResponse == null)
         {
             return NotFound();
         }
 
-        ViewData["TrainingPlanId"] = trainingPlanId.Value;
-        ViewData["WorkoutId"] = id.Value;
+        WorkoutResultFormInputModel inputModel = new()
+        {
+            ActualDistance = workoutResultResponse.ActualDistance,
+            ActualDuration = workoutResultResponse.ActualDuration,
+            CompletedAt = workoutResultResponse.CompletedAt,
+            Notes = workoutResultResponse.Notes,
+            WorkoutId = id.Value,
+            TrainingPlanId = trainingPlanId.Value,
+        };
 
-        return View(workoutResultInputModel);
+        return View(inputModel);
     }
 
     [HttpPost]
     public async Task<IActionResult> Complete(
         [FromRoute] int? id,
         [FromQuery] int? trainingPlanId,
-        [FromForm] WorkoutResultInputModel workoutResultInputModel)
+        [FromForm] WorkoutResultFormInputModel inputModel)
     {
         if (!id.HasValue || id.Value <= 0
             || !trainingPlanId.HasValue || trainingPlanId.Value <= 0)
@@ -134,23 +161,31 @@ public class WorkoutController : Controller
             return BadRequest();
         }
 
+        inputModel.WorkoutId = id.Value;
+        inputModel.TrainingPlanId = trainingPlanId.Value;
+
         if (!ModelState.IsValid)
         {
-            ViewData["TrainingPlanId"] = trainingPlanId.Value;
-            ViewData["WorkoutId"] = id.Value;
-
-            return View(workoutResultInputModel);
+            return View(inputModel);
         }
+
+        CreateWorkoutResultRequestModel createWorkoutResultRequest = new()
+        {
+            ActualDistance = inputModel.ActualDistance,
+            ActualDuration = inputModel.ActualDuration,
+            CompletedAt = inputModel.CompletedAt,
+            Notes = inputModel.Notes,
+        };
 
         string userId = ValidateAuthorizedUserId(GetUserId());
         try
         {
-            bool requestComplete = await _workoutService.CompleteWorkoutAsync(
+            bool isCompletionSuccessful = await _workoutService.CompleteWorkoutAsync(
                 id.Value,
                 trainingPlanId.Value,
-                workoutResultInputModel,
+                createWorkoutResultRequest,
                 userId);
-            if (!requestComplete)
+            if (!isCompletionSuccessful)
             {
                 return NotFound();
             }
@@ -158,13 +193,10 @@ public class WorkoutController : Controller
         catch (ValidationException ex)
         {
             string memberKey = ex.ValidationResult?.MemberNames.FirstOrDefault()
-                ?? nameof(WorkoutResultInputModel.CompletedAt);
+                ?? nameof(WorkoutResultFormInputModel.CompletedAt);
             ModelState.AddModelError(memberKey, ex.Message);
 
-            ViewData["TrainingPlanId"] = trainingPlanId.Value;
-            ViewData["WorkoutId"] = id.Value;
-
-            return View(workoutResultInputModel);
+            return View(inputModel);
         }
 
         return RedirectToAction(
@@ -185,11 +217,11 @@ public class WorkoutController : Controller
         }
 
         string userId = ValidateAuthorizedUserId(GetUserId());
-        bool requestSkip = await _workoutService.SkipWorkoutAsync(
+        bool isSkipSuccessful = await _workoutService.SkipWorkoutAsync(
             id.Value,
             trainingPlanId.Value,
             userId);
-        if (!requestSkip)
+        if (!isSkipSuccessful)
         {
             return NotFound();
         }
@@ -212,11 +244,11 @@ public class WorkoutController : Controller
         }
 
         string userId = ValidateAuthorizedUserId(GetUserId());
-        bool requestPlanAgain = await _workoutService.PlanAgainWorkoutAsync(
+        bool isPlanAgainSuccessful = await _workoutService.PlanAgainWorkoutAsync(
             id.Value,
             trainingPlanId.Value,
             userId);
-        if (!requestPlanAgain)
+        if (!isPlanAgainSuccessful)
         {
             return NotFound();
         }

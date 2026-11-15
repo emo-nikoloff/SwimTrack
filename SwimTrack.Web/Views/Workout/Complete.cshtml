@@ -1,14 +1,11 @@
-@model WorkoutResultInputModel
+@model WorkoutResultFormInputModel
 @{
     ViewData["Title"] = "Complete workout";
-
-    int trainingPlanId = (int)(ViewData["TrainingPlanId"] ?? 0);
-    int workoutId = (int)(ViewData["WorkoutId"] ?? 0);
 }
 
 <main class="container page-content">
     <div class="stack stack--compact">
-        <a class="text-muted" asp-controller="TrainingPlan" asp-action="Details" asp-route-id="@trainingPlanId">← Back to plan</a>
+        <a class="text-muted" asp-controller="TrainingPlan" asp-action="Details" asp-route-id="@Model.TrainingPlanId">← Back to plan</a>
         <h1 class="page-title">How did it go?</h1>
     </div>
 
@@ -34,8 +31,8 @@
         <form class="card"
               asp-controller="Workout"
               asp-action="Complete"
-              asp-route-id="@workoutId"
-              asp-route-trainingPlanId="@trainingPlanId"
+              asp-route-id="@Model.WorkoutId"
+              asp-route-Model.TrainingPlanId="@Model.TrainingPlanId"
               method="post">
             <div class="field-validation-error" asp-validation-summary="ModelOnly"></div>
 
@@ -75,7 +72,7 @@
 
             <div class="flex-row">
                 <button class="button button--primary" type="submit">Complete workout</button>
-                <a class="button" asp-controller="TrainingPlan" asp-action="Details" asp-route-id="@trainingPlanId">Cancel</a>
+                <a class="button" asp-controller="TrainingPlan" asp-action="Details" asp-route-id="@Model.TrainingPlanId">Cancel</a>
             </div>
         </form>
     </div>

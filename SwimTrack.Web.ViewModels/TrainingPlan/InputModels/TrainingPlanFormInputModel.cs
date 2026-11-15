@@ -1,14 +1,16 @@
 using System.ComponentModel.DataAnnotations;
 
-using SwimTrack.Services.DTOs.Workout;
+using SwimTrack.Web.ViewModels.Workout.InputModels;
 using SwimTrack.Shared.Validation;
 using static SwimTrack.Shared.Constants.EntityValidation.TrainingPlan;
 using static SwimTrack.Shared.Constants.ValidationMessages.DateValidation;
 
-namespace SwimTrack.Services.DTOs.TrainingPlan;
+namespace SwimTrack.Web.ViewModels.TrainingPlan.InputModels;
 
-public class TrainingPlanInputModel : IValidatableObject
+public class TrainingPlanFormInputModel : IValidatableObject
 {
+    public int? Id { get; set; }
+
     [Required]
     [StringLength(NameMaxLength, MinimumLength = NameMinLength)]
     public string Name { get; set; } = null!;
@@ -20,7 +22,7 @@ public class TrainingPlanInputModel : IValidatableObject
 
     public DateTime EndDate { get; set; }
 
-    public List<WorkoutInputModel> Workouts { get; set; } = new();
+    public List<WorkoutFormInputModel> Workouts { get; set; } = new();
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
@@ -43,7 +45,7 @@ public class TrainingPlanInputModel : IValidatableObject
                     WorkoutDateOutsidePlanPeriod,
                     new[]
                     {
-                        $"{nameof(Workouts)}[{i}].{nameof(WorkoutInputModel.Date)}"
+                        $"{nameof(Workouts)}[{i}].{nameof(WorkoutFormInputModel.Date)}"
                     });
             }
         }

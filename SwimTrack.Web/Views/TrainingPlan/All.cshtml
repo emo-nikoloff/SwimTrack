@@ -1,4 +1,4 @@
-@model IEnumerable<TrainingPlanViewModel>
+@model IEnumerable<AllTrainingPlansViewModel>
 @{
     ViewData["Title"] = "Plans";
 
@@ -46,7 +46,7 @@
     }
 
     bool hasUserPlans = Model.Any();
-    TrainingPlanViewModel? trainingPlanWithoutWorkouts = Model.FirstOrDefault(p => !p.Workouts.Any());
+    AllTrainingPlansViewModel? trainingPlanWithoutWorkouts = Model.FirstOrDefault(p => !p.Workouts.Any());
 
     int totalCompletedWorkouts = allTrainingPlanWorkouts.Count(x => x.Workout.Status == WorkoutStatus.Completed);
     int totalSkippedWorkouts = allTrainingPlanWorkouts.Count(x => x.Workout.Status == WorkoutStatus.Skipped);
@@ -172,7 +172,7 @@
     else
     {
         <section class="grid-2-columns">
-            @foreach (TrainingPlanViewModel trainingPlan in Model)
+            @foreach (AllTrainingPlansViewModel trainingPlan in Model)
             {
                 List<WorkoutViewModel>? workouts = trainingPlan.Workouts.OrderBy(w => w.Date).ToList();
                 int trainingPlanCompleted = workouts.Count(w => w.Status == WorkoutStatus.Completed);

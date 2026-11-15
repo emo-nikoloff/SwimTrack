@@ -1,8 +1,8 @@
-@model TrainingPlanInputModel
+@model TrainingPlanFormInputModel
 @{
     ViewData["Title"] = "Create training plan";
 
-    List<WorkoutInputModel> trainingPlanWorkouts = Model.Workouts;
+    List<WorkoutFormInputModel> trainingPlanWorkouts = Model.Workouts;
 }
 
 <main class="container page-content">
@@ -37,7 +37,7 @@
             {
                 @for (int i = 0; i < trainingPlanWorkouts.Count; i++)
                 {
-                    WorkoutInputModel currentWorkout = trainingPlanWorkouts[i];
+                    WorkoutFormInputModel currentWorkout = trainingPlanWorkouts[i];
                     ViewDataDictionary workoutViewData = new ViewDataDictionary(ViewData);
                     workoutViewData.TemplateInfo.HtmlFieldPrefix = $"Workouts[{i}]";
 

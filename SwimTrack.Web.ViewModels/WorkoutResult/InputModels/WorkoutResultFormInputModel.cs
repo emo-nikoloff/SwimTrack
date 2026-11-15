@@ -2,9 +2,9 @@ using System.ComponentModel.DataAnnotations;
 
 using static SwimTrack.Shared.Constants.EntityValidation.WorkoutResult;
 
-namespace SwimTrack.Services.DTOs.WorkoutResult;
+namespace SwimTrack.Web.ViewModels.WorkoutResult.InputModels;
 
-public class WorkoutResultInputModel
+public class WorkoutResultFormInputModel
 {
     [Range(DistanceMinValue, DistanceMaxValue)]
     public int ActualDistance { get; set; }
@@ -16,4 +16,8 @@ public class WorkoutResultInputModel
 
     [MaxLength(NotesMaxLength)]
     public string? Notes { get; set; }
+
+    public int WorkoutId { get; set; }
+
+    public int TrainingPlanId { get; set; }
 }
