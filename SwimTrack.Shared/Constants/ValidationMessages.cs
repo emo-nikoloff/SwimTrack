@@ -2,6 +2,11 @@ namespace SwimTrack.Shared.Constants;
 
 public static class ValidationMessages
 {
+    public static class Identity
+    {
+        public const string InvalidUserId = "The authenticated user's ID could not be retrieved.";
+    }
+
     public static class DateValidation
     {
         public const string InvalidTrainingPlanPeriod = "The start date cannot be after the end date.";

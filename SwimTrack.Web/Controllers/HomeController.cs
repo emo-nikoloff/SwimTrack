@@ -7,7 +7,7 @@ using SwimTrack.Web.ViewModels;
 namespace SwimTrack.Web.Controllers;
 
 [AllowAnonymous]
-public class HomeController : Controller
+public class HomeController : BaseController
 {
     public IActionResult Index()
     {

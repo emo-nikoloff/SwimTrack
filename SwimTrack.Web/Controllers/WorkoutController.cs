@@ -1,20 +1,17 @@
 using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-using SwimTrack.Services.DTOs.Workout.Request;
-using SwimTrack.Services.DTOs.WorkoutResult.Request;
 using SwimTrack.Services.Contracts;
+using SwimTrack.Services.DTOs.Workout.Request;
 using SwimTrack.Services.DTOs.Workout.Response;
-using SwimTrack.Web.ViewModels.Workout.InputModels;
+using SwimTrack.Services.DTOs.WorkoutResult.Request;
 using SwimTrack.Services.DTOs.WorkoutResult.Response;
+using SwimTrack.Web.ViewModels.Workout.InputModels;
 using SwimTrack.Web.ViewModels.WorkoutResult.InputModels;
 
 namespace SwimTrack.Web.Controllers;
 
-[Authorize]
-public class WorkoutController : Controller
+public class WorkoutController : BaseController
 {
     private readonly IWorkoutService _workoutService;
 
@@ -34,12 +31,11 @@ public class WorkoutController : Controller
             return BadRequest();
         }
 
-        string userId = ValidateAuthorizedUserId(GetUserId());
         EditWorkoutResponseModel? editWorkoutResponse =
             await _workoutService.GetWorkoutForEditAsync(
                 id.Value,
                 trainingPlanId.Value,
-                userId);
+                UserId);
         if (editWorkoutResponse == null)
         {
             return NotFound();
@@ -88,13 +84,12 @@ public class WorkoutController : Controller
             Notes = inputModel.Notes,
         };
 
-        string userId = ValidateAuthorizedUserId(GetUserId());
         try
         {
             bool isEditSuccessful = await _workoutService.EditWorkoutAsync(
                 trainingPlanId.Value,
                 editWorkoutRequest,
-                userId);
+                UserId);
             if (!isEditSuccessful)
             {
                 return NotFound();
@@ -126,11 +121,10 @@ public class WorkoutController : Controller
             return BadRequest();
         }
 
-        string userId = ValidateAuthorizedUserId(GetUserId());
         WorkoutResultResponseModel? workoutResultResponse = await _workoutService.GetWorkoutForCompletionAsync(
             id.Value,
             trainingPlanId.Value,
-            userId);
+            UserId);
         if (workoutResultResponse == null)
         {
             return NotFound();
@@ -177,14 +171,13 @@ public class WorkoutController : Controller
             Notes = inputModel.Notes,
         };
 
-        string userId = ValidateAuthorizedUserId(GetUserId());
         try
         {
             bool isCompletionSuccessful = await _workoutService.CompleteWorkoutAsync(
                 id.Value,
                 trainingPlanId.Value,
                 createWorkoutResultRequest,
-                userId);
+                UserId);
             if (!isCompletionSuccessful)
             {
                 return NotFound();
@@ -216,11 +209,10 @@ public class WorkoutController : Controller
             return BadRequest();
         }
 
-        string userId = ValidateAuthorizedUserId(GetUserId());
         bool isSkipSuccessful = await _workoutService.SkipWorkoutAsync(
             id.Value,
             trainingPlanId.Value,
-            userId);
+            UserId);
         if (!isSkipSuccessful)
         {
             return NotFound();
@@ -243,11 +235,10 @@ public class WorkoutController : Controller
             return BadRequest();
         }
 
-        string userId = ValidateAuthorizedUserId(GetUserId());
         bool isPlanAgainSuccessful = await _workoutService.PlanAgainWorkoutAsync(
             id.Value,
             trainingPlanId.Value,
-            userId);
+            UserId);
         if (!isPlanAgainSuccessful)
         {
             return NotFound();
@@ -257,20 +248,5 @@ public class WorkoutController : Controller
             nameof(TrainingPlanController.Details),
             "TrainingPlan",
             new { id = trainingPlanId.Value });
-    }
-
-    private string? GetUserId()
-    {
-        return User?.FindFirstValue(ClaimTypes.NameIdentifier);
-    }
-
-    private string ValidateAuthorizedUserId(string? userId)
-    {
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            throw new InvalidOperationException("General identity error occurred - id is null in authorized area!");
-        }
-
-        return userId;
     }
 }

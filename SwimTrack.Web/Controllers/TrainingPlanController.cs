@@ -1,21 +1,18 @@
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-using SwimTrack.Services.DTOs.TrainingPlan.Request;
-using SwimTrack.Services.DTOs.Workout.Request;
 using SwimTrack.Services.Contracts;
+using SwimTrack.Services.DTOs.TrainingPlan.Request;
 using SwimTrack.Services.DTOs.TrainingPlan.Response;
+using SwimTrack.Services.DTOs.Workout.Request;
+using SwimTrack.Web.ViewModels.TrainingPlan.InputModels;
 using SwimTrack.Web.ViewModels.TrainingPlan.ViewModels;
+using SwimTrack.Web.ViewModels.Workout.InputModels;
 using SwimTrack.Web.ViewModels.Workout.ViewModels;
 using SwimTrack.Web.ViewModels.WorkoutResult.ViewModels;
-using SwimTrack.Web.ViewModels.TrainingPlan.InputModels;
-using SwimTrack.Web.ViewModels.Workout.InputModels;
 
 namespace SwimTrack.Web.Controllers;
 
-[Authorize]
-public class TrainingPlanController : Controller
+public class TrainingPlanController : BaseController
 {
     private readonly ITrainingPlanService _trainingPlanService;
 
@@ -27,10 +24,8 @@ public class TrainingPlanController : Controller
     [HttpGet]
     public async Task<IActionResult> All()
     {
-        string userId = ValidateAuthorizedUserId(GetUserId());
-
         IEnumerable<AllTrainingPlansResponseModel> allTrainingPlansResponse =
-            await _trainingPlanService.GetAllTrainingPlansAsync(userId);
+            await _trainingPlanService.GetAllTrainingPlansAsync(UserId);
 
         IEnumerable<AllTrainingPlansViewModel> allTrainingPlansViewModel = allTrainingPlansResponse
             .Select(tp => new AllTrainingPlansViewModel
@@ -140,8 +135,7 @@ public class TrainingPlanController : Controller
                 .ToArray(),
         };
 
-        string userId = ValidateAuthorizedUserId(GetUserId());
-        await _trainingPlanService.CreateTrainingPlanAsync(createTrainingPlanRequest, userId);
+        await _trainingPlanService.CreateTrainingPlanAsync(createTrainingPlanRequest, UserId);
 
         return RedirectToAction(nameof(All));
     }
@@ -154,9 +148,8 @@ public class TrainingPlanController : Controller
             return BadRequest();
         }
 
-        string userId = ValidateAuthorizedUserId(GetUserId());
         EditTrainingPlanResponseModel? editTrainingPlanResponse =
-            await _trainingPlanService.GetTrainingPlanForEditAsync(id.Value, userId);
+            await _trainingPlanService.GetTrainingPlanForEditAsync(id.Value, UserId);
         if (editTrainingPlanResponse == null)
         {
             return NotFound();
@@ -265,9 +258,8 @@ public class TrainingPlanController : Controller
                 .ToArray(),
         };
 
-        string userId = ValidateAuthorizedUserId(GetUserId());
         bool isEditSuccessful =
-            await _trainingPlanService.EditTrainingPlanAsync(editTrainingPlanRequest, userId);
+            await _trainingPlanService.EditTrainingPlanAsync(editTrainingPlanRequest, UserId);
         if (!isEditSuccessful)
         {
             return NotFound();
@@ -284,9 +276,8 @@ public class TrainingPlanController : Controller
             return BadRequest();
         }
 
-        string userId = ValidateAuthorizedUserId(GetUserId());
         bool isRemoveSuccessful =
-            await _trainingPlanService.RemoveTrainingPlanAsync(id.Value, userId);
+            await _trainingPlanService.RemoveTrainingPlanAsync(id.Value, UserId);
         if (!isRemoveSuccessful)
         {
             return NotFound();
@@ -303,9 +294,8 @@ public class TrainingPlanController : Controller
             return BadRequest();
         }
 
-        string userId = ValidateAuthorizedUserId(GetUserId());
         TrainingPlanDetailsResponseModel? trainingPlanDetailsResponse =
-            await _trainingPlanService.GetTrainingPlanDetailsAsync(id.Value, userId);
+            await _trainingPlanService.GetTrainingPlanDetailsAsync(id.Value, UserId);
         if (trainingPlanDetailsResponse == null)
         {
             return NotFound();
@@ -340,20 +330,5 @@ public class TrainingPlanController : Controller
         };
 
         return View(trainingPlanDetailsViewModel);
-    }
-
-    private string? GetUserId()
-    {
-        return User?.FindFirstValue(ClaimTypes.NameIdentifier);
-    }
-
-    private string ValidateAuthorizedUserId(string? userId)
-    {
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            throw new InvalidOperationException("General identity error occurred - id is null in authorized area!");
-        }
-
-        return userId;
     }
 }
