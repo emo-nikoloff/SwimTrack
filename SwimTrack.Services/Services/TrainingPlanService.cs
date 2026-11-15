@@ -1,11 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 
-using SwimTrack.Data;
+using SwimTrack.Data.Contracts;
 using SwimTrack.Data.Models;
-using SwimTrack.Services.DTOs.TrainingPlan.Request;
-using SwimTrack.Services.DTOs.Workout.Request;
+using SwimTrack.Data.Repository.Contracts;
 using SwimTrack.Services.Contracts;
+using SwimTrack.Services.DTOs.TrainingPlan.Request;
 using SwimTrack.Services.DTOs.TrainingPlan.Response;
+using SwimTrack.Services.DTOs.Workout.Request;
 using SwimTrack.Services.DTOs.Workout.Response;
 using SwimTrack.Services.DTOs.WorkoutResult.Response;
 
@@ -13,16 +14,22 @@ namespace SwimTrack.Services.Services;
 
 public class TrainingPlanService : ITrainingPlanService
 {
-    private readonly SwimTrackDbContext _dbContext;
+    private readonly ITrainingPlanRepository _trainingPlanRepository;
 
-    public TrainingPlanService(SwimTrackDbContext dbContext)
+    private readonly IWorkoutRepository _workoutRepository;
+
+    private readonly IUnitOfWork _unitOfWork;
+
+    public TrainingPlanService(ITrainingPlanRepository trainingPlanRepository, IWorkoutRepository workoutRepository, IUnitOfWork unitOfWork)
     {
-        _dbContext = dbContext;
+        _trainingPlanRepository = trainingPlanRepository;
+        _workoutRepository = workoutRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<IEnumerable<AllTrainingPlansResponseModel>> GetAllTrainingPlansAsync(string currentUserId)
     {
-        return await _dbContext.TrainingPlans
+        return await _trainingPlanRepository.AllAsNoTracking()
             .Where(tp => tp.UserId == currentUserId)
             .Select(tp => new AllTrainingPlansResponseModel
             {
@@ -75,14 +82,14 @@ public class TrainingPlanService : ITrainingPlanService
             UserId = currentUserId,
         };
 
-        await _dbContext.TrainingPlans.AddAsync(newTrainingPlan);
-        await _dbContext.SaveChangesAsync();
+        await _trainingPlanRepository.AddAsync(newTrainingPlan);
+        await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task<EditTrainingPlanResponseModel?> GetTrainingPlanForEditAsync(int id, string currentUserId)
     {
         TrainingPlan? requestedTrainingPlan =
-            await _dbContext.TrainingPlans
+            await _trainingPlanRepository.AllAsNoTracking()
                 .Include(tp => tp.Workouts)
                 .FirstOrDefaultAsync(tp =>
                     tp.Id == id
@@ -118,7 +125,7 @@ public class TrainingPlanService : ITrainingPlanService
     public async Task<bool> EditTrainingPlanAsync(EditTrainingPlanRequestModel request, string currentUserId)
     {
         TrainingPlan? requestedTrainingPlan =
-            await _dbContext.TrainingPlans
+            await _trainingPlanRepository.All()
                 .Include(tp => tp.Workouts)
                 .FirstOrDefaultAsync(tp =>
                     tp.Id == request.Id
@@ -154,7 +161,7 @@ public class TrainingPlanService : ITrainingPlanService
         requestedTrainingPlan.StartDate = request.StartDate;
         requestedTrainingPlan.EndDate = request.EndDate;
 
-        _dbContext.Workouts.RemoveRange(workoutsToRemove);
+        _workoutRepository.RemoveRange(workoutsToRemove);
 
         foreach (CreateWorkoutRequestModel workoutRequest in request.NewWorkouts)
         {
@@ -167,7 +174,7 @@ public class TrainingPlanService : ITrainingPlanService
             });
         }
 
-        await _dbContext.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync();
 
         return true;
     }
@@ -175,7 +182,7 @@ public class TrainingPlanService : ITrainingPlanService
     public async Task<bool> RemoveTrainingPlanAsync(int id, string currentUserId)
     {
         TrainingPlan? requestedTrainingPlan =
-            await _dbContext.TrainingPlans
+            await _trainingPlanRepository.All()
                 .FirstOrDefaultAsync(tp =>
                     tp.Id == id
                     && tp.UserId == currentUserId);
@@ -184,15 +191,15 @@ public class TrainingPlanService : ITrainingPlanService
             return false;
         }
 
-        _dbContext.TrainingPlans.Remove(requestedTrainingPlan);
-        await _dbContext.SaveChangesAsync();
+        _trainingPlanRepository.Remove(requestedTrainingPlan);
+        await _unitOfWork.SaveChangesAsync();
 
         return true;
     }
 
     public async Task<TrainingPlanDetailsResponseModel?> GetTrainingPlanDetailsAsync(int id, string currentUserId)
     {
-        return await _dbContext.TrainingPlans
+        return await _trainingPlanRepository.AllAsNoTracking()
             .Where(tp => tp.Id == id && tp.UserId == currentUserId)
             .Select(tp => new TrainingPlanDetailsResponseModel
             {

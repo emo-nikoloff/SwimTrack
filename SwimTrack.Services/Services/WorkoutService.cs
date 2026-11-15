@@ -1,35 +1,43 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 
-using SwimTrack.Data;
+using SwimTrack.Data.Contracts;
 using SwimTrack.Data.Models;
-using SwimTrack.Services.DTOs.Workout.Request;
-using SwimTrack.Services.DTOs.WorkoutResult.Request;
+using SwimTrack.Data.Repository.Contracts;
 using SwimTrack.Services.Contracts;
+using SwimTrack.Services.DTOs.Workout.Request;
+using SwimTrack.Services.DTOs.Workout.Response;
+using SwimTrack.Services.DTOs.WorkoutResult.Request;
+using SwimTrack.Services.DTOs.WorkoutResult.Response;
 using SwimTrack.Shared.Enums;
 using SwimTrack.Shared.Validation;
 using static SwimTrack.Shared.Constants.ValidationMessages.DateValidation;
-using SwimTrack.Services.DTOs.Workout.Response;
-using SwimTrack.Services.DTOs.WorkoutResult.Response;
 
 namespace SwimTrack.Services.Services;
 
 public class WorkoutService : IWorkoutService
 {
-    private readonly SwimTrackDbContext _dbContext;
+    private readonly IWorkoutRepository _workoutRepository;
 
-    public WorkoutService(SwimTrackDbContext dbContext)
+    private readonly IWorkoutResultRepository _workoutResultRepository;
+
+    private readonly IUnitOfWork _unitOfWork;
+
+    public WorkoutService(IWorkoutRepository workoutRepository, IWorkoutResultRepository workoutResultRepository, IUnitOfWork unitOfWork)
     {
-        _dbContext = dbContext;
+        _workoutRepository = workoutRepository;
+        _workoutResultRepository = workoutResultRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<EditWorkoutResponseModel?> GetWorkoutForEditAsync(int id, int trainingPlanId, string currentUserId)
     {
         Workout? requestedWorkout =
-            await _dbContext.Workouts.FirstOrDefaultAsync(w =>
-                w.Id == id
-                && w.TrainingPlanId == trainingPlanId
-                && w.TrainingPlan.UserId == currentUserId);
+            await _workoutRepository.AllAsNoTracking()
+                .FirstOrDefaultAsync(w =>
+                    w.Id == id
+                    && w.TrainingPlanId == trainingPlanId
+                    && w.TrainingPlan.UserId == currentUserId);
         if (requestedWorkout == null)
         {
             return null;
@@ -51,7 +59,7 @@ public class WorkoutService : IWorkoutService
     public async Task<bool> EditWorkoutAsync(int trainingPlanId, EditWorkoutRequestModel request, string currentUserId)
     {
         Workout? requestedWorkout =
-            await _dbContext.Workouts
+            await _workoutRepository.All()
                 .Include(w => w.TrainingPlan)
                 .FirstOrDefaultAsync(w =>
                     w.Id == request.Id
@@ -86,7 +94,7 @@ public class WorkoutService : IWorkoutService
         }
         requestedWorkout.Notes = request.Notes;
 
-        await _dbContext.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync();
 
         return true;
     }
@@ -94,10 +102,11 @@ public class WorkoutService : IWorkoutService
     public async Task<WorkoutResultResponseModel?> GetWorkoutForCompletionAsync(int id, int trainingPlanId, string currentUserId)
     {
         Workout? requestedWorkout =
-            await _dbContext.Workouts.FirstOrDefaultAsync(w =>
-                w.Id == id
-                && w.TrainingPlanId == trainingPlanId
-                && w.TrainingPlan.UserId == currentUserId);
+            await _workoutRepository.AllAsNoTracking()
+                .FirstOrDefaultAsync(w =>
+                    w.Id == id
+                    && w.TrainingPlanId == trainingPlanId
+                    && w.TrainingPlan.UserId == currentUserId);
         if (requestedWorkout == null)
         {
             return null;
@@ -122,10 +131,11 @@ public class WorkoutService : IWorkoutService
     public async Task<bool> CompleteWorkoutAsync(int id, int trainingPlanId, CreateWorkoutResultRequestModel request, string currentUserId)
     {
         Workout? requestedWorkout =
-            await _dbContext.Workouts.FirstOrDefaultAsync(w =>
-                w.Id == id
-                && w.TrainingPlanId == trainingPlanId
-                && w.TrainingPlan.UserId == currentUserId);
+            await _workoutRepository.All()
+                .FirstOrDefaultAsync(w =>
+                    w.Id == id
+                    && w.TrainingPlanId == trainingPlanId
+                    && w.TrainingPlan.UserId == currentUserId);
         if (requestedWorkout == null)
         {
             return false;
@@ -162,8 +172,8 @@ public class WorkoutService : IWorkoutService
             WorkoutId = requestedWorkout.Id
         };
 
-        _dbContext.WorkoutResults.Add(newWorkoutResult);
-        await _dbContext.SaveChangesAsync();
+        _workoutResultRepository.Add(newWorkoutResult);
+        await _unitOfWork.SaveChangesAsync();
 
         return true;
     }
@@ -171,10 +181,11 @@ public class WorkoutService : IWorkoutService
     public async Task<bool> SkipWorkoutAsync(int id, int trainingPlanId, string currentUserId)
     {
         Workout? requestedWorkout =
-            await _dbContext.Workouts.FirstOrDefaultAsync(w =>
-                w.Id == id
-                && w.TrainingPlanId == trainingPlanId
-                && w.TrainingPlan.UserId == currentUserId);
+            await _workoutRepository.All()
+                .FirstOrDefaultAsync(w =>
+                    w.Id == id
+                    && w.TrainingPlanId == trainingPlanId
+                    && w.TrainingPlan.UserId == currentUserId);
         if (requestedWorkout == null)
         {
             return false;
@@ -187,7 +198,7 @@ public class WorkoutService : IWorkoutService
 
         requestedWorkout.Status = WorkoutStatus.Skipped;
 
-        await _dbContext.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync();
 
         return true;
     }
@@ -195,10 +206,11 @@ public class WorkoutService : IWorkoutService
     public async Task<bool> PlanAgainWorkoutAsync(int id, int trainingPlanId, string currentUserId)
     {
         Workout? requestedWorkout =
-            await _dbContext.Workouts.FirstOrDefaultAsync(w =>
-                w.Id == id
-                && w.TrainingPlanId == trainingPlanId
-                && w.TrainingPlan.UserId == currentUserId);
+            await _workoutRepository.All()
+                .FirstOrDefaultAsync(w =>
+                    w.Id == id
+                    && w.TrainingPlanId == trainingPlanId
+                    && w.TrainingPlan.UserId == currentUserId);
         if (requestedWorkout == null)
         {
             return false;
@@ -211,7 +223,7 @@ public class WorkoutService : IWorkoutService
 
         requestedWorkout.Status = WorkoutStatus.Planned;
 
-        await _dbContext.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync();
 
         return true;
     }
