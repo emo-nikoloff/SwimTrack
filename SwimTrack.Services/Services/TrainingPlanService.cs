@@ -1,8 +1,10 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 
 using SwimTrack.Data.Contracts;
 using SwimTrack.Data.Models;
 using SwimTrack.Data.Repository.Contracts;
+using SwimTrack.Services.Common.Results;
 using SwimTrack.Services.Common.Utilities;
 using SwimTrack.Services.Contracts;
 using SwimTrack.Services.DTOs.TrainingPlan.Request;
@@ -10,6 +12,10 @@ using SwimTrack.Services.DTOs.TrainingPlan.Response;
 using SwimTrack.Services.DTOs.Workout.Request;
 using SwimTrack.Services.DTOs.Workout.Response;
 using SwimTrack.Services.DTOs.WorkoutResult.Response;
+using SwimTrack.Shared.Validation;
+using static SwimTrack.Shared.Constants.ApplicationDefaults;
+using static SwimTrack.Shared.Constants.ValidationMessages.DateValidation;
+using static SwimTrack.Shared.Constants.ValidationMessages.TrainingPlanValidation;
 
 namespace SwimTrack.Services.Services;
 
@@ -66,19 +72,88 @@ public class TrainingPlanService : ITrainingPlanService
             .ToArrayAsync();
     }
 
-    public async Task CreateTrainingPlanAsync(CreateTrainingPlanRequestModel request, string currentUserId)
+    public async Task<ServiceResult> CreateTrainingPlanAsync(CreateTrainingPlanRequestModel request, string currentUserId)
     {
-        bool isInputValid = _modelValidator.IsValid(request);
-        if (!isInputValid)
+        List<ServiceError> serviceErrors = new();
+
+        bool isRequestValid = _modelValidator.IsValid(request);
+        if (!isRequestValid)
         {
-            return;
+            IReadOnlyCollection<ValidationResult> inputErrors = _modelValidator.ValidationResults;
+            foreach (ValidationResult error in inputErrors)
+            {
+                string? propertyName = error.MemberNames.FirstOrDefault();
+                string errorMessage = error.ErrorMessage ?? string.Empty;
+
+                ServiceError serviceError = new(propertyName, errorMessage);
+
+                serviceErrors.Add(serviceError);
+            }
         }
 
-        bool hasInvalidWorkoutInput = request.Workouts
-            .Any(w => !_modelValidator.IsValid(w));
-        if (hasInvalidWorkoutInput)
+        bool isTrainingPlanPeriodValid = DateValidator.ValidatePlanPeriod(
+            request.StartDate,
+            request.EndDate);
+        if (!isTrainingPlanPeriodValid)
         {
-            return;
+            string propertyName = nameof(CreateTrainingPlanRequestModel.EndDate);
+            string errorMessage = InvalidTrainingPlanPeriod;
+
+            ServiceError serviceError = new(propertyName, errorMessage);
+
+            serviceErrors.Add(serviceError);
+        }
+
+        for (int i = 0; i < request.Workouts.Count; i++)
+        {
+            CreateWorkoutRequestModel workout = request.Workouts[i];
+
+            bool isWorkoutRequestValid = _modelValidator.IsValid(workout);
+            if (!isWorkoutRequestValid)
+            {
+                IReadOnlyCollection<ValidationResult> inputErrors = _modelValidator.ValidationResults;
+                foreach (ValidationResult error in inputErrors)
+                {
+                    string? propertyName = error.MemberNames.FirstOrDefault();
+                    if (propertyName != null)
+                    {
+                        propertyName = $"Workouts[{i}].{propertyName}";
+                    }
+                    else
+                    {
+                        propertyName = $"Workouts[{i}]";
+                    }
+                    string errorMessage = error.ErrorMessage ?? string.Empty;
+
+                    ServiceError serviceError = new(propertyName, errorMessage);
+
+                    serviceErrors.Add(serviceError);
+                }
+            }
+
+            if (isTrainingPlanPeriodValid)
+            {
+                bool isWorkoutDateInPlanPeriod = DateValidator.ValidateWorkoutDate(
+                    workout.Date,
+                    request.StartDate,
+                    request.EndDate);
+                if (!isWorkoutDateInPlanPeriod)
+                {
+                    string propertyName = $"Workouts[{i}].{nameof(workout.Date)}";
+                    string errorMessage = WorkoutDateOutsidePlanPeriod;
+
+                    ServiceError serviceError = new(propertyName, errorMessage);
+
+                    serviceErrors.Add(serviceError);
+                }
+            }
+        }
+
+        if (serviceErrors.Count > 0)
+        {
+            return ServiceResult.Failure(
+                ServiceResultStatus.InvalidRequest,
+                serviceErrors);
         }
 
         TrainingPlan newTrainingPlan = new()
@@ -101,6 +176,8 @@ public class TrainingPlanService : ITrainingPlanService
 
         await _trainingPlanRepository.AddAsync(newTrainingPlan);
         await _unitOfWork.SaveChangesAsync();
+
+        return ServiceResult.Success();
     }
 
     public async Task<EditTrainingPlanResponseModel?> GetTrainingPlanForEditAsync(int id, string currentUserId)
@@ -139,19 +216,89 @@ public class TrainingPlanService : ITrainingPlanService
         return editTrainingPlanResponse;
     }
 
-    public async Task<bool> EditTrainingPlanAsync(EditTrainingPlanRequestModel request, string currentUserId)
+    public async Task<ServiceResult> EditTrainingPlanAsync(EditTrainingPlanRequestModel request, string currentUserId)
     {
-        bool isInputValid = _modelValidator.IsValid(request);
-        if (!isInputValid)
+        List<ServiceError> serviceErrors = new();
+
+        bool isRequestValid = _modelValidator.IsValid(request);
+        if (!isRequestValid)
         {
-            return false;
+            IReadOnlyCollection<ValidationResult> inputErrors = _modelValidator.ValidationResults;
+            foreach (ValidationResult error in inputErrors)
+            {
+                string? propertyName = error.MemberNames.FirstOrDefault();
+                string errorMessage = error.ErrorMessage ?? string.Empty;
+
+                ServiceError serviceError = new(propertyName, errorMessage);
+
+                serviceErrors.Add(serviceError);
+            }
         }
 
-        bool hasInvalidWorkoutInput = request.NewWorkouts
-            .Any(w => !_modelValidator.IsValid(w));
-        if (hasInvalidWorkoutInput)
+        bool isTrainingPlanPeriodValid = DateValidator.ValidatePlanPeriod(
+            request.StartDate,
+            request.EndDate);
+        if (!isTrainingPlanPeriodValid)
         {
-            return false;
+            string propertyName = nameof(EditTrainingPlanRequestModel.EndDate);
+            string errorMessage = InvalidTrainingPlanPeriod;
+
+            ServiceError serviceError = new(propertyName, errorMessage);
+
+            serviceErrors.Add(serviceError);
+        }
+
+        for (int i = 0; i < request.Workouts.Count; i++)
+        {
+            EditWorkoutRequestModel workout = request.Workouts[i];
+
+            bool isWorkoutRequestValid = _modelValidator.IsValid(workout);
+            if (!isWorkoutRequestValid)
+            {
+                IReadOnlyCollection<ValidationResult> inputErrors = _modelValidator.ValidationResults;
+                foreach (ValidationResult error in inputErrors)
+                {
+                    string? propertyName = error.MemberNames.FirstOrDefault();
+                    if (propertyName != null)
+                    {
+                        propertyName = $"Workouts[{i}].{propertyName}";
+                    }
+                    else
+                    {
+                        propertyName = $"Workouts[{i}]";
+                    }
+                    string errorMessage = error.ErrorMessage ?? string.Empty;
+
+                    ServiceError serviceError = new(propertyName, errorMessage);
+
+                    serviceErrors.Add(serviceError);
+                }
+            }
+
+            if (workout.Id == null
+                && isTrainingPlanPeriodValid)
+            {
+                bool isWorkoutDateInPlanPeriod = DateValidator.ValidateWorkoutDate(
+                    workout.Date,
+                    request.StartDate,
+                    request.EndDate);
+                if (!isWorkoutDateInPlanPeriod)
+                {
+                    string propertyName = $"Workouts[{i}].{nameof(workout.Date)}";
+                    string errorMessage = WorkoutDateOutsidePlanPeriod;
+
+                    ServiceError serviceError = new(propertyName, errorMessage);
+
+                    serviceErrors.Add(serviceError);
+                }
+            }
+        }
+
+        if (serviceErrors.Count > 0)
+        {
+            return ServiceResult.Failure(
+                ServiceResultStatus.InvalidRequest,
+                serviceErrors);
         }
 
         TrainingPlan? requestedTrainingPlan =
@@ -162,39 +309,81 @@ public class TrainingPlanService : ITrainingPlanService
                     && tp.UserId == currentUserId);
         if (requestedTrainingPlan == null)
         {
-            return false;
+            return ServiceResult.Failure(
+                ServiceResultStatus.NotFound,
+                NotFoundTrainingPlan);
         }
 
-        HashSet<int> workoutIdsToKeep = request.WorkoutIdsToKeep
+        HashSet<int> workoutIdsToKeep = request.Workouts
+            .Where(w => w.Id.HasValue)
+            .Select(w => w.Id!.Value)
             .ToHashSet();
-
-        if (workoutIdsToKeep.Count != request.WorkoutIdsToKeep.Count)
+        if (workoutIdsToKeep.Count != request.Workouts.Count(w => w.Id.HasValue))
         {
-            return false;
+            return ServiceResult.Failure(
+                ServiceResultStatus.InvalidRequest,
+                DuplicateWorkoutIds);
         }
 
         HashSet<int> existingWorkoutIds = requestedTrainingPlan.Workouts
             .Select(w => w.Id)
             .ToHashSet();
-
         if (!workoutIdsToKeep.IsSubsetOf(existingWorkoutIds))
         {
-            return false;
+            return ServiceResult.Failure(
+                ServiceResultStatus.InvalidRequest,
+                InvalidTrainingPlanWorkout);
         }
 
-        IEnumerable<Workout> workoutsToRemove = requestedTrainingPlan.Workouts
-            .Where(w => !workoutIdsToKeep.Contains(w.Id))
-            .ToArray();
+        if (isTrainingPlanPeriodValid)
+        {
+            IEnumerable<Workout> workoutsToKeep = requestedTrainingPlan.Workouts
+               .Where(w => workoutIdsToKeep.Contains(w.Id));
+            foreach (Workout workout in workoutsToKeep)
+            {
+                bool isWorkoutDateValid = DateValidator.ValidateWorkoutDate(
+                    workout.Date,
+                    request.StartDate,
+                    request.EndDate);
+                if (!isWorkoutDateValid)
+                {
+                    string? propertyName = null;
+                    string errorMessage = string.Format(
+                        ExistingWorkoutOutsidePlanPeriod,
+                        $"{workout.Date.ToString(DateTimeFormat)}");
+
+                    ServiceError serviceError = new(propertyName, errorMessage);
+
+                    serviceErrors.Add(serviceError);
+                }
+            }
+        }
+
+        if (serviceErrors.Count > 0)
+        {
+            return ServiceResult.Failure(
+                ServiceResultStatus.InvalidRequest,
+                serviceErrors);
+        }
 
         requestedTrainingPlan.Name = request.Name;
         requestedTrainingPlan.Goal = request.Goal;
         requestedTrainingPlan.StartDate = request.StartDate;
         requestedTrainingPlan.EndDate = request.EndDate;
 
+        IEnumerable<Workout> workoutsToRemove = requestedTrainingPlan.Workouts
+            .Where(w => !workoutIdsToKeep.Contains(w.Id))
+            .ToArray();
+
         _workoutRepository.RemoveRange(workoutsToRemove);
 
-        foreach (CreateWorkoutRequestModel workoutRequest in request.NewWorkouts)
+        foreach (EditWorkoutRequestModel workoutRequest in request.Workouts)
         {
+            if (workoutRequest.Id.HasValue)
+            {
+                continue;
+            }
+
             requestedTrainingPlan.Workouts.Add(new Workout
             {
                 Date = workoutRequest.Date,
@@ -206,10 +395,10 @@ public class TrainingPlanService : ITrainingPlanService
 
         await _unitOfWork.SaveChangesAsync();
 
-        return true;
+        return ServiceResult.Success();
     }
 
-    public async Task<bool> RemoveTrainingPlanAsync(int id, string currentUserId)
+    public async Task<ServiceResult> RemoveTrainingPlanAsync(int id, string currentUserId)
     {
         TrainingPlan? requestedTrainingPlan =
             await _trainingPlanRepository.All()
@@ -218,13 +407,15 @@ public class TrainingPlanService : ITrainingPlanService
                     && tp.UserId == currentUserId);
         if (requestedTrainingPlan == null)
         {
-            return false;
+            return ServiceResult.Failure(
+                ServiceResultStatus.NotFound,
+                NotFoundTrainingPlan);
         }
 
         _trainingPlanRepository.Remove(requestedTrainingPlan);
         await _unitOfWork.SaveChangesAsync();
 
-        return true;
+        return ServiceResult.Success();
     }
 
     public async Task<TrainingPlanDetailsResponseModel?> GetTrainingPlanDetailsAsync(int id, string currentUserId)

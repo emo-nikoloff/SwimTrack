@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using SwimTrack.Data.Contracts;
 using SwimTrack.Data.Models;
 using SwimTrack.Data.Repository.Contracts;
+using SwimTrack.Services.Common.Results;
 using SwimTrack.Services.Common.Utilities;
 using SwimTrack.Services.Contracts;
 using SwimTrack.Services.DTOs.Workout.Request;
@@ -13,6 +14,7 @@ using SwimTrack.Services.DTOs.WorkoutResult.Response;
 using SwimTrack.Shared.Enums;
 using SwimTrack.Shared.Validation;
 using static SwimTrack.Shared.Constants.ValidationMessages.DateValidation;
+using static SwimTrack.Shared.Constants.ValidationMessages.WorkoutValidation;
 
 namespace SwimTrack.Services.Services;
 
@@ -60,12 +62,23 @@ public class WorkoutService : IWorkoutService
         return editWorkoutResponse;
     }
 
-    public async Task<bool> EditWorkoutAsync(int trainingPlanId, EditWorkoutRequestModel request, string currentUserId)
+    public async Task<ServiceResult> EditWorkoutAsync(int trainingPlanId, EditWorkoutRequestModel request, string currentUserId)
     {
-        bool isInputValid = _modelValidator.IsValid(request);
-        if (!isInputValid)
+        List<ServiceError> serviceErrors = new();
+
+        bool isRequestValid = _modelValidator.IsValid(request);
+        if (!isRequestValid)
         {
-            return false;
+            IReadOnlyCollection<ValidationResult> inputErrors = _modelValidator.ValidationResults;
+            foreach (ValidationResult error in inputErrors)
+            {
+                string? propertyName = error.MemberNames.FirstOrDefault();
+                string errorMessage = error.ErrorMessage ?? string.Empty;
+
+                ServiceError serviceError = new(propertyName, errorMessage);
+
+                serviceErrors.Add(serviceError);
+            }
         }
 
         Workout? requestedWorkout =
@@ -77,7 +90,9 @@ public class WorkoutService : IWorkoutService
                     && w.TrainingPlan.UserId == currentUserId);
         if (requestedWorkout == null)
         {
-            return false;
+            return ServiceResult.Failure(
+                ServiceResultStatus.NotFound,
+                NotFoundWorkout);
         }
 
         if (requestedWorkout.Status == WorkoutStatus.Planned)
@@ -88,16 +103,24 @@ public class WorkoutService : IWorkoutService
                 requestedWorkout.TrainingPlan.EndDate);
             if (!isWorkoutDateValid)
             {
-                throw new ValidationException(new ValidationResult(
-                    WorkoutDateOutsidePlanPeriod,
-                    new[]
-                        {
-                            nameof(EditWorkoutRequestModel.Date)
-                        }),
-                    null,
-                    null);
-            }
+                string propertyName = nameof(EditWorkoutRequestModel.Date);
+                string errorMessage = WorkoutDateOutsidePlanPeriod;
 
+                ServiceError serviceError = new(propertyName, errorMessage);
+
+                serviceErrors.Add(serviceError);
+            }
+        }
+
+        if (serviceErrors.Count > 0)
+        {
+            return ServiceResult.Failure(
+                ServiceResultStatus.InvalidRequest,
+                serviceErrors);
+        }
+
+        if (requestedWorkout.Status == WorkoutStatus.Planned)
+        {
             requestedWorkout.Date = request.Date;
             requestedWorkout.PlannedDistance = request.PlannedDistance;
             requestedWorkout.PlannedDuration = request.PlannedDuration;
@@ -106,7 +129,7 @@ public class WorkoutService : IWorkoutService
 
         await _unitOfWork.SaveChangesAsync();
 
-        return true;
+        return ServiceResult.Success();
     }
 
     public async Task<WorkoutResultResponseModel?> GetWorkoutForCompletionAsync(int id, int trainingPlanId, string currentUserId)
@@ -138,12 +161,23 @@ public class WorkoutService : IWorkoutService
         return workoutResultResponse;
     }
 
-    public async Task<bool> CompleteWorkoutAsync(int id, int trainingPlanId, CreateWorkoutResultRequestModel request, string currentUserId)
+    public async Task<ServiceResult> CompleteWorkoutAsync(int id, int trainingPlanId, CreateWorkoutResultRequestModel request, string currentUserId)
     {
-        bool isInputValid = _modelValidator.IsValid(request);
-        if (!isInputValid)
+        List<ServiceError> serviceErrors = new();
+
+        bool isRequestValid = _modelValidator.IsValid(request);
+        if (!isRequestValid)
         {
-            return false;
+            IReadOnlyCollection<ValidationResult> inputErrors = _modelValidator.ValidationResults;
+            foreach (ValidationResult error in inputErrors)
+            {
+                string? propertyName = error.MemberNames.FirstOrDefault();
+                string errorMessage = error.ErrorMessage ?? string.Empty;
+
+                ServiceError serviceError = new(propertyName, errorMessage);
+
+                serviceErrors.Add(serviceError);
+            }
         }
 
         Workout? requestedWorkout =
@@ -154,12 +188,23 @@ public class WorkoutService : IWorkoutService
                     && w.TrainingPlan.UserId == currentUserId);
         if (requestedWorkout == null)
         {
-            return false;
+            return ServiceResult.Failure(
+                ServiceResultStatus.NotFound,
+                NotFoundWorkout);
         }
 
-        if (requestedWorkout.Status != WorkoutStatus.Planned || requestedWorkout.Date.Date > DateTime.Today)
+        if (requestedWorkout.Status != WorkoutStatus.Planned)
         {
-            return false;
+            return ServiceResult.Failure(
+                ServiceResultStatus.InvalidOperation,
+                CannotCompleteWorkoutDueToStatus);
+        }
+
+        if (requestedWorkout.Date.Date > DateTime.Today)
+        {
+            return ServiceResult.Failure(
+                ServiceResultStatus.InvalidOperation,
+                CannotCompleteWorkoutInFuture);
         }
 
         bool isWorkoutCompletionDateValid = DateValidator.ValidateWorkoutCompletionDate(
@@ -167,14 +212,19 @@ public class WorkoutService : IWorkoutService
             requestedWorkout.Date);
         if (!isWorkoutCompletionDateValid)
         {
-            throw new ValidationException(new ValidationResult(
-                InvalidWorkoutCompletionDate,
-                new[]
-                    {
-                        nameof(CreateWorkoutResultRequestModel.CompletedAt)
-                    }),
-                null,
-                null);
+            string propertyName = nameof(CreateWorkoutResultRequestModel.CompletedAt);
+            string errorMessage = InvalidWorkoutCompletionDate;
+
+            ServiceError serviceError = new(propertyName, errorMessage);
+
+            serviceErrors.Add(serviceError);
+        }
+
+        if (serviceErrors.Count > 0)
+        {
+            return ServiceResult.Failure(
+                ServiceResultStatus.InvalidRequest,
+                serviceErrors);
         }
 
         requestedWorkout.Status = WorkoutStatus.Completed;
@@ -191,10 +241,10 @@ public class WorkoutService : IWorkoutService
         _workoutResultRepository.Add(newWorkoutResult);
         await _unitOfWork.SaveChangesAsync();
 
-        return true;
+        return ServiceResult.Success();
     }
 
-    public async Task<bool> SkipWorkoutAsync(int id, int trainingPlanId, string currentUserId)
+    public async Task<ServiceResult> SkipWorkoutAsync(int id, int trainingPlanId, string currentUserId)
     {
         Workout? requestedWorkout =
             await _workoutRepository.All()
@@ -204,22 +254,33 @@ public class WorkoutService : IWorkoutService
                     && w.TrainingPlan.UserId == currentUserId);
         if (requestedWorkout == null)
         {
-            return false;
+            return ServiceResult.Failure(
+                ServiceResultStatus.NotFound,
+                NotFoundWorkout);
         }
 
-        if (requestedWorkout.Status != WorkoutStatus.Planned || requestedWorkout.Date.Date > DateTime.Today)
+        if (requestedWorkout.Status != WorkoutStatus.Planned)
         {
-            return false;
+            return ServiceResult.Failure(
+                ServiceResultStatus.InvalidOperation,
+                CannotSkipWorkoutDueToStatus);
+        }
+
+        if (requestedWorkout.Date.Date > DateTime.Today)
+        {
+            return ServiceResult.Failure(
+                ServiceResultStatus.InvalidOperation,
+                CannotSkipWorkoutInFuture);
         }
 
         requestedWorkout.Status = WorkoutStatus.Skipped;
 
         await _unitOfWork.SaveChangesAsync();
 
-        return true;
+        return ServiceResult.Success();
     }
 
-    public async Task<bool> PlanAgainWorkoutAsync(int id, int trainingPlanId, string currentUserId)
+    public async Task<ServiceResult> PlanAgainWorkoutAsync(int id, int trainingPlanId, string currentUserId)
     {
         Workout? requestedWorkout =
             await _workoutRepository.All()
@@ -229,18 +290,22 @@ public class WorkoutService : IWorkoutService
                     && w.TrainingPlan.UserId == currentUserId);
         if (requestedWorkout == null)
         {
-            return false;
+            return ServiceResult.Failure(
+                ServiceResultStatus.NotFound,
+                NotFoundWorkout);
         }
 
         if (requestedWorkout.Status != WorkoutStatus.Skipped)
         {
-            return false;
+            return ServiceResult.Failure(
+                ServiceResultStatus.InvalidOperation,
+                CannotPlanAgainWorkoutDueToStatus);
         }
 
         requestedWorkout.Status = WorkoutStatus.Planned;
 
         await _unitOfWork.SaveChangesAsync();
 
-        return true;
+        return ServiceResult.Success();
     }
 }

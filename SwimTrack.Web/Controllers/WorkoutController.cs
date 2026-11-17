@@ -1,6 +1,6 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 
+using SwimTrack.Services.Common.Results;
 using SwimTrack.Services.Contracts;
 using SwimTrack.Services.DTOs.Workout.Request;
 using SwimTrack.Services.DTOs.Workout.Response;
@@ -84,24 +84,21 @@ public class WorkoutController : BaseController
             Notes = inputModel.Notes,
         };
 
-        try
+        ServiceResult result =
+            await _workoutService.EditWorkoutAsync(trainingPlanId.Value, editWorkoutRequest, UserId);
+        if (result.Status == ServiceResultStatus.InvalidRequest)
         {
-            bool isEditSuccessful = await _workoutService.EditWorkoutAsync(
-                trainingPlanId.Value,
-                editWorkoutRequest,
-                UserId);
-            if (!isEditSuccessful)
-            {
-                return NotFound();
-            }
-        }
-        catch (ValidationException ex)
-        {
-            string memberKey = ex.ValidationResult?.MemberNames.FirstOrDefault()
-                ?? nameof(WorkoutFormInputModel.Date);
-            ModelState.AddModelError(memberKey, ex.Message);
+            AddServiceErrorsToModelState(result.Errors);
 
             return View(inputModel);
+        }
+        else if (result.Status == ServiceResultStatus.NotFound)
+        {
+            return NotFound();
+        }
+        else if (result.Status != ServiceResultStatus.Success)
+        {
+            throw new InvalidOperationException($"Unexpected service result: {result.Status}");
         }
 
         return RedirectToAction(
@@ -171,31 +168,32 @@ public class WorkoutController : BaseController
             Notes = inputModel.Notes,
         };
 
-        try
-        {
-            bool isCompletionSuccessful = await _workoutService.CompleteWorkoutAsync(
+        ServiceResult result =
+            await _workoutService.CompleteWorkoutAsync(
                 id.Value,
                 trainingPlanId.Value,
                 createWorkoutResultRequest,
                 UserId);
-            if (!isCompletionSuccessful)
-            {
-                return NotFound();
-            }
-        }
-        catch (ValidationException ex)
+        if (result.Status == ServiceResultStatus.InvalidRequest
+            || result.Status == ServiceResultStatus.InvalidOperation)
         {
-            string memberKey = ex.ValidationResult?.MemberNames.FirstOrDefault()
-                ?? nameof(WorkoutResultFormInputModel.CompletedAt);
-            ModelState.AddModelError(memberKey, ex.Message);
+            AddServiceErrorsToModelState(result.Errors);
 
             return View(inputModel);
         }
+        else if (result.Status == ServiceResultStatus.NotFound)
+        {
+            return NotFound();
+        }
+        else if (result.Status != ServiceResultStatus.Success)
+        {
+            throw new InvalidOperationException($"Unexpected service result: {result.Status}");
+        }
 
         return RedirectToAction(
-            nameof(TrainingPlanController.Details),
-            "TrainingPlan",
-            new { id = trainingPlanId.Value });
+        nameof(TrainingPlanController.Details),
+        "TrainingPlan",
+        new { id = trainingPlanId.Value });
     }
 
     [HttpPost]
@@ -209,13 +207,21 @@ public class WorkoutController : BaseController
             return BadRequest();
         }
 
-        bool isSkipSuccessful = await _workoutService.SkipWorkoutAsync(
+        ServiceResult result = await _workoutService.SkipWorkoutAsync(
             id.Value,
             trainingPlanId.Value,
             UserId);
-        if (!isSkipSuccessful)
+        if (result.Status == ServiceResultStatus.NotFound)
         {
             return NotFound();
+        }
+        else if (result.Status == ServiceResultStatus.InvalidOperation)
+        {
+            return Conflict();
+        }
+        else if (result.Status != ServiceResultStatus.Success)
+        {
+            throw new InvalidOperationException($"Unexpected service result: {result.Status}");
         }
 
         return RedirectToAction(
@@ -235,13 +241,19 @@ public class WorkoutController : BaseController
             return BadRequest();
         }
 
-        bool isPlanAgainSuccessful = await _workoutService.PlanAgainWorkoutAsync(
-            id.Value,
-            trainingPlanId.Value,
-            UserId);
-        if (!isPlanAgainSuccessful)
+        ServiceResult result =
+            await _workoutService.PlanAgainWorkoutAsync(id.Value, trainingPlanId.Value, UserId);
+        if (result.Status == ServiceResultStatus.NotFound)
         {
             return NotFound();
+        }
+        else if (result.Status == ServiceResultStatus.InvalidOperation)
+        {
+            return Conflict();
+        }
+        else if (result.Status != ServiceResultStatus.Success)
+        {
+            throw new InvalidOperationException($"Unexpected service result: {result.Status}");
         }
 
         return RedirectToAction(

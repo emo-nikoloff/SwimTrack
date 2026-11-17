@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using SwimTrack.Services.Common.Results;
 
 using SwimTrack.Services.Contracts;
 using SwimTrack.Services.DTOs.TrainingPlan.Request;
@@ -135,7 +136,18 @@ public class TrainingPlanController : BaseController
                 .ToArray(),
         };
 
-        await _trainingPlanService.CreateTrainingPlanAsync(createTrainingPlanRequest, UserId);
+        ServiceResult result =
+            await _trainingPlanService.CreateTrainingPlanAsync(createTrainingPlanRequest, UserId);
+        if (result.Status == ServiceResultStatus.InvalidRequest)
+        {
+            AddServiceErrorsToModelState(result.Errors);
+
+            return View(inputModel);
+        }
+        else if (result.Status != ServiceResultStatus.Success)
+        {
+            throw new InvalidOperationException($"Unexpected service result: {result.Status}");
+        }
 
         return RedirectToAction(nameof(All));
     }
@@ -242,14 +254,10 @@ public class TrainingPlanController : BaseController
             Goal = inputModel.Goal,
             StartDate = inputModel.StartDate,
             EndDate = inputModel.EndDate,
-            WorkoutIdsToKeep = inputModel.Workouts
-                .Where(w => w.Id.HasValue)
-                .Select(w => w.Id!.Value)
-                .ToArray(),
-            NewWorkouts = inputModel.Workouts
-                .Where(w => !w.Id.HasValue)
-                .Select(w => new CreateWorkoutRequestModel
+            Workouts = inputModel.Workouts
+                .Select(w => new EditWorkoutRequestModel
                 {
+                    Id = w.Id,
                     Date = w.Date,
                     PlannedDistance = w.PlannedDistance,
                     PlannedDuration = w.PlannedDuration,
@@ -258,11 +266,21 @@ public class TrainingPlanController : BaseController
                 .ToArray(),
         };
 
-        bool isEditSuccessful =
+        ServiceResult result =
             await _trainingPlanService.EditTrainingPlanAsync(editTrainingPlanRequest, UserId);
-        if (!isEditSuccessful)
+        if (result.Status == ServiceResultStatus.InvalidRequest)
+        {
+            AddServiceErrorsToModelState(result.Errors);
+
+            return View(inputModel);
+        }
+        else if (result.Status == ServiceResultStatus.NotFound)
         {
             return NotFound();
+        }
+        else if (result.Status != ServiceResultStatus.Success)
+        {
+            throw new InvalidOperationException($"Unexpected service result: {result.Status}");
         }
 
         return RedirectToAction(nameof(Details), new { id = id.Value });
@@ -276,11 +294,15 @@ public class TrainingPlanController : BaseController
             return BadRequest();
         }
 
-        bool isRemoveSuccessful =
+        ServiceResult result =
             await _trainingPlanService.RemoveTrainingPlanAsync(id.Value, UserId);
-        if (!isRemoveSuccessful)
+        if (result.Status == ServiceResultStatus.NotFound)
         {
             return NotFound();
+        }
+        else if (result.Status != ServiceResultStatus.Success)
+        {
+            throw new InvalidOperationException($"Unexpected service result: {result.Status}");
         }
 
         return RedirectToAction(nameof(All));

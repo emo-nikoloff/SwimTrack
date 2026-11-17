@@ -4,7 +4,8 @@ namespace SwimTrack.Services.Common.Utilities;
 
 public class BasicModelValidator
 {
-    public IReadOnlyCollection<ValidationResult> ValidationResults = new List<ValidationResult>();
+    public IReadOnlyCollection<ValidationResult> ValidationResults { get; private set; } =
+        new List<ValidationResult>();
 
     public bool IsValid(object model)
     {

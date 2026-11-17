@@ -18,5 +18,5 @@ public class CreateTrainingPlanRequestModel
 
     public DateTime EndDate { get; set; }
 
-    public IReadOnlyCollection<CreateWorkoutRequestModel> Workouts { get; set; } = new List<CreateWorkoutRequestModel>();
+    public IReadOnlyList<CreateWorkoutRequestModel> Workouts { get; set; } = new List<CreateWorkoutRequestModel>();
 }
