@@ -17,7 +17,7 @@ using static SwimTrack.Shared.Constants.ApplicationDefaults;
 using static SwimTrack.Shared.Constants.ValidationMessages.DateValidation;
 using static SwimTrack.Shared.Constants.ValidationMessages.TrainingPlanValidation;
 
-namespace SwimTrack.Services.Services;
+namespace SwimTrack.Services;
 
 public class TrainingPlanService : ITrainingPlanService
 {

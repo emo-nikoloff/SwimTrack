@@ -16,7 +16,7 @@ using SwimTrack.Shared.Validation;
 using static SwimTrack.Shared.Constants.ValidationMessages.DateValidation;
 using static SwimTrack.Shared.Constants.ValidationMessages.WorkoutValidation;
 
-namespace SwimTrack.Services.Services;
+namespace SwimTrack.Services;
 
 public class WorkoutService : IWorkoutService
 {

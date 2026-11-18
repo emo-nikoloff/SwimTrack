@@ -1,7 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
 using SwimTrack.Services.Contracts;
-using SwimTrack.Services.Services;
 
 namespace SwimTrack.Services.Extensions;
 
