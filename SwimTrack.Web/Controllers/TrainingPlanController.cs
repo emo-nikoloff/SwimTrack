@@ -28,7 +28,10 @@ public class TrainingPlanController : BaseController
         IEnumerable<AllTrainingPlansResponseModel> allTrainingPlansResponse =
             await _trainingPlanService.GetAllTrainingPlansAsync(UserId);
 
-        IEnumerable<AllTrainingPlansViewModel> allTrainingPlansViewModel = allTrainingPlansResponse
+        IReadOnlyCollection<AllTrainingPlansViewModel> allTrainingPlansViewModel = allTrainingPlansResponse
+            .OrderBy(tp => tp.StartDate)
+            .ThenBy(tp => tp.EndDate)
+            .ThenBy(tp => tp.Id)
             .Select(tp => new AllTrainingPlansViewModel
             {
                 Id = tp.Id,
@@ -37,6 +40,8 @@ public class TrainingPlanController : BaseController
                 StartDate = tp.StartDate,
                 EndDate = tp.EndDate,
                 Workouts = tp.Workouts
+                    .OrderBy(w => w.Date)
+                    .ThenBy(w => w.Id)
                     .Select(w => new WorkoutViewModel
                     {
                         Id = w.Id,
@@ -55,9 +60,13 @@ public class TrainingPlanController : BaseController
                                 Notes = w.Result.Notes,
                             },
                     })
-            });
+                    .ToArray(),
+            })
+            .ToArray();
 
-        return View(allTrainingPlansViewModel);
+        AllTrainingPlansPageViewModel pageViewModel = new(allTrainingPlansViewModel);
+
+        return View(pageViewModel);
     }
 
     [HttpGet]
