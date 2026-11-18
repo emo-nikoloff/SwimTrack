@@ -184,6 +184,8 @@ public class TrainingPlanController : BaseController
             StartDate = editTrainingPlanResponse.StartDate,
             EndDate = editTrainingPlanResponse.EndDate,
             Workouts = editTrainingPlanResponse.Workouts
+                .OrderBy(w => w.Date)
+                .ThenBy(w => w.Id)
                 .Select(w => new WorkoutFormInputModel
                 {
                     Id = w.Id,
