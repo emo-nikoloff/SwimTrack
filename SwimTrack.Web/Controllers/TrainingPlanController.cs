@@ -331,7 +331,9 @@ public class TrainingPlanController : BaseController
             StartDate = trainingPlanDetailsResponse.StartDate,
             EndDate = trainingPlanDetailsResponse.EndDate,
             Workouts = trainingPlanDetailsResponse.Workouts
-                .Select(w => new WorkoutViewModel
+                .OrderBy(w => w.Date)
+                .ThenBy(w => w.Id)
+                .Select(w => new TrainingPlanWorkoutViewModel
                 {
                     Id = w.Id,
                     Date = w.Date,
@@ -348,7 +350,8 @@ public class TrainingPlanController : BaseController
                             CompletedAt = w.Result.CompletedAt,
                             Notes = w.Result.Notes,
                         },
-                }),
+                })
+                .ToArray(),
         };
 
         return View(trainingPlanDetailsViewModel);
