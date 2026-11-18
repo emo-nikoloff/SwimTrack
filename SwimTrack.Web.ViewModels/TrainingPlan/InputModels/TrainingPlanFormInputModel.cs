@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 using SwimTrack.Web.ViewModels.Workout.InputModels;
 using SwimTrack.Shared.Validation;
-using static SwimTrack.Shared.Constants.EntityValidation.TrainingPlan;
+using static SwimTrack.Shared.Constants.ModelValidation.TrainingPlan;
 using static SwimTrack.Shared.Constants.ValidationMessages.DateValidation;
 
 namespace SwimTrack.Web.ViewModels.TrainingPlan.InputModels;

@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-using static SwimTrack.Shared.Constants.EntityValidation.WorkoutResult;
+using static SwimTrack.Shared.Constants.ModelValidation.WorkoutResult;
 
 namespace SwimTrack.Web.ViewModels.WorkoutResult.InputModels;
 
