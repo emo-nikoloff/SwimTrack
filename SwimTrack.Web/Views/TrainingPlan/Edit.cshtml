@@ -1,8 +1,6 @@
 @model TrainingPlanFormInputModel
 @{
     ViewData["Title"] = "Edit training plan";
-
-    List<WorkoutFormInputModel> trainingPlanWorkouts = Model.Workouts;
 }
 
 <main class="container page-content">
@@ -31,7 +29,7 @@
                 </button>
             </div>
 
-            @if (!trainingPlanWorkouts.Any())
+            @if (Model.Workouts.Count == 0)
             {
                 <div class="card card--center">
                     <p class="text-muted">No workouts in this plan. Click "+ Add workout" to schedule sessions.</p>
@@ -39,9 +37,9 @@
             }
             else
             {
-                @for (int i = 0; i < trainingPlanWorkouts.Count; i++)
+                @for (int i = 0; i < Model.Workouts.Count; i++)
                 {
-                    WorkoutFormInputModel currentWorkout = trainingPlanWorkouts[i];
+                    WorkoutFormInputModel currentWorkout = Model.Workouts[i];
                     ViewDataDictionary workoutViewData = new ViewDataDictionary(ViewData);
                     workoutViewData.TemplateInfo.HtmlFieldPrefix = $"Workouts[{i}]";
 

@@ -48,7 +48,7 @@
         }
     </div>
 
-    @if (!Model.Workouts.Any())
+    @if (Model.Workouts.Count == 0)
     {
         <div class="card card--center">
             <p class="text-muted">No workouts planned yet.</p>
