@@ -1,9 +1,9 @@
+using SwimTrack.Services.DTOs.WorkoutResult.Response;
 using SwimTrack.Shared.Enums;
-using SwimTrack.Services.DTOs.WorkoutResult;
 
-namespace SwimTrack.Services.DTOs.Workout;
+namespace SwimTrack.Services.DTOs.Workout.Response;
 
-public class WorkoutViewModel
+public class WorkoutResponseModel
 {
     public int Id { get; set; }
 
@@ -17,5 +17,5 @@ public class WorkoutViewModel
 
     public WorkoutStatus Status { get; set; }
 
-    public WorkoutResultViewModel? Result { get; set; }
+    public WorkoutResultResponseModel? Result { get; set; }
 }

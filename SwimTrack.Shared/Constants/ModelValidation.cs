@@ -1,6 +1,6 @@
 namespace SwimTrack.Shared.Constants;
 
-public static class EntityValidation
+public static class ModelValidation
 {
     public static class TrainingPlan
     {

@@ -1,6 +1,6 @@
-namespace SwimTrack.Services.DTOs.WorkoutResult;
+namespace SwimTrack.Services.DTOs.WorkoutResult.Response;
 
-public class WorkoutResultViewModel
+public class WorkoutResultResponseModel
 {
     public int ActualDistance { get; set; }
 

@@ -1,61 +1,9 @@
-@model IEnumerable<TrainingPlanViewModel>
+@model AllTrainingPlansPageViewModel
 @{
     ViewData["Title"] = "Plans";
 
     string userName = User.Identity?.Name ?? "swimmer";
     string displayName = userName.Contains("@") ? userName.Split('@')[0] : userName;
-
-    var allTrainingPlanWorkouts = Model
-        .SelectMany(p => p.Workouts.Select(w => new { Plan = p, Workout = w }))
-        .ToList();
-
-    var todaySession = allTrainingPlanWorkouts
-        .FirstOrDefault(x => x.Workout.Date.Date == DateTime.Today && x.Workout.Status == WorkoutStatus.Planned);
-
-    var overdueSession = todaySession != null ? null : allTrainingPlanWorkouts
-        .Where(x => x.Workout.Status == WorkoutStatus.Planned && x.Workout.Date.Date < DateTime.Today)
-        .OrderBy(x => x.Workout.Date)
-        .FirstOrDefault();
-
-    var upcomingSession = (todaySession ?? overdueSession) != null ? null : allTrainingPlanWorkouts
-        .Where(x => x.Workout.Status == WorkoutStatus.Planned && x.Workout.Date.Date > DateTime.Today)
-        .OrderBy(x => x.Workout.Date)
-        .FirstOrDefault();
-
-    var displaySession = todaySession ?? overdueSession ?? upcomingSession;
-
-    string sessionPrefix = string.Empty;
-    if (displaySession != null)
-    {
-        if (todaySession != null)
-        {
-            sessionPrefix = "Today’s session";
-        }
-        else if (overdueSession != null)
-        {
-            sessionPrefix = $"Overdue · {overdueSession.Workout.Date.ToString(DateTimeFormat)}";
-        }
-        else if (displaySession.Workout.Date.Date == DateTime.Today.AddDays(1))
-        {
-            sessionPrefix = $"Tomorrow · {displaySession.Workout.Date.ToString(DateTimeFormat)}";
-        }
-        else
-        {
-            sessionPrefix = $"Next session · {displaySession.Workout.Date.ToString(DateTimeFormat)}";
-        }
-    }
-
-    bool hasUserPlans = Model.Any();
-    TrainingPlanViewModel? trainingPlanWithoutWorkouts = Model.FirstOrDefault(p => !p.Workouts.Any());
-
-    int totalCompletedWorkouts = allTrainingPlanWorkouts.Count(x => x.Workout.Status == WorkoutStatus.Completed);
-    int totalSkippedWorkouts = allTrainingPlanWorkouts.Count(x => x.Workout.Status == WorkoutStatus.Skipped);
-    int dueWorkouts = allTrainingPlanWorkouts.Count(x => x.Workout.Date.Date <= DateTime.Today);
-    int completionPercent = dueWorkouts > 0 ? (int)Math.Round((double)totalCompletedWorkouts / dueWorkouts * 100) : 0;
-
-    int totalDistanceSwum = allTrainingPlanWorkouts
-        .Where(x => x.Workout.Status == WorkoutStatus.Completed)
-        .Sum(x => x.Workout.Result?.ActualDistance ?? x.Workout.PlannedDistance);
 }
 
 <main class="container page-content">
@@ -65,37 +13,7 @@
     </div>
 
     <section class="dashboard-grid">
-        @if (displaySession != null)
-        {
-            <article class="dashboard-hero-card">
-                <header>
-                    <p class="eyebrow-heading">@sessionPrefix · @displaySession.Plan.Name</p>
-                </header>
-                <div class="metric-large">
-                    <span class="metric-large-value"><b>@displaySession.Workout.PlannedDistance</b><span>m</span></span>
-                    <span class="metric-large-value"><b>@displaySession.Workout.PlannedDuration</b><span>min</span></span>
-                </div>
-                @if (!string.IsNullOrWhiteSpace(displaySession.Workout.Notes))
-                {
-                    <p class="dashboard-card-quote">“@displaySession.Workout.Notes”</p>
-                }
-                else
-                {
-                    <p class="dashboard-card-quote">“Stay consistent. Enjoy the swim.”</p>
-                }
-                <footer>
-                    @if (displaySession.Workout.Date.Date <= DateTime.Today)
-                    {
-                        <a class="button button--primary" asp-controller="Workout" asp-action="Complete" asp-route-id="@displaySession.Workout.Id" asp-route-trainingPlanId="@displaySession.Plan.Id">Complete</a>
-                        <form class="inline-form" asp-controller="Workout" asp-action="Skip" asp-route-id="@displaySession.Workout.Id" asp-route-trainingPlanId="@displaySession.Plan.Id" method="post">
-                            <button class="button button--warning" type="submit">Skip</button>
-                        </form>
-                    }
-                    <a class="button" asp-controller="Workout" asp-action="Edit" asp-route-id="@displaySession.Workout.Id" asp-route-trainingPlanId="@displaySession.Plan.Id">Edit</a>
-                </footer>
-            </article>
-        }
-        else if (!hasUserPlans)
+        @if (!Model.HasUserPlans)
         {
             <article class="dashboard-hero-card">
                 <header>
@@ -110,19 +28,77 @@
                 </footer>
             </article>
         }
-        else if (trainingPlanWithoutWorkouts != null)
+        else if (Model.Dashboard.TrainingPlanWithoutWorkouts != null)
         {
             <article class="dashboard-hero-card">
                 <header>
-                    <p class="eyebrow-heading">Plan setup · @trainingPlanWithoutWorkouts.Name</p>
+                    <p class="eyebrow-heading">Plan setup · @Model.Dashboard.TrainingPlanWithoutWorkouts.Name</p>
                 </header>
                 <div class="metric-large">
                     <span>Add workouts</span>
                 </div>
-                <p class="dashboard-card-quote">“@trainingPlanWithoutWorkouts.Name” has no workouts scheduled yet.</p>
+                <p class="dashboard-card-quote">“@Model.Dashboard.TrainingPlanWithoutWorkouts.Name” has no workouts scheduled yet.</p>
                 <footer>
-                    <a class="button button--primary" asp-controller="TrainingPlan" asp-action="Edit" asp-route-id="@trainingPlanWithoutWorkouts.Id">Add workouts</a>
-                    <a class="button" asp-controller="TrainingPlan" asp-action="Details" asp-route-id="@trainingPlanWithoutWorkouts.Id">Details</a>
+                    <a class="button button--primary" 
+                       asp-controller="TrainingPlan" 
+                       asp-action="Edit" 
+                       asp-route-id="@Model.Dashboard.TrainingPlanWithoutWorkouts.Id">Add workouts</a>
+                    <a class="button"
+                       asp-controller="TrainingPlan" 
+                       asp-action="Details" 
+                       asp-route-id="@Model.Dashboard.TrainingPlanWithoutWorkouts.Id">Details</a>
+                </footer>
+            </article>
+        }
+        else if (Model.Dashboard.DisplayWorkout != null)
+        {
+            string? displaySessionLabel = Model.Dashboard.State switch
+            {
+                WorkoutState.Today => "Today's session",
+                WorkoutState.Overdue => $"Overdue · {Model.Dashboard.DisplayWorkout!.Date.ToString(DateTimeFormat)}",
+                WorkoutState.Tomorrow => $"Tomorrow · {Model.Dashboard.DisplayWorkout!.Date.ToString(DateTimeFormat)}",
+                WorkoutState.Upcoming => $"Next session · {Model.Dashboard.DisplayWorkout!.Date.ToString(DateTimeFormat)}",
+                _ => null
+            };
+
+            <article class="dashboard-hero-card">
+                <header>
+                    <p class="eyebrow-heading">@displaySessionLabel · @Model.Dashboard.DisplayWorkoutPlan!.Name</p>
+                </header>
+                <div class="metric-large">
+                    <span class="metric-large-value"><b>@Model.Dashboard.DisplayWorkout!.PlannedDistance</b><span>m</span></span>
+                    <span class="metric-large-value"><b>@Model.Dashboard.DisplayWorkout!.PlannedDuration</b><span>min</span></span>
+                </div>
+                @if (!string.IsNullOrWhiteSpace(Model.Dashboard.DisplayWorkout!.Notes))
+                {
+                    <p class="dashboard-card-quote">“@Model.Dashboard.DisplayWorkout!.Notes”</p>
+                }
+                else
+                {
+                    <p class="dashboard-card-quote">“Stay consistent. Enjoy the swim.”</p>
+                }
+                <footer>
+                    @if (Model.Dashboard.DisplayWorkout!.Date.Date <= DateTime.Today)
+                    {
+                        <a class="button button--primary" 
+                           asp-controller="Workout" 
+                           asp-action="Complete" 
+                           asp-route-id="@Model.Dashboard.DisplayWorkout!.Id" 
+                           asp-route-trainingPlanId="@Model.Dashboard.DisplayWorkoutPlan.Id">Complete</a>
+                        <form class="inline-form" 
+                              asp-controller="Workout" 
+                              asp-action="Skip" 
+                              asp-route-id="@Model.Dashboard.DisplayWorkout!.Id" 
+                              asp-route-trainingPlanId="@Model.Dashboard.DisplayWorkoutPlan.Id" 
+                              method="post">
+                            <button class="button button--warning" type="submit">Skip</button>
+                        </form>
+                    }
+                    <a class="button" 
+                       asp-controller="Workout" 
+                       asp-action="Edit" 
+                       asp-route-id="@Model.Dashboard.DisplayWorkout!.Id" 
+                       asp-route-trainingPlanId="@Model.Dashboard.DisplayWorkoutPlan.Id">Edit</a>
                 </footer>
             </article>
         }
@@ -143,27 +119,27 @@
         }
 
         <aside class="card card--center">
-            <div class="progress-ring" style="--p:@completionPercent"><b>@completionPercent%</b></div>
+            <div class="progress-ring" style="--p:@Model.Dashboard.CompletionPercentage"><b>@Model.Dashboard.CompletionPercentage%</b></div>
             <strong>Completion</strong>
-            <small>@totalCompletedWorkouts done · @totalSkippedWorkouts skipped of @dueWorkouts due</small>
+            <small>@Model.Dashboard.TotalCompletedWorkouts done · @Model.Dashboard.TotalSkippedWorkouts skipped of @Model.Dashboard.DueWorkouts due</small>
         </aside>
 
         <aside class="card card--center">
-            <span class="stat-number">@totalDistanceSwum</span>
+            <span class="stat-number">@Model.Dashboard.TotalDistanceSwum</span>
             <strong>metres swum</strong>
-            <small>@totalCompletedWorkouts completed sessions</small>
+            <small>@Model.Dashboard.TotalCompletedWorkouts completed sessions</small>
         </aside>
     </section>
 
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-12">
         <h2>Your plans</h2>
-        @if (hasUserPlans)
+        @if (Model.HasUserPlans)
         {
             <a class="button button--dark" asp-controller="TrainingPlan" asp-action="Create">+ New plan</a>
         }
     </div>
 
-    @if (!hasUserPlans)
+    @if (!Model.HasUserPlans)
     {
         <div class="card card--center">
             <p class="text-muted">No training plans yet. Create your first plan above to get started.</p>
@@ -172,40 +148,16 @@
     else
     {
         <section class="grid-2-columns">
-            @foreach (TrainingPlanViewModel trainingPlan in Model)
+            @foreach (AllTrainingPlansViewModel trainingPlan in Model.TrainingPlans)
             {
-                List<WorkoutViewModel>? workouts = trainingPlan.Workouts.OrderBy(w => w.Date).ToList();
-                int trainingPlanCompleted = workouts.Count(w => w.Status == WorkoutStatus.Completed);
-                int trainingPlanSkipped = workouts.Count(w => w.Status == WorkoutStatus.Skipped);
-                int trainingPlanPlanned = workouts.Count(w => w.Status == WorkoutStatus.Planned);
-
-                bool hasWorkouts = workouts.Any();
-                bool allWorkoutsResolved = hasWorkouts && trainingPlanPlanned == 0;
-                bool isPlanExpired = trainingPlan.EndDate.Date < DateTime.Today;
-
-                string trainingPlanStatusClass;
-                string trainingPlanStatusText;
-
-                if (allWorkoutsResolved)
+                string statusClass = trainingPlan.Status switch
                 {
-                    trainingPlanStatusClass = "badge badge--completed";
-                    trainingPlanStatusText = "Finished";
-                }
-                else if (isPlanExpired)
-                {
-                    trainingPlanStatusClass = "badge badge--expired";
-                    trainingPlanStatusText = "Expired";
-                }
-                else if (trainingPlan.StartDate.Date > DateTime.Today)
-                {
-                    trainingPlanStatusClass = "badge badge--upcoming";
-                    trainingPlanStatusText = "Upcoming";
-                }
-                else
-                {
-                    trainingPlanStatusClass = "badge badge--active";
-                    trainingPlanStatusText = "Active";
-                }
+                    TrainingPlanStatus.Finished => "badge badge--completed",
+                    TrainingPlanStatus.Expired => "badge badge--expired",
+                    TrainingPlanStatus.Upcoming => "badge badge--upcoming",
+                    TrainingPlanStatus.Active => "badge badge--active",
+                    _ => "badge"
+                };
 
                 <article class="card plan-card">
                     <header>
@@ -213,7 +165,7 @@
                             <h3>@trainingPlan.Name</h3>
                             <p class="text-muted">@trainingPlan.StartDate.ToString(DateTimeFormat) – @trainingPlan.EndDate.ToString(DateTimeFormat)</p>
                         </div>
-                        <span class="@trainingPlanStatusClass">@trainingPlanStatusText</span>
+                        <span class="@statusClass">@trainingPlan.StatusText</span>
                     </header>
 
                     @if (!string.IsNullOrWhiteSpace(trainingPlan.Goal))
@@ -225,10 +177,10 @@
                         <p class="text-muted">No goal specified.</p>
                     }
 
-                    @if (workouts.Any())
+                    @if (trainingPlan.Workouts.Count > 0)
                     {
-                        <div class="workout-strip" role="img" aria-label="@trainingPlanCompleted completed, @trainingPlanSkipped skipped, @trainingPlanPlanned planned">
-                            @foreach (WorkoutViewModel workout in workouts)
+                        <div class="workout-strip" role="img" aria-label="@trainingPlan.CompletedWorkouts completed, @trainingPlan.SkippedWorkouts skipped, @trainingPlan.PlannedWorkouts planned">
+                            @foreach (WorkoutViewModel workout in trainingPlan.Workouts)
                             {
                                 if (workout.Status == WorkoutStatus.Completed)
                                 {
@@ -247,7 +199,7 @@
                     }
 
                     <footer>
-                        <small>@trainingPlanCompleted of @workouts.Count sessions done</small>
+                        <small>@trainingPlan.CompletedWorkouts of @trainingPlan.Workouts.Count sessions done</small>
                         <a class="button button--small" asp-controller="TrainingPlan" asp-action="Details" asp-route-id="@trainingPlan.Id">Details</a>
                     </footer>
                 </article>

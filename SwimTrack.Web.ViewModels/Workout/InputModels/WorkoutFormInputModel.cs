@@ -1,11 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 
 using SwimTrack.Shared.Enums;
-using static SwimTrack.Shared.Constants.EntityValidation.Workout;
+using static SwimTrack.Shared.Constants.ModelValidation.Workout;
 
-namespace SwimTrack.Services.DTOs.Workout;
+namespace SwimTrack.Web.ViewModels.Workout.InputModels;
 
-public class WorkoutInputModel
+public class WorkoutFormInputModel
 {
     public int? Id { get; set; }
 
@@ -21,4 +21,6 @@ public class WorkoutInputModel
     public string? Notes { get; set; }
 
     public WorkoutStatus Status { get; set; } = WorkoutStatus.Planned;
+
+    public int TrainingPlanId { get; set; }
 }
