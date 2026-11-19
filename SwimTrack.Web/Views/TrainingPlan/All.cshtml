@@ -84,12 +84,14 @@
                            asp-controller="Workout" 
                            asp-action="Complete" 
                            asp-route-id="@Model.Dashboard.DisplayWorkout!.Id" 
-                           asp-route-trainingPlanId="@Model.Dashboard.DisplayWorkoutPlan.Id">Complete</a>
+                           asp-route-trainingPlanId="@Model.Dashboard.DisplayWorkoutPlan.Id"
+                           asp-route-returnUrl="@Url.Action("All", "TrainingPlan")">Complete</a>
                         <form class="inline-form" 
                               asp-controller="Workout" 
                               asp-action="Skip" 
                               asp-route-id="@Model.Dashboard.DisplayWorkout!.Id" 
                               asp-route-trainingPlanId="@Model.Dashboard.DisplayWorkoutPlan.Id" 
+                              asp-route-returnUrl="@Url.Action("All", "TrainingPlan")"
                               method="post">
                             <button class="button button--warning" type="submit">Skip</button>
                         </form>
@@ -98,7 +100,8 @@
                        asp-controller="Workout" 
                        asp-action="Edit" 
                        asp-route-id="@Model.Dashboard.DisplayWorkout!.Id" 
-                       asp-route-trainingPlanId="@Model.Dashboard.DisplayWorkoutPlan.Id">Edit</a>
+                       asp-route-trainingPlanId="@Model.Dashboard.DisplayWorkoutPlan.Id"
+                       asp-route-returnUrl="@Url.Action("All", "TrainingPlan")">Edit</a>
                 </footer>
             </article>
         }

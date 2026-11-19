@@ -23,13 +23,16 @@ public class WorkoutController : BaseController
     [HttpGet]
     public async Task<IActionResult> Edit(
         [FromRoute] int? id,
-        [FromQuery] int? trainingPlanId)
+        [FromQuery] int? trainingPlanId,
+        [FromQuery] string? returnUrl)
     {
         if (!id.HasValue || id.Value <= 0
             || !trainingPlanId.HasValue || trainingPlanId.Value <= 0)
         {
             return BadRequest();
         }
+
+        ViewData["ReturnUrl"] = returnUrl;
 
         EditWorkoutResponseModel? editWorkoutResponse =
             await _workoutService.GetWorkoutForEditAsync(
@@ -59,6 +62,7 @@ public class WorkoutController : BaseController
     public async Task<IActionResult> Edit(
         [FromRoute] int? id,
         [FromQuery] int? trainingPlanId,
+        [FromQuery] string? returnUrl,
         [FromForm] WorkoutFormInputModel inputModel)
     {
         if (!id.HasValue || id.Value <= 0
@@ -66,6 +70,8 @@ public class WorkoutController : BaseController
         {
             return BadRequest();
         }
+
+        ViewData["ReturnUrl"] = returnUrl;
 
         inputModel.Id = id.Value;
         inputModel.TrainingPlanId = trainingPlanId.Value;
@@ -101,22 +107,22 @@ public class WorkoutController : BaseController
             throw new InvalidOperationException($"Unexpected service result: {result.Status}");
         }
 
-        return RedirectToAction(
-            nameof(TrainingPlanController.Details),
-            "TrainingPlan",
-            new { id = trainingPlanId.Value });
+        return RedirectToReturnUrlOrDetails(trainingPlanId.Value, returnUrl);
     }
 
     [HttpGet]
     public async Task<IActionResult> Complete(
         [FromRoute] int? id,
-        [FromQuery] int? trainingPlanId)
+        [FromQuery] int? trainingPlanId,
+        [FromQuery] string? returnUrl)
     {
         if (!id.HasValue || id.Value <= 0
             || !trainingPlanId.HasValue || trainingPlanId.Value <= 0)
         {
             return BadRequest();
         }
+
+        ViewData["ReturnUrl"] = returnUrl;
 
         WorkoutResultResponseModel? workoutResultResponse = await _workoutService.GetWorkoutForCompletionAsync(
             id.Value,
@@ -144,6 +150,7 @@ public class WorkoutController : BaseController
     public async Task<IActionResult> Complete(
         [FromRoute] int? id,
         [FromQuery] int? trainingPlanId,
+        [FromQuery] string? returnUrl,
         [FromForm] WorkoutResultFormInputModel inputModel)
     {
         if (!id.HasValue || id.Value <= 0
@@ -151,6 +158,8 @@ public class WorkoutController : BaseController
         {
             return BadRequest();
         }
+
+        ViewData["ReturnUrl"] = returnUrl;
 
         inputModel.WorkoutId = id.Value;
         inputModel.TrainingPlanId = trainingPlanId.Value;
@@ -190,16 +199,14 @@ public class WorkoutController : BaseController
             throw new InvalidOperationException($"Unexpected service result: {result.Status}");
         }
 
-        return RedirectToAction(
-        nameof(TrainingPlanController.Details),
-        "TrainingPlan",
-        new { id = trainingPlanId.Value });
+        return RedirectToReturnUrlOrDetails(trainingPlanId.Value, returnUrl);
     }
 
     [HttpPost]
     public async Task<IActionResult> Skip(
         [FromRoute] int? id,
-        [FromQuery] int? trainingPlanId)
+        [FromQuery] int? trainingPlanId,
+        [FromQuery] string? returnUrl)
     {
         if (!id.HasValue || id.Value <= 0
             || !trainingPlanId.HasValue || trainingPlanId.Value <= 0)
@@ -224,16 +231,14 @@ public class WorkoutController : BaseController
             throw new InvalidOperationException($"Unexpected service result: {result.Status}");
         }
 
-        return RedirectToAction(
-            nameof(TrainingPlanController.Details),
-            "TrainingPlan",
-            new { id = trainingPlanId.Value });
+        return RedirectToReturnUrlOrDetails(trainingPlanId.Value, returnUrl);
     }
 
     [HttpPost]
     public async Task<IActionResult> PlanAgain(
         [FromRoute] int? id,
-        [FromQuery] int? trainingPlanId)
+        [FromQuery] int? trainingPlanId,
+        [FromQuery] string? returnUrl)
     {
         if (!id.HasValue || id.Value <= 0
             || !trainingPlanId.HasValue || trainingPlanId.Value <= 0)
@@ -256,9 +261,19 @@ public class WorkoutController : BaseController
             throw new InvalidOperationException($"Unexpected service result: {result.Status}");
         }
 
+        return RedirectToReturnUrlOrDetails(trainingPlanId.Value, returnUrl);
+    }
+
+    private IActionResult RedirectToReturnUrlOrDetails(int trainingPlanId, string? returnUrl)
+    {
+        if (returnUrl != null)
+        {
+            return LocalRedirect(returnUrl);
+        }
+
         return RedirectToAction(
             nameof(TrainingPlanController.Details),
             "TrainingPlan",
-            new { id = trainingPlanId.Value });
+            new { id = trainingPlanId });
     }
 }

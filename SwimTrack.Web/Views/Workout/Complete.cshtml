@@ -33,6 +33,7 @@
               asp-action="Complete"
               asp-route-id="@Model.WorkoutId"
               asp-route-trainingPlanId="@Model.TrainingPlanId"
+              asp-route-returnUrl="@ViewData["ReturnUrl"]"
               method="post">
             <div class="field-validation-error" asp-validation-summary="ModelOnly"></div>
 
