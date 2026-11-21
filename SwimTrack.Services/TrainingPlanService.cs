@@ -350,7 +350,7 @@ public class TrainingPlanService : ITrainingPlanService
                     string? propertyName = null;
                     string errorMessage = string.Format(
                         ExistingWorkoutOutsidePlanPeriod,
-                        $"{workout.Date.ToString(DateTimeFormat)}");
+                        workout.Date.ToString(DateTimeFormat));
 
                     ServiceError serviceError = new(propertyName, errorMessage);
 

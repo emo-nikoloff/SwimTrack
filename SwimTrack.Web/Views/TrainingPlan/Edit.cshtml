@@ -14,6 +14,8 @@
           asp-route-id="@Model.Id"
           method="post">
         <div class="stack form-page-stack">
+            <div class="field-validation-error" asp-validation-summary="ModelOnly"></div>
+
             <partial name="_TrainingPlanInputPartial" model="Model" />
 
             <div class="d-flex flex-wrap align-items-center justify-content-between gap-12">
@@ -96,8 +98,6 @@
                     </div>
                 }
             }
-
-            <div class="field-validation-error" asp-validation-summary="ModelOnly"></div>
 
             <div class="flex-row">
                 <button class="button button--primary" type="submit">Save changes</button>

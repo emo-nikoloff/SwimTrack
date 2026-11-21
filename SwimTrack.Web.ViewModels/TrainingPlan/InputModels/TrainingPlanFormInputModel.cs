@@ -1,9 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 
-using SwimTrack.Web.ViewModels.Workout.InputModels;
 using SwimTrack.Shared.Validation;
+using SwimTrack.Web.ViewModels.Workout.InputModels;
+using static SwimTrack.Shared.Constants.ApplicationDefaults;
 using static SwimTrack.Shared.Constants.ModelValidation.TrainingPlan;
 using static SwimTrack.Shared.Constants.ValidationMessages.DateValidation;
+using static SwimTrack.Shared.Constants.ValidationMessages.TrainingPlanValidation;
 
 namespace SwimTrack.Web.ViewModels.TrainingPlan.InputModels;
 
@@ -46,12 +48,22 @@ public class TrainingPlanFormInputModel : IValidatableObject
         {
             if (!DateValidator.ValidateWorkoutDate(Workouts[i].Date, StartDate, EndDate))
             {
-                yield return new ValidationResult(
-                    WorkoutDateOutsidePlanPeriod,
-                    new[]
-                    {
-                        $"{nameof(Workouts)}[{i}].{nameof(WorkoutFormInputModel.Date)}"
-                    });
+                if (Workouts[i].Id.HasValue)
+                {
+                    yield return new ValidationResult(
+                        string.Format(
+                            ExistingWorkoutOutsidePlanPeriod,
+                            Workouts[i].Date.ToString(DateTimeFormat)));
+                }
+                else
+                {
+                    yield return new ValidationResult(
+                        WorkoutDateOutsidePlanPeriod,
+                        new[]
+                        {
+                            $"{nameof(Workouts)}[{i}].{nameof(WorkoutFormInputModel.Date)}"
+                        });
+                }
             }
         }
     }
