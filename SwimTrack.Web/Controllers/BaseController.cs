@@ -8,6 +8,7 @@ using static SwimTrack.Shared.Constants.ValidationMessages.Identity;
 namespace SwimTrack.Web.Controllers;
 
 [Authorize]
+[AutoValidateAntiforgeryToken]
 public abstract class BaseController : Controller
 {
     protected string UserId
