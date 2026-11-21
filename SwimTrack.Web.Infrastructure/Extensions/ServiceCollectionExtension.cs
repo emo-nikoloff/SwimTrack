@@ -1,27 +1,18 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using SwimTrack.Data;
-using static SwimTrack.Shared.Constants.ApplicationDefaults.Identity;
 
 namespace SwimTrack.Web.Infrastructure.Extensions;
 
 public static class ServiceCollectionExtension
 {
-    public static IServiceCollection AddApplicationIdentity(this IServiceCollection services)
+    public static IServiceCollection AddApplicationIdentity(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDefaultIdentity<IdentityUser>(options =>
         {
-            // Caution: Dev only options
-            // TODO: Use appsettings.json to store different options depending on the app environment
-            options.User.RequireUniqueEmail = true;
-
-            options.Password.RequireDigit = false;
-            options.Password.RequireNonAlphanumeric = false;
-            options.Password.RequireUppercase = false;
-            options.Password.RequiredLength = PasswordMinimumLength;
-
-            options.SignIn.RequireConfirmedAccount = false;
+            configuration.GetSection("IdentitySettings").Bind(options);
         })
         .AddEntityFrameworkStores<SwimTrackDbContext>();
 

@@ -5,7 +5,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Encodings.Web;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -79,8 +78,7 @@ public class RegisterModel : PageModel
         /// </summary>
         [Required]
         [StringLength(PasswordMaximumLength,
-            ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.",
-            MinimumLength = PasswordMinimumLength)]
+            ErrorMessage = "The {0} must not exceed {1} characters.")]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public string Password { get; set; }

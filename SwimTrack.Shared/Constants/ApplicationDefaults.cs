@@ -6,7 +6,6 @@ public static class ApplicationDefaults
 
     public static class Identity
     {
-        public const int PasswordMinimumLength = 3;
         public const int PasswordMaximumLength = 100;
     }
 }
