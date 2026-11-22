@@ -7,7 +7,6 @@ using SwimTrack.Services.DTOs.TrainingPlan.Response;
 using SwimTrack.Services.DTOs.Workout.Request;
 using SwimTrack.Web.ViewModels.TrainingPlan.InputModels;
 using SwimTrack.Web.ViewModels.TrainingPlan.ViewModels;
-using SwimTrack.Web.ViewModels.Workout.InputModels;
 using SwimTrack.Web.ViewModels.Workout.ViewModels;
 using SwimTrack.Web.ViewModels.WorkoutResult.ViewModels;
 
@@ -72,7 +71,7 @@ public class TrainingPlanController : BaseController
     [HttpGet]
     public IActionResult Create()
     {
-        return View(new TrainingPlanFormInputModel()
+        return View(new CreateTrainingPlanFormInputModel()
         {
             StartDate = DateTime.Today,
             EndDate = DateTime.Today.AddDays(1),
@@ -80,49 +79,8 @@ public class TrainingPlanController : BaseController
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(
-        [FromQuery] string? workoutAction,
-        [FromQuery] int? workoutIndex,
-        [FromForm] TrainingPlanFormInputModel inputModel)
+    public async Task<IActionResult> Create([FromForm] CreateTrainingPlanFormInputModel inputModel)
     {
-        if (workoutAction == "add")
-        {
-            if (workoutIndex.HasValue)
-            {
-                return BadRequest();
-            }
-
-            inputModel.Workouts.Add(new WorkoutFormInputModel()
-            {
-                Date = inputModel.StartDate,
-            });
-
-            ModelState.Clear();
-
-            return View(inputModel);
-        }
-
-        if (workoutAction == "remove")
-        {
-            if (!workoutIndex.HasValue
-                || workoutIndex.Value < 0
-                || workoutIndex.Value >= inputModel.Workouts.Count)
-            {
-                return BadRequest();
-            }
-
-            inputModel.Workouts.RemoveAt(workoutIndex.Value);
-
-            ModelState.Clear();
-
-            return View(inputModel);
-        }
-
-        if (workoutAction != null || workoutIndex.HasValue)
-        {
-            return BadRequest();
-        }
-
         if (!ModelState.IsValid)
         {
             return View(inputModel);
@@ -176,17 +134,17 @@ public class TrainingPlanController : BaseController
             return NotFound();
         }
 
-        TrainingPlanFormInputModel inputModel = new()
+        EditTrainingPlanFormInputModel inputModel = new()
         {
             Id = editTrainingPlanResponse.Id,
             Name = editTrainingPlanResponse.Name,
             Goal = editTrainingPlanResponse.Goal,
             StartDate = editTrainingPlanResponse.StartDate,
             EndDate = editTrainingPlanResponse.EndDate,
-            Workouts = editTrainingPlanResponse.Workouts
+            ExistingWorkouts = editTrainingPlanResponse.Workouts
                 .OrderBy(w => w.Date)
                 .ThenBy(w => w.Id)
-                .Select(w => new WorkoutFormInputModel
+                .Select(w => new WorkoutViewModel
                 {
                     Id = w.Id,
                     Date = w.Date,
@@ -196,6 +154,9 @@ public class TrainingPlanController : BaseController
                     Status = w.Status,
                 })
                 .ToList(),
+            KeptWorkoutIds = editTrainingPlanResponse.Workouts
+                .Select(w => w.Id)
+                .ToList(),
         };
 
         return View(inputModel);
@@ -204,9 +165,7 @@ public class TrainingPlanController : BaseController
     [HttpPost]
     public async Task<IActionResult> Edit(
         [FromRoute] int? id,
-        [FromQuery] string? workoutAction,
-        [FromQuery] int? workoutIndex,
-        [FromForm] TrainingPlanFormInputModel inputModel)
+        [FromForm] EditTrainingPlanFormInputModel inputModel)
     {
         if (!id.HasValue || id.Value <= 0)
         {
@@ -215,46 +174,10 @@ public class TrainingPlanController : BaseController
 
         inputModel.Id = id.Value;
 
-        if (workoutAction == "add")
-        {
-            if (workoutIndex.HasValue)
-            {
-                return BadRequest();
-            }
-
-            inputModel.Workouts.Add(new WorkoutFormInputModel()
-            {
-                Date = inputModel.StartDate,
-            });
-
-            ModelState.Clear();
-
-            return View(inputModel);
-        }
-
-        if (workoutAction == "remove")
-        {
-            if (!workoutIndex.HasValue
-                || workoutIndex.Value < 0
-                || workoutIndex.Value >= inputModel.Workouts.Count)
-            {
-                return BadRequest();
-            }
-
-            inputModel.Workouts.RemoveAt(workoutIndex.Value);
-
-            ModelState.Clear();
-
-            return View(inputModel);
-        }
-
-        if (workoutAction != null || workoutIndex.HasValue)
-        {
-            return BadRequest();
-        }
-
         if (!ModelState.IsValid)
         {
+            await RestoreExistingWorkoutsAsync(inputModel);
+
             return View(inputModel);
         }
 
@@ -265,10 +188,10 @@ public class TrainingPlanController : BaseController
             Goal = inputModel.Goal,
             StartDate = inputModel.StartDate,
             EndDate = inputModel.EndDate,
-            Workouts = inputModel.Workouts
-                .Select(w => new EditWorkoutRequestModel
+            KeptWorkoutIds = inputModel.KeptWorkoutIds,
+            NewWorkouts = inputModel.NewWorkouts
+                .Select(w => new CreateWorkoutRequestModel
                 {
-                    Id = w.Id,
                     Date = w.Date,
                     PlannedDistance = w.PlannedDistance,
                     PlannedDuration = w.PlannedDuration,
@@ -282,6 +205,8 @@ public class TrainingPlanController : BaseController
         if (result.Status == ServiceResultStatus.InvalidRequest)
         {
             AddServiceErrorsToModelState(result.Errors);
+
+            await RestoreExistingWorkoutsAsync(inputModel);
 
             return View(inputModel);
         }
@@ -366,5 +291,35 @@ public class TrainingPlanController : BaseController
         };
 
         return View(trainingPlanDetailsViewModel);
+    }
+
+    private async Task RestoreExistingWorkoutsAsync(EditTrainingPlanFormInputModel inputModel)
+    {
+        if (inputModel.Id <= 0)
+        {
+            return;
+        }
+
+        EditTrainingPlanResponseModel? trainingPlan =
+            await _trainingPlanService.GetTrainingPlanForEditAsync(inputModel.Id, UserId);
+        if (trainingPlan != null)
+        {
+            HashSet<int> keptWorkouts = inputModel.KeptWorkoutIds.ToHashSet();
+
+            inputModel.ExistingWorkouts = trainingPlan.Workouts
+                .Where(w => keptWorkouts.Contains(w.Id))
+                .OrderBy(w => w.Date)
+                .ThenBy(w => w.Id)
+                .Select(w => new WorkoutViewModel
+                {
+                    Id = w.Id,
+                    Date = w.Date,
+                    PlannedDistance = w.PlannedDistance,
+                    PlannedDuration = w.PlannedDuration,
+                    Notes = w.Notes,
+                    Status = w.Status,
+                })
+                .ToList();
+        }
     }
 }

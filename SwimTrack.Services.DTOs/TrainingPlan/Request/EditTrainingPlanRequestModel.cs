@@ -20,5 +20,7 @@ public class EditTrainingPlanRequestModel
 
     public DateTime EndDate { get; set; }
 
-    public IReadOnlyList<EditWorkoutRequestModel> Workouts { get; set; } = new List<EditWorkoutRequestModel>();
+    public IReadOnlyCollection<int> KeptWorkoutIds { get; set; } = new List<int>();
+
+    public IReadOnlyList<CreateWorkoutRequestModel> NewWorkouts { get; set; } = new List<CreateWorkoutRequestModel>();
 }

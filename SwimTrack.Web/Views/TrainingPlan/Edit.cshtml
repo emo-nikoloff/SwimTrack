@@ -1,4 +1,4 @@
-@model TrainingPlanFormInputModel
+@model EditTrainingPlanFormInputModel
 @{
     ViewData["Title"] = "Edit training plan";
 }
@@ -20,84 +20,39 @@
 
             <div class="d-flex flex-wrap align-items-center justify-content-between gap-12">
                 <h2>Workouts</h2>
-                <button class="button" type="submit"
-                        asp-controller="TrainingPlan"
-                        asp-action="Edit"
-                        asp-route-id="@Model.Id"
-                        asp-route-workoutAction="add"
-                        formnovalidate
-                       >
+                <button class="button" type="button" id="add-workout-btn">
                     + Add workout
                 </button>
             </div>
 
-            @if (Model.Workouts.Count == 0)
-            {
-                <div class="card card--center">
-                    <p class="text-muted">No workouts in this plan. Click "+ Add workout" to schedule sessions.</p>
-                </div>
-            }
-            else
-            {
-                @for (int i = 0; i < Model.Workouts.Count; i++)
-                {
-                    WorkoutFormInputModel currentWorkout = Model.Workouts[i];
-                    ViewDataDictionary workoutViewData = new ViewDataDictionary(ViewData);
-                    workoutViewData.TemplateInfo.HtmlFieldPrefix = $"Workouts[{i}]";
+            <div id="no-workouts-message" class="card card--center" @((Model.ExistingWorkouts.Count == 0 && Model.NewWorkouts.Count == 0) ? null : "hidden")>
+                <p class="text-muted">No workouts in this plan. Click "+ Add workout" to schedule sessions.</p>
+            </div>
 
-                    <div class="card stack workout-input-card">
+            <div id="workouts-container" class="stack" data-new-workouts-prefix="NewWorkouts">
+                @for (int i = 0; i < Model.ExistingWorkouts.Count; i++)
+                {
+                    <div class="card stack workout-input-card" data-is-existing="true">
                         <div class="d-flex flex-wrap align-items-center justify-content-between gap-12">
                             <div class="flex-row workout-input-header">
                                 <span class="index-chip">@(i + 1)</span>
-                                @if (currentWorkout.Id.HasValue)
-                                {
-                                    <b>Workout @(i + 1)</b>
-                                }
-                                else
-                                {
-                                    <b>New workout</b>
-                                }
+                                <b>Workout @(i + 1)</b>
                             </div>
-                            <button class="button button--small button--danger" type="submit"
-                                    asp-controller="TrainingPlan"
-                                    asp-action="Edit"
-                                    asp-route-id="@Model.Id"
-                                    asp-route-workoutAction="remove"
-                                    asp-route-workoutIndex="@i"
-                                    formnovalidate
-                                   >
+                            <button class="button button--small button--danger remove-workout-btn" type="button">
                                 Remove
                             </button>
                         </div>
 
-                        @if (currentWorkout.Id.HasValue)
-                        {
-                            WorkoutViewModel workoutViewModel = new()
-                            {
-                                Id = currentWorkout.Id.Value,
-                                Date = currentWorkout.Date,
-                                PlannedDistance = currentWorkout.PlannedDistance,
-                                PlannedDuration = currentWorkout.PlannedDuration,
-                                Notes = currentWorkout.Notes,
-                                Status = currentWorkout.Status,
-                            };
-
-                            <partial name="_WorkoutDetailsPartial" model="workoutViewModel" />
-
-                            <input asp-for="Workouts[i].Id" type="hidden" />
-                            <input asp-for="Workouts[i].Date" type="hidden" />
-                            <input asp-for="Workouts[i].PlannedDistance" type="hidden" />
-                            <input asp-for="Workouts[i].PlannedDuration" type="hidden" />
-                            <input asp-for="Workouts[i].Notes" type="hidden" />
-                            <input asp-for="Workouts[i].Status" type="hidden" />
-                        }
-                        else
-                        {
-                            <partial name="_WorkoutInputPartial" model="currentWorkout" view-data="workoutViewData" />
-                        }
+                        <partial name="_WorkoutDetailsPartial" model="Model.ExistingWorkouts[i]" />
+                        <input type="hidden" name="KeptWorkoutIds" value="@Model.ExistingWorkouts[i].Id" />
                     </div>
                 }
-            }
+
+                @for (int i = 0; i < Model.NewWorkouts.Count; i++)
+                {
+                    <partial name="_WorkoutCardPartial" for="NewWorkouts[i]" />
+                }
+            </div>
 
             <div class="flex-row">
                 <button class="button button--primary" type="submit">Save changes</button>
@@ -105,8 +60,13 @@
             </div>
         </div>
     </form>
+
+    <template id="workout-card-template">
+        <partial name="_WorkoutCardPartial" model="new WorkoutFormInputModel()" />
+    </template>
 </main>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/training-plan-form.js" asp-append-version="true"></script>
 }

@@ -1,4 +1,4 @@
-@model TrainingPlanFormInputModel
+@model CreateTrainingPlanFormInputModel
 @{
     ViewData["Title"] = "Create training plan";
 }
@@ -17,51 +17,21 @@
 
             <div class="d-flex flex-wrap align-items-center justify-content-between gap-12">
                 <h2>Workouts</h2>
-                <button class="button" type="submit"
-                        asp-controller="TrainingPlan"
-                        asp-action="Create"
-                        asp-route-workoutAction="add"
-                        formnovalidate
-                       >
+                <button class="button" type="button" id="add-workout-btn">
                     + Add workout
                 </button>
             </div>
 
-            @if (Model.Workouts.Count == 0)
-            {
-                <div class="card card--center">
-                    <p class="text-muted">No workouts added yet. Click "+ Add workout" to plan sessions.</p>
-                </div>
-            }
-            else
-            {
+            <div id="no-workouts-message" class="card card--center" @(Model.Workouts.Count == 0 ? null : "hidden")>
+                <p class="text-muted">No workouts added yet. Click "+ Add workout" to plan sessions.</p>
+            </div>
+
+            <div id="workouts-container" class="stack" data-new-workouts-prefix="Workouts">
                 @for (int i = 0; i < Model.Workouts.Count; i++)
                 {
-                    WorkoutFormInputModel currentWorkout = Model.Workouts[i];
-                    ViewDataDictionary workoutViewData = new ViewDataDictionary(ViewData);
-                    workoutViewData.TemplateInfo.HtmlFieldPrefix = $"Workouts[{i}]";
-
-                    <div class="card stack workout-input-card">
-                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-12">
-                            <div class="flex-row workout-input-header">
-                                <span class="index-chip">@(i + 1)</span>
-                                <b>Workout @(i + 1)</b>
-                            </div>
-                            <button class="button button--small button--danger" type="submit"
-                                    asp-controller="TrainingPlan"
-                                    asp-action="Create"
-                                    asp-route-workoutAction="remove"
-                                    asp-route-workoutIndex="@i"
-                                    formnovalidate
-                                   >
-                                Remove
-                            </button>
-                        </div>
-
-                        <partial name="_WorkoutInputPartial" model="currentWorkout" view-data="workoutViewData" />
-                    </div>
+                    <partial name="_WorkoutCardPartial" for="Workouts[i]" />
                 }
-            }
+            </div>
 
             <div class="flex-row">
                 <button class="button button--primary" type="submit">Save</button>
@@ -69,8 +39,13 @@
             </div>
         </div>
     </form>
+
+    <template id="workout-card-template">
+        <partial name="_WorkoutCardPartial" model="new WorkoutFormInputModel()" />
+    </template>
 </main>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/training-plan-form.js" asp-append-version="true"></script>
 }

@@ -16,6 +16,10 @@
   max-width: 880px;
 }
 
+.form-page-stack > .flex-row:last-child {
+  scroll-margin-bottom: 32px;
+}
+
 .cta-banner h2 {
   max-width: 12em;
 }

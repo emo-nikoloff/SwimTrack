@@ -248,9 +248,9 @@ public class TrainingPlanService : ITrainingPlanService
             serviceErrors.Add(serviceError);
         }
 
-        for (int i = 0; i < request.Workouts.Count; i++)
+        for (int i = 0; i < request.NewWorkouts.Count; i++)
         {
-            EditWorkoutRequestModel workout = request.Workouts[i];
+            CreateWorkoutRequestModel workout = request.NewWorkouts[i];
 
             bool isWorkoutRequestValid = _modelValidator.IsValid(workout);
             if (!isWorkoutRequestValid)
@@ -261,11 +261,11 @@ public class TrainingPlanService : ITrainingPlanService
                     string? propertyName = error.MemberNames.FirstOrDefault();
                     if (propertyName != null)
                     {
-                        propertyName = $"Workouts[{i}].{propertyName}";
+                        propertyName = $"NewWorkouts[{i}].{propertyName}";
                     }
                     else
                     {
-                        propertyName = $"Workouts[{i}]";
+                        propertyName = $"NewWorkouts[{i}]";
                     }
                     string errorMessage = error.ErrorMessage ?? string.Empty;
 
@@ -275,8 +275,7 @@ public class TrainingPlanService : ITrainingPlanService
                 }
             }
 
-            if (workout.Id == null
-                && isTrainingPlanPeriodValid)
+            if (isTrainingPlanPeriodValid)
             {
                 bool isWorkoutDateInPlanPeriod = DateValidator.ValidateWorkoutDate(
                     workout.Date,
@@ -284,7 +283,7 @@ public class TrainingPlanService : ITrainingPlanService
                     request.EndDate);
                 if (!isWorkoutDateInPlanPeriod)
                 {
-                    string propertyName = $"Workouts[{i}].{nameof(workout.Date)}";
+                    string propertyName = $"NewWorkouts[{i}].{nameof(workout.Date)}";
                     string errorMessage = WorkoutDateOutsidePlanPeriod;
 
                     ServiceError serviceError = new(propertyName, errorMessage);
@@ -314,48 +313,40 @@ public class TrainingPlanService : ITrainingPlanService
                 NotFoundTrainingPlan);
         }
 
-        HashSet<int> workoutIdsToKeep = request.Workouts
-            .Where(w => w.Id.HasValue)
-            .Select(w => w.Id!.Value)
-            .ToHashSet();
-        if (workoutIdsToKeep.Count != request.Workouts.Count(w => w.Id.HasValue))
-        {
-            return ServiceResult.Failure(
-                ServiceResultStatus.InvalidRequest,
-                DuplicateWorkoutIds);
-        }
-
         HashSet<int> existingWorkoutIds = requestedTrainingPlan.Workouts
             .Select(w => w.Id)
             .ToHashSet();
-        if (!workoutIdsToKeep.IsSubsetOf(existingWorkoutIds))
+
+        HashSet<int> keptWorkoutIds = request.KeptWorkoutIds.ToHashSet();
+
+        // Security check: ensure kept workout IDs actually belong to this training plan
+        if (!keptWorkoutIds.IsSubsetOf(existingWorkoutIds))
         {
             return ServiceResult.Failure(
                 ServiceResultStatus.InvalidRequest,
                 InvalidTrainingPlanWorkout);
         }
 
-        if (isTrainingPlanPeriodValid)
+        // Validate that kept workouts' dates in DB fall within the (possibly updated) plan period
+        IEnumerable<Workout> workoutsToKeep = requestedTrainingPlan.Workouts
+            .Where(w => keptWorkoutIds.Contains(w.Id));
+
+        foreach (Workout workout in workoutsToKeep)
         {
-            IEnumerable<Workout> workoutsToKeep = requestedTrainingPlan.Workouts
-               .Where(w => workoutIdsToKeep.Contains(w.Id));
-            foreach (Workout workout in workoutsToKeep)
+            bool isWorkoutDateValid = DateValidator.ValidateWorkoutDate(
+                workout.Date,
+                request.StartDate,
+                request.EndDate);
+            if (!isWorkoutDateValid)
             {
-                bool isWorkoutDateValid = DateValidator.ValidateWorkoutDate(
-                    workout.Date,
-                    request.StartDate,
-                    request.EndDate);
-                if (!isWorkoutDateValid)
-                {
-                    string? propertyName = null;
-                    string errorMessage = string.Format(
-                        ExistingWorkoutOutsidePlanPeriod,
-                        workout.Date.ToString(DateTimeFormat));
+                string? propertyName = null;
+                string errorMessage = string.Format(
+                    ExistingWorkoutOutsidePlanPeriod,
+                    workout.Date.ToString(DateTimeFormat));
 
-                    ServiceError serviceError = new(propertyName, errorMessage);
+                ServiceError serviceError = new(propertyName, errorMessage);
 
-                    serviceErrors.Add(serviceError);
-                }
+                serviceErrors.Add(serviceError);
             }
         }
 
@@ -366,24 +357,22 @@ public class TrainingPlanService : ITrainingPlanService
                 serviceErrors);
         }
 
+        // Update plan details
         requestedTrainingPlan.Name = request.Name;
         requestedTrainingPlan.Goal = request.Goal;
         requestedTrainingPlan.StartDate = request.StartDate;
         requestedTrainingPlan.EndDate = request.EndDate;
 
+        // Delete workouts that were removed by the user
         IEnumerable<Workout> workoutsToRemove = requestedTrainingPlan.Workouts
-            .Where(w => !workoutIdsToKeep.Contains(w.Id))
+            .Where(w => !keptWorkoutIds.Contains(w.Id))
             .ToArray();
 
         _workoutRepository.RemoveRange(workoutsToRemove);
 
-        foreach (EditWorkoutRequestModel workoutRequest in request.Workouts)
+        // Add newly created workouts
+        foreach (CreateWorkoutRequestModel workoutRequest in request.NewWorkouts)
         {
-            if (workoutRequest.Id.HasValue)
-            {
-                continue;
-            }
-
             requestedTrainingPlan.Workouts.Add(new Workout
             {
                 Date = workoutRequest.Date,

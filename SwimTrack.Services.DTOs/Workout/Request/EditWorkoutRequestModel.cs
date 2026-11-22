@@ -6,7 +6,7 @@ namespace SwimTrack.Services.DTOs.Workout.Request;
 
 public class EditWorkoutRequestModel
 {
-    public int? Id { get; set; }
+    public int Id { get; set; }
 
     public DateTime Date { get; set; }
 

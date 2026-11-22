@@ -1,0 +1,15 @@
+@model WorkoutFormInputModel
+
+<div class="card stack workout-input-card" data-is-existing="false">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-12">
+        <div class="flex-row workout-input-header">
+            <span class="index-chip"></span>
+            <b>New workout</b>
+        </div>
+        <button class="button button--small button--danger remove-workout-btn" type="button">
+            Remove
+        </button>
+    </div>
+
+    <partial name="_WorkoutInputPartial" model="Model" />
+</div>
