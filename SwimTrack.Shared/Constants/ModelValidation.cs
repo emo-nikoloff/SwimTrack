@@ -20,6 +20,17 @@ public static class ModelValidation
         public const int TargetDistanceMaxValue = 100_000;
     }
 
+    public static class SwimmingPool
+    {
+        public const int NameMinLength = 3;
+        public const int NameMaxLength = 100;
+
+        public const int LengthMinValue = 10;
+        public const int LengthMaxValue = 100;
+
+        public const int LocationMaxLength = 200;
+    }
+
     public static class Workout
     {
         public const int DistanceMinValue = 25;

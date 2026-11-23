@@ -41,6 +41,12 @@ public static class ValidationMessages
             "The requested training goal was not found.";
     }
 
+    public static class SwimmingPoolValidation
+    {
+        public const string NotFoundSwimmingPool =
+            "The requested swimming pool was not found.";
+    }
+
     public static class WorkoutValidation
     {
         public const string NotFoundWorkout =
