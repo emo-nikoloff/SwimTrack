@@ -13,6 +13,9 @@ public static class ValidationMessages
         public const string InvalidTrainingPlanPeriod =
             "The end date cannot be before the start date.";
 
+        public const string InvalidTrainingGoalPeriod =
+            "The end date cannot be before the start date.";
+
         public const string WorkoutDateOutsidePlanPeriod =
             "The workout date must be within the training plan period.";
 
@@ -25,14 +28,17 @@ public static class ValidationMessages
         public const string NotFoundTrainingPlan =
             "The requested training plan was not found.";
 
-        public const string DuplicateWorkoutIds =
-            "Duplicate workout IDs were submitted.";
-
         public const string InvalidTrainingPlanWorkout =
             "One or more submitted workout IDs do not belong to the requested training plan.";
 
         public const string ExistingWorkoutOutsidePlanPeriod =
             "The existing workout scheduled for {0} falls outside the new training plan period.";
+    }
+
+    public static class TrainingGoalValidation
+    {
+        public const string NotFoundTrainingGoal =
+            "The requested training goal was not found.";
     }
 
     public static class WorkoutValidation
