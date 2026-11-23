@@ -1,0 +1,53 @@
+@model AllTrainingGoalsPageViewModel
+@{
+    ViewData["Title"] = "Goals";
+}
+
+<main class="container page-content">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-12">
+        <div>
+            <p class="eyebrow-heading">@DateTime.Today.ToString(DateTimeFormat)</p>
+            <h1 class="page-title">Training goals</h1>
+        </div>
+        @if (Model.HasUserGoals)
+        {
+            <a class="button button--dark" asp-controller="TrainingGoal" asp-action="Create">+ New goal</a>
+        }
+    </div>
+
+    @if (!Model.HasUserGoals)
+    {
+        <div class="card card--center">
+            <h3>No training goals yet</h3>
+            <p class="text-muted">Set a goal to keep yourself focused and track your swimming progress over time.</p>
+            <div style="margin-top: 1rem;">
+                <a class="button button--primary" asp-controller="TrainingGoal" asp-action="Create">Create training goal</a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <section class="grid-2-columns">
+            @foreach (AllTrainingGoalsViewModel goal in Model.TrainingGoals)
+            {
+                <article class="card plan-card">
+                    <header>
+                        <div>
+                            <h3>@goal.Title</h3>
+                            <p class="text-muted">@goal.StartDate.ToString(DateTimeFormat) – @goal.EndDate.ToString(DateTimeFormat)</p>
+                        </div>
+                    </header>
+
+                    <div class="metric-large">
+                        <span class="metric-large-value"><b>@goal.TargetDistance</b><span>m</span></span>
+                    </div>
+
+                    <footer>
+                        <small>Target: @goal.TargetDistance m</small>
+                        <a class="button button--small" asp-controller="TrainingGoal" asp-action="Details" asp-route-id="@goal.Id">Details</a>
+                    </footer>
+                </article>
+            }
+        </section>
+    }
+</main>

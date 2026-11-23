@@ -1,0 +1,28 @@
+@model CreateTrainingGoalFormInputModel
+@{
+    ViewData["Title"] = "Create training goal";
+}
+
+<main class="container page-content">
+    <div>
+        <p class="eyebrow-heading">Set your target</p>
+        <h1 class="page-title">Create training goal</h1>
+    </div>
+
+    <form asp-controller="TrainingGoal" asp-action="Create" method="post">
+        <div class="stack form-page-stack">
+            <div class="field-validation-error" asp-validation-summary="ModelOnly"></div>
+
+            <partial name="_TrainingGoalInputPartial" model="Model" />
+
+            <div class="flex-row">
+                <button class="button button--primary" type="submit">Save</button>
+                <a class="button" asp-controller="TrainingGoal" asp-action="All">Cancel</a>
+            </div>
+        </div>
+    </form>
+</main>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

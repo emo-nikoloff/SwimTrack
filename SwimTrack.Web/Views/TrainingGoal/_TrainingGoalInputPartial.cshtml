@@ -1,0 +1,31 @@
+@model BaseTrainingGoalFormInputModel
+
+<section class="card">
+    <h3>Goal</h3>
+    <div class="form-field">
+        <label asp-for="Title">Title</label>
+        <input asp-for="Title" autocomplete="off" placeholder="e.g. Swim 50km this month, Technique & Endurance" />
+        <small>3–100 characters</small>
+        <span class="field-validation-error" asp-validation-for="Title"></span>
+    </div>
+
+    <div class="form-field">
+        <label asp-for="TargetDistance">Target distance (metres)</label>
+        <input asp-for="TargetDistance" type="number" step="25" min="25" max="100000" placeholder="e.g. 50000" />
+        <small>Between 25 and 100,000 metres</small>
+        <span class="field-validation-error" asp-validation-for="TargetDistance"></span>
+    </div>
+
+    <div class="grid-2-columns">
+        <div class="form-field">
+            <label asp-for="StartDate">Start date</label>
+            <input asp-for="StartDate" type="date" />
+            <span class="field-validation-error" asp-validation-for="StartDate"></span>
+        </div>
+        <div class="form-field">
+            <label asp-for="EndDate">End date</label>
+            <input asp-for="EndDate" type="date" />
+            <span class="field-validation-error" asp-validation-for="EndDate"></span>
+        </div>
+    </div>
+</section>
