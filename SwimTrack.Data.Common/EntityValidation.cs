@@ -15,6 +15,8 @@ public static class EntityValidation
     public static class TrainingGoal
     {
         public const int TitleMaxLength = 100;
+
+        public const string DateColumnType = "date";
     }
 
     public static class Workout

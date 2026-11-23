@@ -17,8 +17,10 @@ public class TrainingGoal
 
     public int TargetDistance { get; set; }
 
+    [Column(TypeName = DateColumnType)]
     public DateTime StartDate { get; set; }
 
+    [Column(TypeName = DateColumnType)]
     public DateTime EndDate { get; set; }
 
     [Required]
