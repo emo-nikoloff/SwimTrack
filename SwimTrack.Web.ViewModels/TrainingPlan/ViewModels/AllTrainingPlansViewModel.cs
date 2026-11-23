@@ -11,7 +11,8 @@ public class AllTrainingPlansViewModel
 
     public string Name { get; set; } = null!;
 
-    public string? Goal { get; set; }
+    // TODO: Decide how to implement the new TrainingGoal
+    // public string? Goal { get; set; }
 
     public DateTime StartDate { get; set; }
 

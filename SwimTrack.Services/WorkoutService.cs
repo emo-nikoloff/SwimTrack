@@ -233,7 +233,7 @@ public class WorkoutService : IWorkoutService
         {
             ActualDistance = request.ActualDistance,
             ActualDuration = request.ActualDuration,
-            CompletedAt = request.CompletedAt,
+            CompletedOn = request.CompletedAt,
             Notes = request.Notes,
             WorkoutId = requestedWorkout.Id
         };

@@ -11,10 +11,13 @@
             <p class="eyebrow-heading">Training plan</p>
             <h1 class="plan-title">@Model.Name</h1>
             <p class="text-muted">@Model.StartDate.ToString(DateTimeFormat) – @Model.EndDate.ToString(DateTimeFormat) · @Model.TotalWorkouts workouts</p>
+            @* TODO: Decide how to implement the new TrainingGoal *@
+            @*
             @if (!string.IsNullOrWhiteSpace(Model.Goal))
             {
                 <blockquote class="plan-goal-card">“@Model.Goal”</blockquote>
             }
+            *@
             <div class="flex-row">
                 <a class="button button--dark" asp-controller="TrainingPlan" asp-action="Edit" asp-route-id="@Model.Id">Edit plan & workouts</a>
             </div>

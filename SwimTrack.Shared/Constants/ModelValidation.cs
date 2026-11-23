@@ -5,9 +5,10 @@ public static class ModelValidation
     public static class TrainingPlan
     {
         public const int NameMinLength = 3;
-        public const int NameMaxLength = 100;
+        public const int TitleMaxLength = 100;
 
-        public const int GoalMaxLength = 250;
+        // TODO: Decide how to implement the new TrainingGoal
+        // public const int GoalMaxLength = 250;
     }
 
     public static class Workout

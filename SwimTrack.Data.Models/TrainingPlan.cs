@@ -12,19 +12,26 @@ public class TrainingPlan
     public int Id { get; set; }
 
     [Required]
-    [MaxLength(NameMaxLength)]
-    public string Name { get; set; } = null!;
+    [MaxLength(TitleMaxLength)]
+    public string Title { get; set; } = null!;
 
-    [MaxLength(GoalMaxLength)]
-    public string? Goal { get; set; }
+    [ForeignKey(nameof(TrainingGoal))]
+    public int? TrainingGoalId { get; set; }
 
-    [Column(TypeName = "DATE")]
+    public virtual TrainingGoal? TrainingGoal { get; set; }
+
+    [Column(TypeName = DateColumnType)]
     public DateTime StartDate { get; set; }
 
-    [Column(TypeName = "DATE")]
+    [Column(TypeName = DateColumnType)]
     public DateTime EndDate { get; set; }
 
     public virtual ICollection<Workout> Workouts { get; set; } = new List<Workout>();
+
+    [ForeignKey(nameof(SwimmingPool))]
+    public int? SwimmingPoolId { get; set; }
+
+    public virtual SwimmingPool? SwimmingPool { get; set; }
 
     [Required]
     [ForeignKey(nameof(User))]

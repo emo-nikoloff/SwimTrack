@@ -10,11 +10,12 @@ public class EditTrainingPlanRequestModel
     public int Id { get; set; }
 
     [Required]
-    [StringLength(NameMaxLength, MinimumLength = NameMinLength)]
+    [StringLength(TitleMaxLength, MinimumLength = NameMinLength)]
     public string Name { get; set; } = null!;
 
-    [MaxLength(GoalMaxLength)]
-    public string? Goal { get; set; }
+    // TODO: Decide how to implement the new TrainingGoal
+    // [MaxLength(GoalMaxLength)]
+    // public string? Goal { get; set; }
 
     public DateTime StartDate { get; set; }
 

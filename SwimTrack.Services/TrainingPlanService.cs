@@ -44,8 +44,9 @@ public class TrainingPlanService : ITrainingPlanService
             .Select(tp => new AllTrainingPlansResponseModel
             {
                 Id = tp.Id,
-                Name = tp.Name,
-                Goal = tp.Goal,
+                Name = tp.Title,
+                // TODO: Decide how to implement the new TrainingGoal
+                // Goal = tp.Goal,
                 StartDate = tp.StartDate,
                 EndDate = tp.EndDate,
                 Workouts = tp.Workouts
@@ -63,7 +64,7 @@ public class TrainingPlanService : ITrainingPlanService
                             {
                                 ActualDistance = w.WorkoutResult.ActualDistance,
                                 ActualDuration = w.WorkoutResult.ActualDuration,
-                                CompletedAt = w.WorkoutResult.CompletedAt,
+                                CompletedAt = w.WorkoutResult.CompletedOn,
                                 Notes = w.WorkoutResult.Notes,
                             },
                     })
@@ -158,8 +159,9 @@ public class TrainingPlanService : ITrainingPlanService
 
         TrainingPlan newTrainingPlan = new()
         {
-            Name = request.Name,
-            Goal = request.Goal,
+            Title = request.Name,
+            // TODO: Decide how to implement the new TrainingGoal
+            // Goal = request.Goal,
             StartDate = request.StartDate,
             EndDate = request.EndDate,
             Workouts = request.Workouts
@@ -196,8 +198,9 @@ public class TrainingPlanService : ITrainingPlanService
         EditTrainingPlanResponseModel editTrainingPlanResponse = new()
         {
             Id = requestedTrainingPlan.Id,
-            Name = requestedTrainingPlan.Name,
-            Goal = requestedTrainingPlan.Goal,
+            Name = requestedTrainingPlan.Title,
+            // TODO: Decide how to implement the new TrainingGoal
+            // Goal = requestedTrainingPlan.Goal,
             StartDate = requestedTrainingPlan.StartDate,
             EndDate = requestedTrainingPlan.EndDate,
             Workouts = requestedTrainingPlan.Workouts
@@ -358,8 +361,9 @@ public class TrainingPlanService : ITrainingPlanService
         }
 
         // Update plan details
-        requestedTrainingPlan.Name = request.Name;
-        requestedTrainingPlan.Goal = request.Goal;
+        requestedTrainingPlan.Title = request.Name;
+        // TODO: Decide how to implement the new TrainingGoal
+        // requestedTrainingPlan.Goal = request.Goal;
         requestedTrainingPlan.StartDate = request.StartDate;
         requestedTrainingPlan.EndDate = request.EndDate;
 
@@ -414,8 +418,9 @@ public class TrainingPlanService : ITrainingPlanService
             .Select(tp => new TrainingPlanDetailsResponseModel
             {
                 Id = tp.Id,
-                Name = tp.Name,
-                Goal = tp.Goal,
+                Name = tp.Title,
+                // TODO: Decide how to implement the new TrainingGoal
+                // Goal = tp.Goal,
                 StartDate = tp.StartDate,
                 EndDate = tp.EndDate,
                 Workouts = tp.Workouts
@@ -433,7 +438,7 @@ public class TrainingPlanService : ITrainingPlanService
                             {
                                 ActualDistance = w.WorkoutResult.ActualDistance,
                                 ActualDuration = w.WorkoutResult.ActualDuration,
-                                CompletedAt = w.WorkoutResult.CompletedAt,
+                                CompletedAt = w.WorkoutResult.CompletedOn,
                                 Notes = w.WorkoutResult.Notes,
                             },
                     })

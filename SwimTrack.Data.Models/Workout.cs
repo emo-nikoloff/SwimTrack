@@ -11,7 +11,7 @@ public class Workout
     [Key]
     public int Id { get; set; }
 
-    [Column(TypeName = "DATE")]
+    [Column(TypeName = DateColumnType)]
     public DateTime Date { get; set; }
 
     public int PlannedDistance { get; set; }

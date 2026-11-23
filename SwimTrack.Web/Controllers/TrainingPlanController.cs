@@ -35,7 +35,8 @@ public class TrainingPlanController : BaseController
             {
                 Id = tp.Id,
                 Name = tp.Name,
-                Goal = tp.Goal,
+                // TODO: Decide how to implement the new TrainingGoal
+                // Goal = tp.Goal,
                 StartDate = tp.StartDate,
                 EndDate = tp.EndDate,
                 Workouts = tp.Workouts
@@ -89,7 +90,8 @@ public class TrainingPlanController : BaseController
         CreateTrainingPlanRequestModel createTrainingPlanRequest = new()
         {
             Name = inputModel.Name,
-            Goal = inputModel.Goal,
+            // TODO: Decide how to implement the new TrainingGoal
+            // Goal = inputModel.Goal,
             StartDate = inputModel.StartDate,
             EndDate = inputModel.EndDate,
             Workouts = inputModel.Workouts
@@ -138,7 +140,8 @@ public class TrainingPlanController : BaseController
         {
             Id = editTrainingPlanResponse.Id,
             Name = editTrainingPlanResponse.Name,
-            Goal = editTrainingPlanResponse.Goal,
+            // TODO: Decide how to implement the new TrainingGoal
+            // Goal = editTrainingPlanResponse.Goal,
             StartDate = editTrainingPlanResponse.StartDate,
             EndDate = editTrainingPlanResponse.EndDate,
             ExistingWorkouts = editTrainingPlanResponse.Workouts
@@ -185,7 +188,8 @@ public class TrainingPlanController : BaseController
         {
             Id = id.Value,
             Name = inputModel.Name,
-            Goal = inputModel.Goal,
+            // TODO: Decide how to implement the new TrainingGoal
+            // Goal = inputModel.Goal,
             StartDate = inputModel.StartDate,
             EndDate = inputModel.EndDate,
             KeptWorkoutIds = inputModel.KeptWorkoutIds,
@@ -263,7 +267,8 @@ public class TrainingPlanController : BaseController
         {
             Id = trainingPlanDetailsResponse.Id,
             Name = trainingPlanDetailsResponse.Name,
-            Goal = trainingPlanDetailsResponse.Goal,
+            // TODO: Decide how to implement the new TrainingGoal
+            // Goal = trainingPlanDetailsResponse.Goal,
             StartDate = trainingPlanDetailsResponse.StartDate,
             EndDate = trainingPlanDetailsResponse.EndDate,
             Workouts = trainingPlanDetailsResponse.Workouts

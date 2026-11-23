@@ -4,9 +4,17 @@ public static class EntityValidation
 {
     public static class TrainingPlan
     {
-        public const int NameMaxLength = 100;
+        public const int TitleMaxLength = 100;
 
-        public const int GoalMaxLength = 250;
+        // TODO: Decide how to implement the new TrainingGoal
+        // public const int GoalMaxLength = 250;
+
+        public const string DateColumnType = "date";
+    }
+
+    public static class TrainingGoal
+    {
+        public const int TitleMaxLength = 100;
     }
 
     public static class Workout
@@ -16,6 +24,8 @@ public static class EntityValidation
         public const int DurationMaxValue = 600;
 
         public const int NotesMaxLength = 500;
+
+        public const string DateColumnType = "date";
     }
 
     public static class WorkoutResult
@@ -25,5 +35,14 @@ public static class EntityValidation
         public const int DurationMaxValue = 600;
 
         public const int NotesMaxLength = 500;
+
+        public const string DateColumnType = "date";
+    }
+
+    public static class SwimmingPool
+    {
+        public const int NameMaxLength = 100;
+
+        public const int LocationMaxLength = 200;
     }
 }

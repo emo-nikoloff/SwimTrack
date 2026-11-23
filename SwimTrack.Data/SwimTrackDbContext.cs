@@ -31,6 +31,18 @@ public class SwimTrackDbContext : IdentityDbContext<IdentityUser>
                     "[EndDate] >= [StartDate]");
             });
 
+        modelBuilder.Entity<TrainingGoal>()
+            .ToTable(table =>
+            {
+                table.HasCheckConstraint(
+                    "CK_TrainingGoal_TargetDistance_Positive",
+                    "[TargetDistance] > 0");
+
+                table.HasCheckConstraint(
+                    "CK_TrainingGoal_ValidDateRange",
+                    "[EndDate] >= [StartDate]");
+            });
+
         modelBuilder.Entity<Workout>()
             .ToTable(table =>
             {
@@ -53,6 +65,14 @@ public class SwimTrackDbContext : IdentityDbContext<IdentityUser>
                 table.HasCheckConstraint(
                     "CK_WorkoutResult_ActualDuration_Positive",
                     "[ActualDuration] > 0");
+            });
+
+        modelBuilder.Entity<SwimmingPool>()
+            .ToTable(table =>
+            {
+                table.HasCheckConstraint(
+                    "CK_SwimmingPool_Length_Positive",
+                    "[Length] > 0");
             });
     }
 }

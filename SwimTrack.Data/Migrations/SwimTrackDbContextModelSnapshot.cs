@@ -17,7 +17,7 @@ namespace SwimTrack.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.13")
+                .HasAnnotation("ProductVersion", "10.0.15")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -224,6 +224,78 @@ namespace SwimTrack.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("SwimTrack.Data.Models.SwimmingPool", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Length")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Location")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("SwimmingPool", t =>
+                        {
+                            t.HasCheckConstraint("CK_SwimmingPool_Length_Positive", "[Length] > 0");
+                        });
+                });
+
+            modelBuilder.Entity("SwimTrack.Data.Models.TrainingGoal", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TargetDistance")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("TrainingGoal", t =>
+                        {
+                            t.HasCheckConstraint("CK_TrainingGoal_TargetDistance_Positive", "[TargetDistance] > 0");
+
+                            t.HasCheckConstraint("CK_TrainingGoal_ValidDateRange", "[EndDate] >= [StartDate]");
+                        });
+                });
+
             modelBuilder.Entity("SwimTrack.Data.Models.TrainingPlan", b =>
                 {
                     b.Property<int>("Id")
@@ -233,25 +305,31 @@ namespace SwimTrack.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("EndDate")
-                        .HasColumnType("DATE");
+                        .HasColumnType("date");
 
-                    b.Property<string>("Goal")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("date");
 
-                    b.Property<string>("Name")
+                    b.Property<int?>("SwimmingPoolId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("DATE");
+                    b.Property<int?>("TrainingGoalId")
+                        .HasColumnType("int");
 
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SwimmingPoolId");
+
+                    b.HasIndex("TrainingGoalId");
 
                     b.HasIndex("UserId");
 
@@ -270,7 +348,7 @@ namespace SwimTrack.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("Date")
-                        .HasColumnType("DATE");
+                        .HasColumnType("date");
 
                     b.Property<string>("Notes")
                         .HasMaxLength(500)
@@ -314,17 +392,22 @@ namespace SwimTrack.Data.Migrations
                     b.Property<int>("ActualDuration")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("CompletedAt")
-                        .HasColumnType("DATE");
+                    b.Property<DateTime>("CompletedOn")
+                        .HasColumnType("date");
 
                     b.Property<string>("Notes")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<int?>("SwimmingPoolId")
+                        .HasColumnType("int");
+
                     b.Property<int>("WorkoutId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SwimmingPoolId");
 
                     b.HasIndex("WorkoutId")
                         .IsUnique();
@@ -388,13 +471,47 @@ namespace SwimTrack.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SwimTrack.Data.Models.TrainingPlan", b =>
+            modelBuilder.Entity("SwimTrack.Data.Models.SwimmingPool", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SwimTrack.Data.Models.TrainingGoal", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SwimTrack.Data.Models.TrainingPlan", b =>
+                {
+                    b.HasOne("SwimTrack.Data.Models.SwimmingPool", "SwimmingPool")
+                        .WithMany("TrainingPlans")
+                        .HasForeignKey("SwimmingPoolId");
+
+                    b.HasOne("SwimTrack.Data.Models.TrainingGoal", "TrainingGoal")
+                        .WithMany("TrainingPlans")
+                        .HasForeignKey("TrainingGoalId");
+
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SwimmingPool");
+
+                    b.Navigation("TrainingGoal");
 
                     b.Navigation("User");
                 });
@@ -412,13 +529,31 @@ namespace SwimTrack.Data.Migrations
 
             modelBuilder.Entity("SwimTrack.Data.Models.WorkoutResult", b =>
                 {
+                    b.HasOne("SwimTrack.Data.Models.SwimmingPool", "SwimmingPool")
+                        .WithMany("WorkoutResults")
+                        .HasForeignKey("SwimmingPoolId");
+
                     b.HasOne("SwimTrack.Data.Models.Workout", "Workout")
                         .WithOne("WorkoutResult")
                         .HasForeignKey("SwimTrack.Data.Models.WorkoutResult", "WorkoutId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("SwimmingPool");
+
                     b.Navigation("Workout");
+                });
+
+            modelBuilder.Entity("SwimTrack.Data.Models.SwimmingPool", b =>
+                {
+                    b.Navigation("TrainingPlans");
+
+                    b.Navigation("WorkoutResults");
+                });
+
+            modelBuilder.Entity("SwimTrack.Data.Models.TrainingGoal", b =>
+                {
+                    b.Navigation("TrainingPlans");
                 });
 
             modelBuilder.Entity("SwimTrack.Data.Models.TrainingPlan", b =>

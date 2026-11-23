@@ -14,11 +14,16 @@ public class WorkoutResult
 
     public int ActualDuration { get; set; }
 
-    [Column(TypeName = "DATE")]
-    public DateTime CompletedAt { get; set; }
+    [Column(TypeName = DateColumnType)]
+    public DateTime CompletedOn { get; set; }
 
     [MaxLength(NotesMaxLength)]
     public string? Notes { get; set; }
+
+    [ForeignKey(nameof(SwimmingPool))]
+    public int? SwimmingPoolId { get; set; }
+
+    public virtual SwimmingPool? SwimmingPool { get; set; }
 
     [ForeignKey(nameof(Workout))]
     public int WorkoutId { get; set; }
