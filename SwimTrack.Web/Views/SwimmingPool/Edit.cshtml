@@ -1,0 +1,31 @@
+@model EditSwimmingPoolFormInputModel
+@{
+    ViewData["Title"] = "Edit swimming pool";
+}
+
+<main class="container page-content">
+    <div>
+        <p class="eyebrow-heading">Update facility</p>
+        <h1 class="page-title">Edit swimming pool</h1>
+    </div>
+
+    <form asp-controller="SwimmingPool"
+          asp-action="Edit"
+          asp-route-id="@Model.Id"
+          method="post">
+        <div class="stack form-page-stack">
+            <div class="field-validation-error" asp-validation-summary="ModelOnly"></div>
+
+            <partial name="_SwimmingPoolInputPartial" model="Model" />
+
+            <div class="flex-row">
+                <button class="button button--primary" type="submit">Save changes</button>
+                <a class="button" asp-controller="SwimmingPool" asp-action="Details" asp-route-id="@Model.Id">Cancel</a>
+            </div>
+        </div>
+    </form>
+</main>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

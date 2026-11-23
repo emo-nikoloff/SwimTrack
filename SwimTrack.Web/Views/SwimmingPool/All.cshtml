@@ -1,0 +1,60 @@
+@model AllSwimmingPoolsPageViewModel
+@{
+    ViewData["Title"] = "Pools";
+}
+
+<main class="container page-content">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-12">
+        <div>
+            <p class="eyebrow-heading">@DateTime.Today.ToString(DateTimeFormat)</p>
+            <h1 class="page-title">Swimming pools</h1>
+        </div>
+        @if (Model.HasUserPools)
+        {
+            <a class="button button--dark" asp-controller="SwimmingPool" asp-action="Create">+ New pool</a>
+        }
+    </div>
+
+    @if (!Model.HasUserPools)
+    {
+        <div class="card card--center">
+            <h3>No swimming pools added yet</h3>
+            <p class="text-muted">Add pools you train at to track pool lengths and locations.</p>
+            <div style="margin-top: 1rem;">
+                <a class="button button--primary" asp-controller="SwimmingPool" asp-action="Create">Add swimming pool</a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <section class="grid-2-columns">
+            @foreach (AllSwimmingPoolsViewModel pool in Model.SwimmingPools)
+            {
+                <article class="card plan-card">
+                    <header>
+                        <div>
+                            <h3>@pool.Name</h3>
+                            @if (!string.IsNullOrWhiteSpace(pool.Location))
+                            {
+                                <p class="text-muted">@pool.Location</p>
+                            }
+                            else
+                            {
+                                <p class="text-muted">Location not specified</p>
+                            }
+                        </div>
+                    </header>
+
+                    <div class="metric-large">
+                        <span class="metric-large-value"><b>@pool.Length</b><span>m</span></span>
+                    </div>
+
+                    <footer>
+                        <small>Length: @pool.Length m</small>
+                        <a class="button button--small" asp-controller="SwimmingPool" asp-action="Details" asp-route-id="@pool.Id">Details</a>
+                    </footer>
+                </article>
+            }
+        </section>
+    }
+</main>
