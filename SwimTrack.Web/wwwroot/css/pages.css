@@ -258,3 +258,33 @@
   color: #C9DCE6;
   overflow-wrap: break-word;
 }
+
+/* ==========================================================================
+   ADMIN DASHBOARD
+   ========================================================================== */
+
+.admin-management-card {
+  box-shadow: none;
+  transform: none;
+}
+
+.admin-management-card:hover {
+  box-shadow: none;
+  transform: none;
+}
+
+.admin-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background-color: var(--color-page-bg);
+  border: 1px solid var(--color-border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-teal);
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+
