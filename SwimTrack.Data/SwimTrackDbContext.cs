@@ -6,7 +6,7 @@ using SwimTrack.Data.Models;
 
 namespace SwimTrack.Data;
 
-public class SwimTrackDbContext : IdentityDbContext<IdentityUser>
+public class SwimTrackDbContext : IdentityDbContext<IdentityUser, IdentityRole, string>
 {
     public SwimTrackDbContext(DbContextOptions<SwimTrackDbContext> options)
         : base(options)

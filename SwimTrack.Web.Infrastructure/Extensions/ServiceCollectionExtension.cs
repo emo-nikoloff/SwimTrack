@@ -10,11 +10,13 @@ public static class ServiceCollectionExtension
 {
     public static IServiceCollection AddApplicationIdentity(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDefaultIdentity<IdentityUser>(options =>
+        services.AddIdentity<IdentityUser, IdentityRole>(options =>
         {
             configuration.GetSection("IdentitySettings").Bind(options);
         })
-        .AddEntityFrameworkStores<SwimTrackDbContext>();
+        .AddEntityFrameworkStores<SwimTrackDbContext>()
+        .AddDefaultTokenProviders()
+        .AddDefaultUI();
 
         return services;
     }

@@ -6,6 +6,9 @@ public static class ValidationMessages
     {
         public const string InvalidUserId =
             "The authenticated user's ID could not be retrieved.";
+
+        public const string InvalidIdentityRoleOperation =
+            "Role {0} cannot be created!";
     }
 
     public static class DateValidation

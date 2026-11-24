@@ -7,5 +7,12 @@ public static class ApplicationDefaults
     public static class Identity
     {
         public const int PasswordMaximumLength = 100;
+
+        public static class Role
+        {
+            public const string User = "User";
+            public const string Manager = "Manager";
+            public const string Admin = "Admin";
+        }
     }
 }
