@@ -51,6 +51,7 @@ public class Program
             .WithStaticAssets();
 
         app.UseDefaultRoles();
+        app.UseAdminSeeding();
 
         app.Run();
     }

@@ -40,4 +40,46 @@ public static class IdentitySeeder
             }
         }
     }
+
+    public static void SeedAdminUser(IServiceProvider serviceProvider, string adminEmail, string adminPassword)
+    {
+        UserManager<IdentityUser> userManager = serviceProvider
+            .GetRequiredService<UserManager<IdentityUser>>();
+
+        IdentityUser? adminUser = userManager.FindByEmailAsync(adminEmail)
+            .GetAwaiter()
+            .GetResult();
+        if (adminUser != null)
+        {
+            return;
+        }
+
+        adminUser = new IdentityUser(adminEmail)
+        {
+            Email = adminEmail
+        };
+
+        IdentityResult result = userManager.CreateAsync(adminUser, adminPassword)
+            .GetAwaiter()
+            .GetResult();
+        if (!result.Succeeded)
+        {
+            throw new InvalidOperationException(string.Format(
+                InvalidAdminUserSeedOperation,
+                adminEmail
+            ));
+        }
+
+        result = userManager.AddToRoleAsync(adminUser, Admin)
+            .GetAwaiter()
+            .GetResult();
+        if (!result.Succeeded)
+        {
+            throw new InvalidOperationException(string.Format(
+                InvalidAdminUserRoleOperation,
+                adminEmail,
+                Admin
+            ));
+        }
+    }
 }

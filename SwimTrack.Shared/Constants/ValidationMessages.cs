@@ -9,6 +9,12 @@ public static class ValidationMessages
 
         public const string InvalidIdentityRoleOperation =
             "Role {0} cannot be created!";
+
+        public const string InvalidAdminUserSeedOperation =
+            "Admin user {0} cannot be seeded!";
+
+        public const string InvalidAdminUserRoleOperation =
+            "Admin user {0} cannot be added to role {1}!";
     }
 
     public static class DateValidation
