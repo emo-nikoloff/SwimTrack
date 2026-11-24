@@ -2,10 +2,12 @@ using Microsoft.AspNetCore.Mvc;
 
 using SwimTrack.Services.Common.Results;
 using SwimTrack.Services.Contracts;
+using SwimTrack.Services.DTOs.SwimmingPool.Response;
 using SwimTrack.Services.DTOs.TrainingGoal.Response;
 using SwimTrack.Services.DTOs.TrainingPlan.Request;
 using SwimTrack.Services.DTOs.TrainingPlan.Response;
 using SwimTrack.Services.DTOs.Workout.Request;
+using SwimTrack.Web.ViewModels.SwimmingPool.ViewModels;
 using SwimTrack.Web.ViewModels.TrainingGoal.ViewModels;
 using SwimTrack.Web.ViewModels.TrainingPlan.InputModels;
 using SwimTrack.Web.ViewModels.TrainingPlan.ViewModels;
@@ -20,12 +22,16 @@ public class TrainingPlanController : BaseController
 
     private readonly ITrainingGoalService _trainingGoalService;
 
+    private readonly ISwimmingPoolService _swimmingPoolService;
+
     public TrainingPlanController(
         ITrainingPlanService trainingPlanService,
-        ITrainingGoalService trainingGoalService)
+        ITrainingGoalService trainingGoalService,
+        ISwimmingPoolService swimmingPoolService)
     {
         _trainingPlanService = trainingPlanService;
         _trainingGoalService = trainingGoalService;
+        _swimmingPoolService = swimmingPoolService;
     }
 
     [HttpGet]
@@ -52,6 +58,15 @@ public class TrainingPlanController : BaseController
                         StartDate = tp.TrainingGoal.StartDate,
                         EndDate = tp.TrainingGoal.EndDate,
                     },
+                SwimmingPool = tp.SwimmingPool == null
+                    ? null
+                    : new SwimmingPoolViewModel
+                    {
+                        Id = tp.SwimmingPool.Id,
+                        Name = tp.SwimmingPool.Name,
+                        Length = tp.SwimmingPool.Length,
+                        Location = tp.SwimmingPool.Location,
+                    },
                 StartDate = tp.StartDate,
                 EndDate = tp.EndDate,
                 Workouts = tp.Workouts
@@ -73,6 +88,15 @@ public class TrainingPlanController : BaseController
                                 ActualDuration = w.Result.ActualDuration,
                                 CompletedAt = w.Result.CompletedAt,
                                 Notes = w.Result.Notes,
+                                SwimmingPool = w.Result.SwimmingPool == null
+                                    ? null
+                                    : new SwimmingPoolViewModel
+                                    {
+                                        Id = w.Result.SwimmingPool.Id,
+                                        Name = w.Result.SwimmingPool.Name,
+                                        Length = w.Result.SwimmingPool.Length,
+                                        Location = w.Result.SwimmingPool.Location,
+                                    },
                             },
                     })
                     .ToArray(),
@@ -94,6 +118,7 @@ public class TrainingPlanController : BaseController
         };
 
         await PopulateAvailableGoalsAsync(inputModel);
+        await PopulateAvailablePoolsAsync(inputModel);
 
         return View(inputModel);
     }
@@ -104,6 +129,7 @@ public class TrainingPlanController : BaseController
         if (!ModelState.IsValid)
         {
             await PopulateAvailableGoalsAsync(inputModel);
+            await PopulateAvailablePoolsAsync(inputModel);
 
             return View(inputModel);
         }
@@ -112,6 +138,7 @@ public class TrainingPlanController : BaseController
         {
             Name = inputModel.Name,
             TrainingGoalId = inputModel.TrainingGoalId,
+            SwimmingPoolId = inputModel.SwimmingPoolId,
             StartDate = inputModel.StartDate,
             EndDate = inputModel.EndDate,
             Workouts = inputModel.Workouts
@@ -132,6 +159,7 @@ public class TrainingPlanController : BaseController
             AddServiceErrorsToModelState(result.Errors);
 
             await PopulateAvailableGoalsAsync(inputModel);
+            await PopulateAvailablePoolsAsync(inputModel);
 
             return View(inputModel);
         }
@@ -163,6 +191,7 @@ public class TrainingPlanController : BaseController
             Id = editTrainingPlanResponse.Id,
             Name = editTrainingPlanResponse.Name,
             TrainingGoalId = editTrainingPlanResponse.TrainingGoalId,
+            SwimmingPoolId = editTrainingPlanResponse.SwimmingPoolId,
             StartDate = editTrainingPlanResponse.StartDate,
             EndDate = editTrainingPlanResponse.EndDate,
             ExistingWorkouts = editTrainingPlanResponse.Workouts
@@ -184,6 +213,7 @@ public class TrainingPlanController : BaseController
         };
 
         await PopulateAvailableGoalsAsync(inputModel);
+        await PopulateAvailablePoolsAsync(inputModel);
 
         return View(inputModel);
     }
@@ -203,6 +233,7 @@ public class TrainingPlanController : BaseController
         if (!ModelState.IsValid)
         {
             await PopulateAvailableGoalsAsync(inputModel);
+            await PopulateAvailablePoolsAsync(inputModel);
             await RestoreExistingWorkoutsAsync(inputModel);
 
             return View(inputModel);
@@ -213,6 +244,7 @@ public class TrainingPlanController : BaseController
             Id = id.Value,
             Name = inputModel.Name,
             TrainingGoalId = inputModel.TrainingGoalId,
+            SwimmingPoolId = inputModel.SwimmingPoolId,
             StartDate = inputModel.StartDate,
             EndDate = inputModel.EndDate,
             KeptWorkoutIds = inputModel.KeptWorkoutIds,
@@ -234,6 +266,7 @@ public class TrainingPlanController : BaseController
             AddServiceErrorsToModelState(result.Errors);
 
             await PopulateAvailableGoalsAsync(inputModel);
+            await PopulateAvailablePoolsAsync(inputModel);
             await RestoreExistingWorkoutsAsync(inputModel);
 
             return View(inputModel);
@@ -301,6 +334,15 @@ public class TrainingPlanController : BaseController
                     StartDate = trainingPlanDetailsResponse.TrainingGoal.StartDate,
                     EndDate = trainingPlanDetailsResponse.TrainingGoal.EndDate,
                 },
+            SwimmingPool = trainingPlanDetailsResponse.SwimmingPool == null
+                ? null
+                : new SwimmingPoolViewModel
+                {
+                    Id = trainingPlanDetailsResponse.SwimmingPool.Id,
+                    Name = trainingPlanDetailsResponse.SwimmingPool.Name,
+                    Length = trainingPlanDetailsResponse.SwimmingPool.Length,
+                    Location = trainingPlanDetailsResponse.SwimmingPool.Location,
+                },
             StartDate = trainingPlanDetailsResponse.StartDate,
             EndDate = trainingPlanDetailsResponse.EndDate,
             Workouts = trainingPlanDetailsResponse.Workouts
@@ -322,6 +364,15 @@ public class TrainingPlanController : BaseController
                             ActualDuration = w.Result.ActualDuration,
                             CompletedAt = w.Result.CompletedAt,
                             Notes = w.Result.Notes,
+                            SwimmingPool = w.Result.SwimmingPool == null
+                                ? null
+                                : new SwimmingPoolViewModel
+                                {
+                                    Id = w.Result.SwimmingPool.Id,
+                                    Name = w.Result.SwimmingPool.Name,
+                                    Length = w.Result.SwimmingPool.Length,
+                                    Location = w.Result.SwimmingPool.Location,
+                                },
                         },
                 })
                 .ToArray(),
@@ -346,6 +397,24 @@ public class TrainingPlanController : BaseController
                 TargetDistance = g.TargetDistance,
                 StartDate = g.StartDate,
                 EndDate = g.EndDate,
+            })
+            .ToArray();
+    }
+
+    private async Task PopulateAvailablePoolsAsync(BaseTrainingPlanFormInputModel inputModel)
+    {
+        IEnumerable<AllSwimmingPoolsResponseModel> pools = await _swimmingPoolService
+            .GetAllSwimmingPoolsAsync(UserId);
+
+        inputModel.AvailablePools = pools
+            .OrderBy(p => p.Name)
+            .ThenBy(p => p.Id)
+            .Select(p => new AllSwimmingPoolsViewModel
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Length = p.Length,
+                Location = p.Location,
             })
             .ToArray();
     }

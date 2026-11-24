@@ -2,10 +2,12 @@ using Microsoft.AspNetCore.Mvc;
 
 using SwimTrack.Services.Common.Results;
 using SwimTrack.Services.Contracts;
+using SwimTrack.Services.DTOs.SwimmingPool.Response;
 using SwimTrack.Services.DTOs.Workout.Request;
 using SwimTrack.Services.DTOs.Workout.Response;
 using SwimTrack.Services.DTOs.WorkoutResult.Request;
 using SwimTrack.Services.DTOs.WorkoutResult.Response;
+using SwimTrack.Web.ViewModels.SwimmingPool.ViewModels;
 using SwimTrack.Web.ViewModels.Workout.InputModels;
 using SwimTrack.Web.ViewModels.WorkoutResult.InputModels;
 
@@ -15,9 +17,14 @@ public class WorkoutController : BaseController
 {
     private readonly IWorkoutService _workoutService;
 
-    public WorkoutController(IWorkoutService workoutService)
+    private readonly ISwimmingPoolService _swimmingPoolService;
+
+    public WorkoutController(
+        IWorkoutService workoutService,
+        ISwimmingPoolService swimmingPoolService)
     {
         _workoutService = workoutService;
+        _swimmingPoolService = swimmingPoolService;
     }
 
     [HttpGet]
@@ -26,8 +33,8 @@ public class WorkoutController : BaseController
         [FromQuery] int? trainingPlanId,
         [FromQuery] string? returnUrl)
     {
-        if (!id.HasValue || id.Value <= 0
-            || !trainingPlanId.HasValue || trainingPlanId.Value <= 0)
+        if (!id.HasValue || id.Value <= 0 ||
+            !trainingPlanId.HasValue || trainingPlanId.Value <= 0)
         {
             return BadRequest();
         }
@@ -65,8 +72,8 @@ public class WorkoutController : BaseController
         [FromQuery] string? returnUrl,
         [FromForm] WorkoutFormInputModel inputModel)
     {
-        if (!id.HasValue || id.Value <= 0
-            || !trainingPlanId.HasValue || trainingPlanId.Value <= 0)
+        if (!id.HasValue || id.Value <= 0 ||
+            !trainingPlanId.HasValue || trainingPlanId.Value <= 0)
         {
             return BadRequest();
         }
@@ -116,8 +123,8 @@ public class WorkoutController : BaseController
         [FromQuery] int? trainingPlanId,
         [FromQuery] string? returnUrl)
     {
-        if (!id.HasValue || id.Value <= 0
-            || !trainingPlanId.HasValue || trainingPlanId.Value <= 0)
+        if (!id.HasValue || id.Value <= 0 ||
+            !trainingPlanId.HasValue || trainingPlanId.Value <= 0)
         {
             return BadRequest();
         }
@@ -139,9 +146,12 @@ public class WorkoutController : BaseController
             ActualDuration = workoutResultResponse.ActualDuration,
             CompletedAt = workoutResultResponse.CompletedAt,
             Notes = workoutResultResponse.Notes,
+            SwimmingPoolId = workoutResultResponse.SwimmingPoolId,
             WorkoutId = id.Value,
             TrainingPlanId = trainingPlanId.Value,
         };
+
+        await PopulateAvailablePoolsAsync(inputModel);
 
         return View(inputModel);
     }
@@ -153,8 +163,8 @@ public class WorkoutController : BaseController
         [FromQuery] string? returnUrl,
         [FromForm] WorkoutResultFormInputModel inputModel)
     {
-        if (!id.HasValue || id.Value <= 0
-            || !trainingPlanId.HasValue || trainingPlanId.Value <= 0)
+        if (!id.HasValue || id.Value <= 0 ||
+            !trainingPlanId.HasValue || trainingPlanId.Value <= 0)
         {
             return BadRequest();
         }
@@ -166,6 +176,8 @@ public class WorkoutController : BaseController
 
         if (!ModelState.IsValid)
         {
+            await PopulateAvailablePoolsAsync(inputModel);
+
             return View(inputModel);
         }
 
@@ -175,6 +187,7 @@ public class WorkoutController : BaseController
             ActualDuration = inputModel.ActualDuration,
             CompletedAt = inputModel.CompletedAt,
             Notes = inputModel.Notes,
+            SwimmingPoolId = inputModel.SwimmingPoolId,
         };
 
         ServiceResult result =
@@ -183,10 +196,12 @@ public class WorkoutController : BaseController
                 trainingPlanId.Value,
                 createWorkoutResultRequest,
                 UserId);
-        if (result.Status == ServiceResultStatus.InvalidRequest
-            || result.Status == ServiceResultStatus.InvalidOperation)
+        if (result.Status == ServiceResultStatus.InvalidRequest ||
+            result.Status == ServiceResultStatus.InvalidOperation)
         {
             AddServiceErrorsToModelState(result.Errors);
+
+            await PopulateAvailablePoolsAsync(inputModel);
 
             return View(inputModel);
         }
@@ -208,8 +223,8 @@ public class WorkoutController : BaseController
         [FromQuery] int? trainingPlanId,
         [FromQuery] string? returnUrl)
     {
-        if (!id.HasValue || id.Value <= 0
-            || !trainingPlanId.HasValue || trainingPlanId.Value <= 0)
+        if (!id.HasValue || id.Value <= 0 ||
+            !trainingPlanId.HasValue || trainingPlanId.Value <= 0)
         {
             return BadRequest();
         }
@@ -240,8 +255,8 @@ public class WorkoutController : BaseController
         [FromQuery] int? trainingPlanId,
         [FromQuery] string? returnUrl)
     {
-        if (!id.HasValue || id.Value <= 0
-            || !trainingPlanId.HasValue || trainingPlanId.Value <= 0)
+        if (!id.HasValue || id.Value <= 0 ||
+            !trainingPlanId.HasValue || trainingPlanId.Value <= 0)
         {
             return BadRequest();
         }
@@ -262,6 +277,24 @@ public class WorkoutController : BaseController
         }
 
         return RedirectToReturnUrlOrDetails(trainingPlanId.Value, returnUrl);
+    }
+
+    private async Task PopulateAvailablePoolsAsync(WorkoutResultFormInputModel inputModel)
+    {
+        IEnumerable<AllSwimmingPoolsResponseModel> pools = await _swimmingPoolService
+            .GetAllSwimmingPoolsAsync(UserId);
+
+        inputModel.AvailablePools = pools
+            .OrderBy(p => p.Name)
+            .ThenBy(p => p.Id)
+            .Select(p => new AllSwimmingPoolsViewModel
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Length = p.Length,
+                Location = p.Location,
+            })
+            .ToArray();
     }
 
     private IActionResult RedirectToReturnUrlOrDetails(int trainingPlanId, string? returnUrl)

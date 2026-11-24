@@ -182,6 +182,13 @@
                         <p class="text-muted">No goal specified.</p>
                     }
 
+                    @if (trainingPlan.SwimmingPool != null)
+                    {
+                        <p class="text-muted">
+                            <span>Pool: @trainingPlan.SwimmingPool.Name (@trainingPlan.SwimmingPool.Length m)</span>
+                        </p>
+                    }
+
                     @if (trainingPlan.Workouts.Count > 0)
                     {
                         <div class="workout-strip" role="img" aria-label="@trainingPlan.CompletedWorkouts completed, @trainingPlan.SkippedWorkouts skipped, @trainingPlan.PlannedWorkouts planned">

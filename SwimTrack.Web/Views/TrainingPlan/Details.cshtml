@@ -18,6 +18,12 @@
                     <small class="text-muted">(@Model.TrainingGoal.TargetDistance m target)</small>
                 </blockquote>
             }
+            @if (Model.SwimmingPool != null)
+            {
+                <p class="text-muted">
+                    <span>Default pool: <b>@Model.SwimmingPool.Name</b> (@Model.SwimmingPool.Length m@(string.IsNullOrWhiteSpace(Model.SwimmingPool.Location) ? "" : $", {Model.SwimmingPool.Location}"))</span>
+                </p>
+            }
             <div class="flex-row">
                 <a class="button button--dark" asp-controller="TrainingPlan" asp-action="Edit" asp-route-id="@Model.Id">Edit plan & workouts</a>
             </div>
@@ -114,6 +120,13 @@
                                         <b>@workout.Result!.ActualDistance m · @workout.Result!.ActualDuration min</b>
                                     </div>
                                     <div class="progress-bar"><i style="--w:@workout.ActualDistancePercentage"></i></div>
+                                    @if (workout.Result.SwimmingPool != null)
+                                    {
+                                        <div class="key-value-row">
+                                            <span>Pool</span>
+                                            <b>@workout.Result.SwimmingPool.Name (@workout.Result.SwimmingPool.Length m)</b>
+                                        </div>
+                                    }
                                 </div>
                                 <p class="workout-card-note">@workout.DisplayNotes</p>
                                 <footer>

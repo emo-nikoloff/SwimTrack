@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
+using SwimTrack.Web.ViewModels.SwimmingPool.ViewModels;
 using static SwimTrack.Shared.Constants.ModelValidation.WorkoutResult;
 
 namespace SwimTrack.Web.ViewModels.WorkoutResult.InputModels;
@@ -16,6 +17,10 @@ public class WorkoutResultFormInputModel
 
     [MaxLength(NotesMaxLength)]
     public string? Notes { get; set; }
+
+    public int? SwimmingPoolId { get; set; }
+
+    public IEnumerable<AllSwimmingPoolsViewModel> AvailablePools { get; set; } = new List<AllSwimmingPoolsViewModel>();
 
     public int WorkoutId { get; set; }
 

@@ -1,3 +1,4 @@
+using SwimTrack.Services.DTOs.SwimmingPool.Response;
 using SwimTrack.Services.DTOs.TrainingGoal.Response;
 using SwimTrack.Services.DTOs.Workout.Response;
 
@@ -16,4 +17,6 @@ public class TrainingPlanDetailsResponseModel
     public DateTime EndDate { get; set; }
 
     public IReadOnlyCollection<WorkoutResponseModel> Workouts { get; set; } = new List<WorkoutResponseModel>();
+
+    public SwimmingPoolResponseModel? SwimmingPool { get; set; }
 }

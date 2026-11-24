@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 
 using SwimTrack.Shared.Validation;
+using SwimTrack.Web.ViewModels.SwimmingPool.ViewModels;
 using SwimTrack.Web.ViewModels.TrainingGoal.ViewModels;
 using static SwimTrack.Shared.Constants.ModelValidation.TrainingPlan;
 using static SwimTrack.Shared.Constants.ValidationMessages.DateValidation;
@@ -20,6 +21,10 @@ public abstract class BaseTrainingPlanFormInputModel : IValidatableObject
     public DateTime StartDate { get; set; }
 
     public DateTime EndDate { get; set; }
+
+    public int? SwimmingPoolId { get; set; }
+
+    public IEnumerable<AllSwimmingPoolsViewModel> AvailablePools { get; set; } = new List<AllSwimmingPoolsViewModel>();
 
     public virtual IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {

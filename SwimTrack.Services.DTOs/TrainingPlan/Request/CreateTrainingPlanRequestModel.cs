@@ -18,4 +18,6 @@ public class CreateTrainingPlanRequestModel
     public DateTime EndDate { get; set; }
 
     public IReadOnlyList<CreateWorkoutRequestModel> Workouts { get; set; } = new List<CreateWorkoutRequestModel>();
+
+    public int? SwimmingPoolId { get; set; }
 }

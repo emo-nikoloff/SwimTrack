@@ -1,3 +1,5 @@
+using SwimTrack.Web.ViewModels.SwimmingPool.ViewModels;
+
 namespace SwimTrack.Web.ViewModels.WorkoutResult.ViewModels;
 
 public class WorkoutResultViewModel
@@ -9,4 +11,6 @@ public class WorkoutResultViewModel
     public DateTime CompletedAt { get; set; }
 
     public string? Notes { get; set; }
+
+    public SwimmingPoolViewModel? SwimmingPool { get; set; }
 }

@@ -15,4 +15,6 @@ public class EditTrainingPlanResponseModel
     public DateTime EndDate { get; set; }
 
     public IReadOnlyCollection<EditWorkoutResponseModel> Workouts { get; set; } = new List<EditWorkoutResponseModel>();
+
+    public int? SwimmingPoolId { get; set; }
 }

@@ -7,6 +7,7 @@ using SwimTrack.Data.Repository.Contracts;
 using SwimTrack.Services.Common.Results;
 using SwimTrack.Services.Common.Utilities;
 using SwimTrack.Services.Contracts;
+using SwimTrack.Services.DTOs.SwimmingPool.Response;
 using SwimTrack.Services.DTOs.TrainingGoal.Response;
 using SwimTrack.Services.DTOs.TrainingPlan.Request;
 using SwimTrack.Services.DTOs.TrainingPlan.Response;
@@ -16,6 +17,7 @@ using SwimTrack.Services.DTOs.WorkoutResult.Response;
 using SwimTrack.Shared.Validation;
 using static SwimTrack.Shared.Constants.ApplicationDefaults;
 using static SwimTrack.Shared.Constants.ValidationMessages.DateValidation;
+using static SwimTrack.Shared.Constants.ValidationMessages.SwimmingPoolValidation;
 using static SwimTrack.Shared.Constants.ValidationMessages.TrainingGoalValidation;
 using static SwimTrack.Shared.Constants.ValidationMessages.TrainingPlanValidation;
 
@@ -27,6 +29,8 @@ public class TrainingPlanService : ITrainingPlanService
 
     private readonly ITrainingGoalRepository _trainingGoalRepository;
 
+    private readonly ISwimmingPoolRepository _swimmingPoolRepository;
+
     private readonly IWorkoutRepository _workoutRepository;
 
     private readonly IUnitOfWork _unitOfWork;
@@ -36,11 +40,13 @@ public class TrainingPlanService : ITrainingPlanService
     public TrainingPlanService(
         ITrainingPlanRepository trainingPlanRepository,
         ITrainingGoalRepository trainingGoalRepository,
+        ISwimmingPoolRepository swimmingPoolRepository,
         IWorkoutRepository workoutRepository,
         IUnitOfWork unitOfWork)
     {
         _trainingPlanRepository = trainingPlanRepository;
         _trainingGoalRepository = trainingGoalRepository;
+        _swimmingPoolRepository = swimmingPoolRepository;
         _workoutRepository = workoutRepository;
         _unitOfWork = unitOfWork;
         _modelValidator = new();
@@ -65,6 +71,15 @@ public class TrainingPlanService : ITrainingPlanService
                         StartDate = tp.TrainingGoal.StartDate,
                         EndDate = tp.TrainingGoal.EndDate,
                     },
+                SwimmingPool = tp.SwimmingPool == null
+                    ? null
+                    : new SwimmingPoolResponseModel
+                    {
+                        Id = tp.SwimmingPool.Id,
+                        Name = tp.SwimmingPool.Name,
+                        Length = tp.SwimmingPool.Length,
+                        Location = tp.SwimmingPool.Location,
+                    },
                 StartDate = tp.StartDate,
                 EndDate = tp.EndDate,
                 Workouts = tp.Workouts
@@ -84,6 +99,16 @@ public class TrainingPlanService : ITrainingPlanService
                                 ActualDuration = w.WorkoutResult.ActualDuration,
                                 CompletedAt = w.WorkoutResult.CompletedOn,
                                 Notes = w.WorkoutResult.Notes,
+                                SwimmingPoolId = w.WorkoutResult.SwimmingPoolId,
+                                SwimmingPool = w.WorkoutResult.SwimmingPool == null
+                                    ? null
+                                    : new SwimmingPoolResponseModel
+                                    {
+                                        Id = w.WorkoutResult.SwimmingPool.Id,
+                                        Name = w.WorkoutResult.SwimmingPool.Name,
+                                        Length = w.WorkoutResult.SwimmingPool.Length,
+                                        Location = w.WorkoutResult.SwimmingPool.Location,
+                                    },
                             },
                     })
                     .ToArray(),
@@ -158,6 +183,24 @@ public class TrainingPlanService : ITrainingPlanService
             }
         }
 
+        if (request.SwimmingPoolId.HasValue)
+        {
+            SwimmingPool? swimmingPool = await _swimmingPoolRepository
+                .AllAsNoTracking()
+                .FirstOrDefaultAsync(sp =>
+                    sp.Id == request.SwimmingPoolId.Value &&
+                    sp.UserId == currentUserId);
+            if (swimmingPool == null)
+            {
+                string propertyName = nameof(CreateTrainingPlanRequestModel.SwimmingPoolId);
+                string errorMessage = NotFoundSwimmingPool;
+
+                ServiceError serviceError = new(propertyName, errorMessage);
+
+                serviceErrors.Add(serviceError);
+            }
+        }
+
         for (int i = 0; i < request.Workouts.Count; i++)
         {
             CreateWorkoutRequestModel workout = request.Workouts[i];
@@ -225,6 +268,7 @@ public class TrainingPlanService : ITrainingPlanService
                     Notes = workoutInputModel.Notes,
                 })
                 .ToArray(),
+            SwimmingPoolId = request.SwimmingPoolId,
             UserId = currentUserId,
         };
 
@@ -265,6 +309,7 @@ public class TrainingPlanService : ITrainingPlanService
                     Status = w.Status,
                 })
                 .ToArray(),
+            SwimmingPoolId = requestedTrainingPlan.SwimmingPoolId,
         };
 
         return editTrainingPlanResponse;
@@ -334,6 +379,24 @@ public class TrainingPlanService : ITrainingPlanService
 
                     serviceErrors.Add(serviceError);
                 }
+            }
+        }
+
+        if (request.SwimmingPoolId.HasValue)
+        {
+            SwimmingPool? swimmingPool = await _swimmingPoolRepository
+                .AllAsNoTracking()
+                .FirstOrDefaultAsync(sp =>
+                    sp.Id == request.SwimmingPoolId.Value &&
+                    sp.UserId == currentUserId);
+            if (swimmingPool == null)
+            {
+                string propertyName = nameof(EditTrainingPlanRequestModel.SwimmingPoolId);
+                string errorMessage = NotFoundSwimmingPool;
+
+                ServiceError serviceError = new(propertyName, errorMessage);
+
+                serviceErrors.Add(serviceError);
             }
         }
 
@@ -451,6 +514,7 @@ public class TrainingPlanService : ITrainingPlanService
         requestedTrainingPlan.TrainingGoalId = request.TrainingGoalId;
         requestedTrainingPlan.StartDate = request.StartDate;
         requestedTrainingPlan.EndDate = request.EndDate;
+        requestedTrainingPlan.SwimmingPoolId = request.SwimmingPoolId;
 
         // Delete workouts that were removed by the user
         IEnumerable<Workout> workoutsToRemove = requestedTrainingPlan.Workouts
@@ -515,6 +579,15 @@ public class TrainingPlanService : ITrainingPlanService
                         StartDate = tp.TrainingGoal.StartDate,
                         EndDate = tp.TrainingGoal.EndDate,
                     },
+                SwimmingPool = tp.SwimmingPool == null
+                    ? null
+                    : new SwimmingPoolResponseModel
+                    {
+                        Id = tp.SwimmingPool.Id,
+                        Name = tp.SwimmingPool.Name,
+                        Length = tp.SwimmingPool.Length,
+                        Location = tp.SwimmingPool.Location,
+                    },
                 StartDate = tp.StartDate,
                 EndDate = tp.EndDate,
                 Workouts = tp.Workouts
@@ -534,6 +607,16 @@ public class TrainingPlanService : ITrainingPlanService
                                 ActualDuration = w.WorkoutResult.ActualDuration,
                                 CompletedAt = w.WorkoutResult.CompletedOn,
                                 Notes = w.WorkoutResult.Notes,
+                                SwimmingPoolId = w.WorkoutResult.SwimmingPoolId,
+                                SwimmingPool = w.WorkoutResult.SwimmingPool == null
+                                    ? null
+                                    : new SwimmingPoolResponseModel
+                                    {
+                                        Id = w.WorkoutResult.SwimmingPool.Id,
+                                        Name = w.WorkoutResult.SwimmingPool.Name,
+                                        Length = w.WorkoutResult.SwimmingPool.Length,
+                                        Location = w.WorkoutResult.SwimmingPool.Location,
+                                    },
                             },
                     })
                     .ToArray(),

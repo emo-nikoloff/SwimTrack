@@ -16,4 +16,6 @@ public class CreateWorkoutResultRequestModel
 
     [MaxLength(NotesMaxLength)]
     public string? Notes { get; set; }
+
+    public int? SwimmingPoolId { get; set; }
 }

@@ -1,4 +1,5 @@
 using SwimTrack.Shared.Enums;
+using SwimTrack.Web.ViewModels.SwimmingPool.ViewModels;
 using SwimTrack.Web.ViewModels.TrainingGoal.ViewModels;
 using SwimTrack.Web.ViewModels.TrainingPlan.ViewModels.Enums;
 using SwimTrack.Web.ViewModels.Workout.ViewModels;
@@ -19,6 +20,8 @@ public class AllTrainingPlansViewModel
     public DateTime EndDate { get; set; }
 
     public IReadOnlyCollection<WorkoutViewModel> Workouts { get; set; } = new List<WorkoutViewModel>();
+
+    public SwimmingPoolViewModel? SwimmingPool { get; set; }
 
     /* View specific properties */
     public int CompletedWorkouts

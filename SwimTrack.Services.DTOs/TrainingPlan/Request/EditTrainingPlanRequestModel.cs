@@ -22,4 +22,6 @@ public class EditTrainingPlanRequestModel
     public IReadOnlyCollection<int> KeptWorkoutIds { get; set; } = new List<int>();
 
     public IReadOnlyList<CreateWorkoutRequestModel> NewWorkouts { get; set; } = new List<CreateWorkoutRequestModel>();
+
+    public int? SwimmingPoolId { get; set; }
 }

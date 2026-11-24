@@ -21,6 +21,18 @@
         <span class="field-validation-error" asp-validation-for="TrainingGoalId"></span>
     </div>
 
+    <div class="form-field">
+        <label asp-for="SwimmingPoolId">Swimming pool (optional)</label>
+        <select asp-for="SwimmingPoolId">
+            <option value="">No pool selected</option>
+            @foreach (AllSwimmingPoolsViewModel pool in Model.AvailablePools)
+            {
+                <option value="@pool.Id">@pool.Name (@pool.Length m)</option>
+            }
+        </select>
+        <span class="field-validation-error" asp-validation-for="SwimmingPoolId"></span>
+    </div>
+
     <div class="grid-2-columns">
         <div class="form-field">
             <label asp-for="StartDate">Start date</label>

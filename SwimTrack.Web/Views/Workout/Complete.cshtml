@@ -71,6 +71,18 @@
                 <span class="field-validation-error" asp-validation-for="Notes"></span>
             </div>
 
+            <div class="form-field">
+                <label asp-for="SwimmingPoolId">Swimming pool (optional)</label>
+                <select asp-for="SwimmingPoolId">
+                    <option value="">No pool selected</option>
+                    @foreach (AllSwimmingPoolsViewModel pool in Model.AvailablePools)
+                    {
+                        <option value="@pool.Id">@pool.Name (@pool.Length m)</option>
+                    }
+                </select>
+                <span class="field-validation-error" asp-validation-for="SwimmingPoolId"></span>
+            </div>
+
             <div class="flex-row">
                 <button class="button button--primary" type="submit">Complete workout</button>
                 <a class="button" asp-controller="TrainingPlan" asp-action="Details" asp-route-id="@Model.TrainingPlanId">Cancel</a>

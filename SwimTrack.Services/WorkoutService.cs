@@ -7,6 +7,7 @@ using SwimTrack.Data.Repository.Contracts;
 using SwimTrack.Services.Common.Results;
 using SwimTrack.Services.Common.Utilities;
 using SwimTrack.Services.Contracts;
+using SwimTrack.Services.DTOs.SwimmingPool.Response;
 using SwimTrack.Services.DTOs.Workout.Request;
 using SwimTrack.Services.DTOs.Workout.Response;
 using SwimTrack.Services.DTOs.WorkoutResult.Request;
@@ -14,6 +15,7 @@ using SwimTrack.Services.DTOs.WorkoutResult.Response;
 using SwimTrack.Shared.Enums;
 using SwimTrack.Shared.Validation;
 using static SwimTrack.Shared.Constants.ValidationMessages.DateValidation;
+using static SwimTrack.Shared.Constants.ValidationMessages.SwimmingPoolValidation;
 using static SwimTrack.Shared.Constants.ValidationMessages.WorkoutValidation;
 
 namespace SwimTrack.Services;
@@ -24,26 +26,33 @@ public class WorkoutService : IWorkoutService
 
     private readonly IWorkoutResultRepository _workoutResultRepository;
 
+    private readonly ISwimmingPoolRepository _swimmingPoolRepository;
+
     private readonly IUnitOfWork _unitOfWork;
 
     private readonly BasicModelValidator _modelValidator;
 
-    public WorkoutService(IWorkoutRepository workoutRepository, IWorkoutResultRepository workoutResultRepository, IUnitOfWork unitOfWork)
+    public WorkoutService(
+        IWorkoutRepository workoutRepository,
+        IWorkoutResultRepository workoutResultRepository,
+        ISwimmingPoolRepository swimmingPoolRepository,
+        IUnitOfWork unitOfWork)
     {
         _workoutRepository = workoutRepository;
         _workoutResultRepository = workoutResultRepository;
+        _swimmingPoolRepository = swimmingPoolRepository;
         _unitOfWork = unitOfWork;
         _modelValidator = new();
     }
 
     public async Task<EditWorkoutResponseModel?> GetWorkoutForEditAsync(int id, int trainingPlanId, string currentUserId)
     {
-        Workout? requestedWorkout =
-            await _workoutRepository.AllAsNoTracking()
-                .FirstOrDefaultAsync(w =>
-                    w.Id == id
-                    && w.TrainingPlanId == trainingPlanId
-                    && w.TrainingPlan.UserId == currentUserId);
+        Workout? requestedWorkout = await _workoutRepository
+            .AllAsNoTracking()
+            .FirstOrDefaultAsync(w =>
+                w.Id == id &&
+                w.TrainingPlanId == trainingPlanId &&
+                w.TrainingPlan.UserId == currentUserId);
         if (requestedWorkout == null)
         {
             return null;
@@ -81,13 +90,13 @@ public class WorkoutService : IWorkoutService
             }
         }
 
-        Workout? requestedWorkout =
-            await _workoutRepository.All()
-                .Include(w => w.TrainingPlan)
-                .FirstOrDefaultAsync(w =>
-                    w.Id == request.Id
-                    && w.TrainingPlanId == trainingPlanId
-                    && w.TrainingPlan.UserId == currentUserId);
+        Workout? requestedWorkout = await _workoutRepository
+            .All()
+            .Include(w => w.TrainingPlan)
+            .FirstOrDefaultAsync(w =>
+                w.Id == request.Id &&
+                w.TrainingPlanId == trainingPlanId &&
+                w.TrainingPlan.UserId == currentUserId);
         if (requestedWorkout == null)
         {
             return ServiceResult.Failure(
@@ -134,12 +143,13 @@ public class WorkoutService : IWorkoutService
 
     public async Task<WorkoutResultResponseModel?> GetWorkoutForCompletionAsync(int id, int trainingPlanId, string currentUserId)
     {
-        Workout? requestedWorkout =
-            await _workoutRepository.AllAsNoTracking()
-                .FirstOrDefaultAsync(w =>
-                    w.Id == id
-                    && w.TrainingPlanId == trainingPlanId
-                    && w.TrainingPlan.UserId == currentUserId);
+        Workout? requestedWorkout = await _workoutRepository
+            .AllAsNoTracking()
+            .Include(w => w.TrainingPlan)
+            .FirstOrDefaultAsync(w =>
+                w.Id == id &&
+                w.TrainingPlanId == trainingPlanId &&
+                w.TrainingPlan.UserId == currentUserId);
         if (requestedWorkout == null)
         {
             return null;
@@ -156,6 +166,7 @@ public class WorkoutService : IWorkoutService
             ActualDuration = requestedWorkout.PlannedDuration,
             CompletedAt = requestedWorkout.Date,
             Notes = requestedWorkout.Notes,
+            SwimmingPoolId = requestedWorkout.TrainingPlan.SwimmingPoolId,
         };
 
         return workoutResultResponse;
@@ -180,12 +191,12 @@ public class WorkoutService : IWorkoutService
             }
         }
 
-        Workout? requestedWorkout =
-            await _workoutRepository.All()
-                .FirstOrDefaultAsync(w =>
-                    w.Id == id
-                    && w.TrainingPlanId == trainingPlanId
-                    && w.TrainingPlan.UserId == currentUserId);
+        Workout? requestedWorkout = await _workoutRepository
+            .All()
+            .FirstOrDefaultAsync(w =>
+                w.Id == id &&
+                w.TrainingPlanId == trainingPlanId &&
+                w.TrainingPlan.UserId == currentUserId);
         if (requestedWorkout == null)
         {
             return ServiceResult.Failure(
@@ -220,6 +231,24 @@ public class WorkoutService : IWorkoutService
             serviceErrors.Add(serviceError);
         }
 
+        if (request.SwimmingPoolId.HasValue)
+        {
+            SwimmingPool? swimmingPool = await _swimmingPoolRepository
+                .AllAsNoTracking()
+                .FirstOrDefaultAsync(sp =>
+                    sp.Id == request.SwimmingPoolId.Value &&
+                    sp.UserId == currentUserId);
+            if (swimmingPool == null)
+            {
+                string propertyName = nameof(CreateWorkoutResultRequestModel.SwimmingPoolId);
+                string errorMessage = NotFoundSwimmingPool;
+
+                ServiceError serviceError = new(propertyName, errorMessage);
+
+                serviceErrors.Add(serviceError);
+            }
+        }
+
         if (serviceErrors.Count > 0)
         {
             return ServiceResult.Failure(
@@ -235,6 +264,7 @@ public class WorkoutService : IWorkoutService
             ActualDuration = request.ActualDuration,
             CompletedOn = request.CompletedAt,
             Notes = request.Notes,
+            SwimmingPoolId = request.SwimmingPoolId,
             WorkoutId = requestedWorkout.Id
         };
 
@@ -246,12 +276,12 @@ public class WorkoutService : IWorkoutService
 
     public async Task<ServiceResult> SkipWorkoutAsync(int id, int trainingPlanId, string currentUserId)
     {
-        Workout? requestedWorkout =
-            await _workoutRepository.All()
-                .FirstOrDefaultAsync(w =>
-                    w.Id == id
-                    && w.TrainingPlanId == trainingPlanId
-                    && w.TrainingPlan.UserId == currentUserId);
+        Workout? requestedWorkout = await _workoutRepository
+            .All()
+            .FirstOrDefaultAsync(w =>
+                w.Id == id &&
+                w.TrainingPlanId == trainingPlanId &&
+                w.TrainingPlan.UserId == currentUserId);
         if (requestedWorkout == null)
         {
             return ServiceResult.Failure(
@@ -282,12 +312,12 @@ public class WorkoutService : IWorkoutService
 
     public async Task<ServiceResult> PlanAgainWorkoutAsync(int id, int trainingPlanId, string currentUserId)
     {
-        Workout? requestedWorkout =
-            await _workoutRepository.All()
-                .FirstOrDefaultAsync(w =>
-                    w.Id == id
-                    && w.TrainingPlanId == trainingPlanId
-                    && w.TrainingPlan.UserId == currentUserId);
+        Workout? requestedWorkout = await _workoutRepository
+            .All()
+            .FirstOrDefaultAsync(w =>
+                w.Id == id &&
+                w.TrainingPlanId == trainingPlanId &&
+                w.TrainingPlan.UserId == currentUserId);
         if (requestedWorkout == null)
         {
             return ServiceResult.Failure(
