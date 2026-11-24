@@ -3,6 +3,7 @@ namespace SwimTrack.Shared.Constants;
 public static class ApplicationDefaults
 {
     public const string DateTimeFormat = "dd.MM.yyyy";
+    public const string ApplicationHomePagePath = "/";
 
     public static class Identity
     {

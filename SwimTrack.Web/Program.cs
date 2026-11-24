@@ -39,6 +39,8 @@ public class Program
         app.UseAuthentication();
         app.UseAuthorization();
 
+        app.UseAdminHomePageRedirection("/Admin/Home");
+
         app.MapStaticAssets();
         app.MapControllerRoute(
             name: "areas",
