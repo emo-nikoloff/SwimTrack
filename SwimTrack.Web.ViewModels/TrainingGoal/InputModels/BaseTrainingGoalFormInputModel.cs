@@ -21,7 +21,7 @@ public abstract class BaseTrainingGoalFormInputModel : IValidatableObject
 
     public virtual IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        bool isTrainingGoalPeriodValid = DateValidator.ValidatePlanPeriod(StartDate, EndDate);
+        bool isTrainingGoalPeriodValid = DateValidator.ValidatePeriod(StartDate, EndDate);
         if (!isTrainingGoalPeriodValid)
         {
             yield return new ValidationResult(

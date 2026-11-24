@@ -171,17 +171,16 @@
                         <span class="@statusClass">@trainingPlan.StatusText</span>
                     </header>
 
-                    @* TODO: Decide how to implement the new TrainingGoal *@
-                    @*
-                    @if (!string.IsNullOrWhiteSpace(trainingPlan.Goal))
+                    @if (trainingPlan.TrainingGoal != null)
                     {
-                        <p>@trainingPlan.Goal</p>
+                        <p class="text-muted">
+                            <span>Goal: @trainingPlan.TrainingGoal.Title</span>
+                        </p>
                     }
                     else
                     {
                         <p class="text-muted">No goal specified.</p>
                     }
-                    *@
 
                     @if (trainingPlan.Workouts.Count > 0)
                     {

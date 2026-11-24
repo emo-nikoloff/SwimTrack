@@ -11,13 +11,13 @@
             <p class="eyebrow-heading">Training plan</p>
             <h1 class="plan-title">@Model.Name</h1>
             <p class="text-muted">@Model.StartDate.ToString(DateTimeFormat) – @Model.EndDate.ToString(DateTimeFormat) · @Model.TotalWorkouts workouts</p>
-            @* TODO: Decide how to implement the new TrainingGoal *@
-            @*
-            @if (!string.IsNullOrWhiteSpace(Model.Goal))
+            @if (Model.TrainingGoal != null)
             {
-                <blockquote class="plan-goal-card">“@Model.Goal”</blockquote>
+                <blockquote class="plan-goal-card">
+                    <span>Goal: “@Model.TrainingGoal.Title”</span>
+                    <small class="text-muted">(@Model.TrainingGoal.TargetDistance m target)</small>
+                </blockquote>
             }
-            *@
             <div class="flex-row">
                 <a class="button button--dark" asp-controller="TrainingPlan" asp-action="Edit" asp-route-id="@Model.Id">Edit plan & workouts</a>
             </div>

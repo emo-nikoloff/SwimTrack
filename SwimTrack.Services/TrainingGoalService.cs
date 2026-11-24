@@ -55,7 +55,7 @@ public class TrainingGoalService : ITrainingGoalService
             }
         }
 
-        bool isGoalPeriodValid = DateValidator.ValidatePlanPeriod(
+        bool isGoalPeriodValid = DateValidator.ValidatePeriod(
             request.StartDate,
             request.EndDate);
         if (!isGoalPeriodValid)
@@ -95,8 +95,8 @@ public class TrainingGoalService : ITrainingGoalService
         TrainingGoal? requestedGoal = await _trainingGoalRepository
             .AllAsNoTracking()
             .FirstOrDefaultAsync(tg =>
-                tg.Id == id
-                && tg.UserId == currentUserId);
+                tg.Id == id &&
+                tg.UserId == currentUserId);
         if (requestedGoal == null)
         {
             return null;
@@ -133,7 +133,7 @@ public class TrainingGoalService : ITrainingGoalService
             }
         }
 
-        bool isGoalPeriodValid = DateValidator.ValidatePlanPeriod(
+        bool isGoalPeriodValid = DateValidator.ValidatePeriod(
             request.StartDate,
             request.EndDate);
         if (!isGoalPeriodValid)
@@ -155,14 +155,42 @@ public class TrainingGoalService : ITrainingGoalService
 
         TrainingGoal? requestedGoal = await _trainingGoalRepository
             .All()
+            .Include(tg => tg.TrainingPlans)
             .FirstOrDefaultAsync(tg =>
-                tg.Id == request.Id
-                && tg.UserId == currentUserId);
+                tg.Id == request.Id &&
+                tg.UserId == currentUserId);
         if (requestedGoal == null)
         {
             return ServiceResult.Failure(
                 ServiceResultStatus.NotFound,
                 NotFoundTrainingGoal);
+        }
+
+        foreach (TrainingPlan trainingPlan in requestedGoal.TrainingPlans)
+        {
+            bool isPlanWithinNewGoalPeriod = DateValidator.ValidatePlanWithinGoalPeriod(
+                trainingPlan.StartDate,
+                trainingPlan.EndDate,
+                request.StartDate,
+                request.EndDate);
+            if (!isPlanWithinNewGoalPeriod)
+            {
+                string? propertyName = null;
+                string errorMessage = string.Format(
+                    ExistingPlanOutsideGoalPeriod,
+                    trainingPlan.Title);
+
+                ServiceError serviceError = new(propertyName, errorMessage);
+
+                serviceErrors.Add(serviceError);
+            }
+        }
+
+        if (serviceErrors.Count > 0)
+        {
+            return ServiceResult.Failure(
+                ServiceResultStatus.InvalidRequest,
+                serviceErrors);
         }
 
         requestedGoal.Title = request.Title;
@@ -180,9 +208,8 @@ public class TrainingGoalService : ITrainingGoalService
         TrainingGoal? requestedGoal = await _trainingGoalRepository
             .All()
             .FirstOrDefaultAsync(tg =>
-                tg.Id == id
-                && tg.UserId == currentUserId);
-
+                tg.Id == id &&
+                tg.UserId == currentUserId);
         if (requestedGoal == null)
         {
             return ServiceResult.Failure(

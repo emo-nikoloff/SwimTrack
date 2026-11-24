@@ -19,6 +19,9 @@ public static class ValidationMessages
         public const string WorkoutDateOutsidePlanPeriod =
             "The workout date must be within the training plan period.";
 
+        public const string PlanPeriodOutsideGoalPeriod =
+            "The training plan period must be within the training goal period.";
+
         public const string InvalidWorkoutCompletionDate =
             "The workout completion date cannot be before the workout date or in the future.";
     }
@@ -39,6 +42,9 @@ public static class ValidationMessages
     {
         public const string NotFoundTrainingGoal =
             "The requested training goal was not found.";
+
+        public const string ExistingPlanOutsideGoalPeriod =
+            "The existing training plan “{0}” falls outside the new training goal period.";
     }
 
     public static class SwimmingPoolValidation

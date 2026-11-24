@@ -7,6 +7,7 @@ using SwimTrack.Data.Repository.Contracts;
 using SwimTrack.Services.Common.Results;
 using SwimTrack.Services.Common.Utilities;
 using SwimTrack.Services.Contracts;
+using SwimTrack.Services.DTOs.TrainingGoal.Response;
 using SwimTrack.Services.DTOs.TrainingPlan.Request;
 using SwimTrack.Services.DTOs.TrainingPlan.Response;
 using SwimTrack.Services.DTOs.Workout.Request;
@@ -15,6 +16,7 @@ using SwimTrack.Services.DTOs.WorkoutResult.Response;
 using SwimTrack.Shared.Validation;
 using static SwimTrack.Shared.Constants.ApplicationDefaults;
 using static SwimTrack.Shared.Constants.ValidationMessages.DateValidation;
+using static SwimTrack.Shared.Constants.ValidationMessages.TrainingGoalValidation;
 using static SwimTrack.Shared.Constants.ValidationMessages.TrainingPlanValidation;
 
 namespace SwimTrack.Services;
@@ -23,15 +25,22 @@ public class TrainingPlanService : ITrainingPlanService
 {
     private readonly ITrainingPlanRepository _trainingPlanRepository;
 
+    private readonly ITrainingGoalRepository _trainingGoalRepository;
+
     private readonly IWorkoutRepository _workoutRepository;
 
     private readonly IUnitOfWork _unitOfWork;
 
     private readonly BasicModelValidator _modelValidator;
 
-    public TrainingPlanService(ITrainingPlanRepository trainingPlanRepository, IWorkoutRepository workoutRepository, IUnitOfWork unitOfWork)
+    public TrainingPlanService(
+        ITrainingPlanRepository trainingPlanRepository,
+        ITrainingGoalRepository trainingGoalRepository,
+        IWorkoutRepository workoutRepository,
+        IUnitOfWork unitOfWork)
     {
         _trainingPlanRepository = trainingPlanRepository;
+        _trainingGoalRepository = trainingGoalRepository;
         _workoutRepository = workoutRepository;
         _unitOfWork = unitOfWork;
         _modelValidator = new();
@@ -39,14 +48,23 @@ public class TrainingPlanService : ITrainingPlanService
 
     public async Task<IEnumerable<AllTrainingPlansResponseModel>> GetAllTrainingPlansAsync(string currentUserId)
     {
-        return await _trainingPlanRepository.AllAsNoTracking()
+        return await _trainingPlanRepository
+            .AllAsNoTracking()
             .Where(tp => tp.UserId == currentUserId)
             .Select(tp => new AllTrainingPlansResponseModel
             {
                 Id = tp.Id,
                 Name = tp.Title,
-                // TODO: Decide how to implement the new TrainingGoal
-                // Goal = tp.Goal,
+                TrainingGoal = tp.TrainingGoal == null
+                    ? null
+                    : new TrainingGoalResponseModel
+                    {
+                        Id = tp.TrainingGoal.Id,
+                        Title = tp.TrainingGoal.Title,
+                        TargetDistance = tp.TrainingGoal.TargetDistance,
+                        StartDate = tp.TrainingGoal.StartDate,
+                        EndDate = tp.TrainingGoal.EndDate,
+                    },
                 StartDate = tp.StartDate,
                 EndDate = tp.EndDate,
                 Workouts = tp.Workouts
@@ -92,7 +110,7 @@ public class TrainingPlanService : ITrainingPlanService
             }
         }
 
-        bool isTrainingPlanPeriodValid = DateValidator.ValidatePlanPeriod(
+        bool isTrainingPlanPeriodValid = DateValidator.ValidatePeriod(
             request.StartDate,
             request.EndDate);
         if (!isTrainingPlanPeriodValid)
@@ -103,6 +121,41 @@ public class TrainingPlanService : ITrainingPlanService
             ServiceError serviceError = new(propertyName, errorMessage);
 
             serviceErrors.Add(serviceError);
+        }
+
+        if (request.TrainingGoalId.HasValue)
+        {
+            TrainingGoal? trainingGoal = await _trainingGoalRepository
+                .AllAsNoTracking()
+                .FirstOrDefaultAsync(tg =>
+                    tg.Id == request.TrainingGoalId.Value &&
+                    tg.UserId == currentUserId);
+            if (trainingGoal == null)
+            {
+                string propertyName = nameof(CreateTrainingPlanRequestModel.TrainingGoalId);
+                string errorMessage = NotFoundTrainingGoal;
+
+                ServiceError serviceError = new(propertyName, errorMessage);
+
+                serviceErrors.Add(serviceError);
+            }
+            else if (isTrainingPlanPeriodValid)
+            {
+                bool isPlanWithinGoal = DateValidator.ValidatePlanWithinGoalPeriod(
+                    request.StartDate,
+                    request.EndDate,
+                    trainingGoal.StartDate,
+                    trainingGoal.EndDate);
+                if (!isPlanWithinGoal)
+                {
+                    string propertyName = nameof(CreateTrainingPlanRequestModel.TrainingGoalId);
+                    string errorMessage = PlanPeriodOutsideGoalPeriod;
+
+                    ServiceError serviceError = new(propertyName, errorMessage);
+
+                    serviceErrors.Add(serviceError);
+                }
+            }
         }
 
         for (int i = 0; i < request.Workouts.Count; i++)
@@ -160,8 +213,7 @@ public class TrainingPlanService : ITrainingPlanService
         TrainingPlan newTrainingPlan = new()
         {
             Title = request.Name,
-            // TODO: Decide how to implement the new TrainingGoal
-            // Goal = request.Goal,
+            TrainingGoalId = request.TrainingGoalId,
             StartDate = request.StartDate,
             EndDate = request.EndDate,
             Workouts = request.Workouts
@@ -184,12 +236,12 @@ public class TrainingPlanService : ITrainingPlanService
 
     public async Task<EditTrainingPlanResponseModel?> GetTrainingPlanForEditAsync(int id, string currentUserId)
     {
-        TrainingPlan? requestedTrainingPlan =
-            await _trainingPlanRepository.AllAsNoTracking()
-                .Include(tp => tp.Workouts)
-                .FirstOrDefaultAsync(tp =>
-                    tp.Id == id
-                    && tp.UserId == currentUserId);
+        TrainingPlan? requestedTrainingPlan = await _trainingPlanRepository
+            .AllAsNoTracking()
+            .Include(tp => tp.Workouts)
+            .FirstOrDefaultAsync(tp =>
+                tp.Id == id &&
+                tp.UserId == currentUserId);
         if (requestedTrainingPlan == null)
         {
             return null;
@@ -199,8 +251,7 @@ public class TrainingPlanService : ITrainingPlanService
         {
             Id = requestedTrainingPlan.Id,
             Name = requestedTrainingPlan.Title,
-            // TODO: Decide how to implement the new TrainingGoal
-            // Goal = requestedTrainingPlan.Goal,
+            TrainingGoalId = requestedTrainingPlan.TrainingGoalId,
             StartDate = requestedTrainingPlan.StartDate,
             EndDate = requestedTrainingPlan.EndDate,
             Workouts = requestedTrainingPlan.Workouts
@@ -238,7 +289,7 @@ public class TrainingPlanService : ITrainingPlanService
             }
         }
 
-        bool isTrainingPlanPeriodValid = DateValidator.ValidatePlanPeriod(
+        bool isTrainingPlanPeriodValid = DateValidator.ValidatePeriod(
             request.StartDate,
             request.EndDate);
         if (!isTrainingPlanPeriodValid)
@@ -249,6 +300,41 @@ public class TrainingPlanService : ITrainingPlanService
             ServiceError serviceError = new(propertyName, errorMessage);
 
             serviceErrors.Add(serviceError);
+        }
+
+        if (request.TrainingGoalId.HasValue)
+        {
+            TrainingGoal? trainingGoal = await _trainingGoalRepository
+                .AllAsNoTracking()
+                .FirstOrDefaultAsync(tg =>
+                    tg.Id == request.TrainingGoalId.Value &&
+                    tg.UserId == currentUserId);
+            if (trainingGoal == null)
+            {
+                string propertyName = nameof(EditTrainingPlanRequestModel.TrainingGoalId);
+                string errorMessage = NotFoundTrainingGoal;
+
+                ServiceError serviceError = new(propertyName, errorMessage);
+
+                serviceErrors.Add(serviceError);
+            }
+            else if (isTrainingPlanPeriodValid)
+            {
+                bool isPlanWithinGoal = DateValidator.ValidatePlanWithinGoalPeriod(
+                    request.StartDate,
+                    request.EndDate,
+                    trainingGoal.StartDate,
+                    trainingGoal.EndDate);
+                if (!isPlanWithinGoal)
+                {
+                    string propertyName = nameof(EditTrainingPlanRequestModel.TrainingGoalId);
+                    string errorMessage = PlanPeriodOutsideGoalPeriod;
+
+                    ServiceError serviceError = new(propertyName, errorMessage);
+
+                    serviceErrors.Add(serviceError);
+                }
+            }
         }
 
         for (int i = 0; i < request.NewWorkouts.Count; i++)
@@ -303,12 +389,12 @@ public class TrainingPlanService : ITrainingPlanService
                 serviceErrors);
         }
 
-        TrainingPlan? requestedTrainingPlan =
-            await _trainingPlanRepository.All()
-                .Include(tp => tp.Workouts)
-                .FirstOrDefaultAsync(tp =>
-                    tp.Id == request.Id
-                    && tp.UserId == currentUserId);
+        TrainingPlan? requestedTrainingPlan = await _trainingPlanRepository
+            .All()
+            .Include(tp => tp.Workouts)
+            .FirstOrDefaultAsync(tp =>
+                tp.Id == request.Id &&
+                tp.UserId == currentUserId);
         if (requestedTrainingPlan == null)
         {
             return ServiceResult.Failure(
@@ -362,8 +448,7 @@ public class TrainingPlanService : ITrainingPlanService
 
         // Update plan details
         requestedTrainingPlan.Title = request.Name;
-        // TODO: Decide how to implement the new TrainingGoal
-        // requestedTrainingPlan.Goal = request.Goal;
+        requestedTrainingPlan.TrainingGoalId = request.TrainingGoalId;
         requestedTrainingPlan.StartDate = request.StartDate;
         requestedTrainingPlan.EndDate = request.EndDate;
 
@@ -393,11 +478,11 @@ public class TrainingPlanService : ITrainingPlanService
 
     public async Task<ServiceResult> RemoveTrainingPlanAsync(int id, string currentUserId)
     {
-        TrainingPlan? requestedTrainingPlan =
-            await _trainingPlanRepository.All()
-                .FirstOrDefaultAsync(tp =>
-                    tp.Id == id
-                    && tp.UserId == currentUserId);
+        TrainingPlan? requestedTrainingPlan = await _trainingPlanRepository
+            .All()
+            .FirstOrDefaultAsync(tp =>
+                tp.Id == id &&
+                tp.UserId == currentUserId);
         if (requestedTrainingPlan == null)
         {
             return ServiceResult.Failure(
@@ -413,14 +498,23 @@ public class TrainingPlanService : ITrainingPlanService
 
     public async Task<TrainingPlanDetailsResponseModel?> GetTrainingPlanDetailsAsync(int id, string currentUserId)
     {
-        return await _trainingPlanRepository.AllAsNoTracking()
+        return await _trainingPlanRepository
+            .AllAsNoTracking()
             .Where(tp => tp.Id == id && tp.UserId == currentUserId)
             .Select(tp => new TrainingPlanDetailsResponseModel
             {
                 Id = tp.Id,
                 Name = tp.Title,
-                // TODO: Decide how to implement the new TrainingGoal
-                // Goal = tp.Goal,
+                TrainingGoal = tp.TrainingGoal == null
+                    ? null
+                    : new TrainingGoalResponseModel
+                    {
+                        Id = tp.TrainingGoal.Id,
+                        Title = tp.TrainingGoal.Title,
+                        TargetDistance = tp.TrainingGoal.TargetDistance,
+                        StartDate = tp.TrainingGoal.StartDate,
+                        EndDate = tp.TrainingGoal.EndDate,
+                    },
                 StartDate = tp.StartDate,
                 EndDate = tp.EndDate,
                 Workouts = tp.Workouts

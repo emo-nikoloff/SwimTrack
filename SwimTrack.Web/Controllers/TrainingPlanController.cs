@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
-using SwimTrack.Services.Common.Results;
 
+using SwimTrack.Services.Common.Results;
 using SwimTrack.Services.Contracts;
+using SwimTrack.Services.DTOs.TrainingGoal.Response;
 using SwimTrack.Services.DTOs.TrainingPlan.Request;
 using SwimTrack.Services.DTOs.TrainingPlan.Response;
 using SwimTrack.Services.DTOs.Workout.Request;
+using SwimTrack.Web.ViewModels.TrainingGoal.ViewModels;
 using SwimTrack.Web.ViewModels.TrainingPlan.InputModels;
 using SwimTrack.Web.ViewModels.TrainingPlan.ViewModels;
 using SwimTrack.Web.ViewModels.Workout.ViewModels;
@@ -16,16 +18,21 @@ public class TrainingPlanController : BaseController
 {
     private readonly ITrainingPlanService _trainingPlanService;
 
-    public TrainingPlanController(ITrainingPlanService trainingPlanService)
+    private readonly ITrainingGoalService _trainingGoalService;
+
+    public TrainingPlanController(
+        ITrainingPlanService trainingPlanService,
+        ITrainingGoalService trainingGoalService)
     {
         _trainingPlanService = trainingPlanService;
+        _trainingGoalService = trainingGoalService;
     }
 
     [HttpGet]
     public async Task<IActionResult> All()
     {
-        IEnumerable<AllTrainingPlansResponseModel> allTrainingPlansResponse =
-            await _trainingPlanService.GetAllTrainingPlansAsync(UserId);
+        IEnumerable<AllTrainingPlansResponseModel> allTrainingPlansResponse = await _trainingPlanService
+            .GetAllTrainingPlansAsync(UserId);
 
         IReadOnlyCollection<AllTrainingPlansViewModel> allTrainingPlansViewModel = allTrainingPlansResponse
             .OrderBy(tp => tp.StartDate)
@@ -35,8 +42,16 @@ public class TrainingPlanController : BaseController
             {
                 Id = tp.Id,
                 Name = tp.Name,
-                // TODO: Decide how to implement the new TrainingGoal
-                // Goal = tp.Goal,
+                TrainingGoal = tp.TrainingGoal == null
+                    ? null
+                    : new TrainingGoalViewModel
+                    {
+                        Id = tp.TrainingGoal.Id,
+                        Title = tp.TrainingGoal.Title,
+                        TargetDistance = tp.TrainingGoal.TargetDistance,
+                        StartDate = tp.TrainingGoal.StartDate,
+                        EndDate = tp.TrainingGoal.EndDate,
+                    },
                 StartDate = tp.StartDate,
                 EndDate = tp.EndDate,
                 Workouts = tp.Workouts
@@ -70,13 +85,17 @@ public class TrainingPlanController : BaseController
     }
 
     [HttpGet]
-    public IActionResult Create()
+    public async Task<IActionResult> Create()
     {
-        return View(new CreateTrainingPlanFormInputModel()
+        CreateTrainingPlanFormInputModel inputModel = new()
         {
             StartDate = DateTime.Today,
-            EndDate = DateTime.Today.AddDays(1),
-        });
+            EndDate = DateTime.Today.AddDays(30),
+        };
+
+        await PopulateAvailableGoalsAsync(inputModel);
+
+        return View(inputModel);
     }
 
     [HttpPost]
@@ -84,14 +103,15 @@ public class TrainingPlanController : BaseController
     {
         if (!ModelState.IsValid)
         {
+            await PopulateAvailableGoalsAsync(inputModel);
+
             return View(inputModel);
         }
 
         CreateTrainingPlanRequestModel createTrainingPlanRequest = new()
         {
             Name = inputModel.Name,
-            // TODO: Decide how to implement the new TrainingGoal
-            // Goal = inputModel.Goal,
+            TrainingGoalId = inputModel.TrainingGoalId,
             StartDate = inputModel.StartDate,
             EndDate = inputModel.EndDate,
             Workouts = inputModel.Workouts
@@ -105,11 +125,13 @@ public class TrainingPlanController : BaseController
                 .ToArray(),
         };
 
-        ServiceResult result =
-            await _trainingPlanService.CreateTrainingPlanAsync(createTrainingPlanRequest, UserId);
+        ServiceResult result = await _trainingPlanService
+            .CreateTrainingPlanAsync(createTrainingPlanRequest, UserId);
         if (result.Status == ServiceResultStatus.InvalidRequest)
         {
             AddServiceErrorsToModelState(result.Errors);
+
+            await PopulateAvailableGoalsAsync(inputModel);
 
             return View(inputModel);
         }
@@ -129,8 +151,8 @@ public class TrainingPlanController : BaseController
             return BadRequest();
         }
 
-        EditTrainingPlanResponseModel? editTrainingPlanResponse =
-            await _trainingPlanService.GetTrainingPlanForEditAsync(id.Value, UserId);
+        EditTrainingPlanResponseModel? editTrainingPlanResponse = await _trainingPlanService
+            .GetTrainingPlanForEditAsync(id.Value, UserId);
         if (editTrainingPlanResponse == null)
         {
             return NotFound();
@@ -140,8 +162,7 @@ public class TrainingPlanController : BaseController
         {
             Id = editTrainingPlanResponse.Id,
             Name = editTrainingPlanResponse.Name,
-            // TODO: Decide how to implement the new TrainingGoal
-            // Goal = editTrainingPlanResponse.Goal,
+            TrainingGoalId = editTrainingPlanResponse.TrainingGoalId,
             StartDate = editTrainingPlanResponse.StartDate,
             EndDate = editTrainingPlanResponse.EndDate,
             ExistingWorkouts = editTrainingPlanResponse.Workouts
@@ -162,6 +183,8 @@ public class TrainingPlanController : BaseController
                 .ToList(),
         };
 
+        await PopulateAvailableGoalsAsync(inputModel);
+
         return View(inputModel);
     }
 
@@ -179,6 +202,7 @@ public class TrainingPlanController : BaseController
 
         if (!ModelState.IsValid)
         {
+            await PopulateAvailableGoalsAsync(inputModel);
             await RestoreExistingWorkoutsAsync(inputModel);
 
             return View(inputModel);
@@ -188,8 +212,7 @@ public class TrainingPlanController : BaseController
         {
             Id = id.Value,
             Name = inputModel.Name,
-            // TODO: Decide how to implement the new TrainingGoal
-            // Goal = inputModel.Goal,
+            TrainingGoalId = inputModel.TrainingGoalId,
             StartDate = inputModel.StartDate,
             EndDate = inputModel.EndDate,
             KeptWorkoutIds = inputModel.KeptWorkoutIds,
@@ -204,12 +227,13 @@ public class TrainingPlanController : BaseController
                 .ToArray(),
         };
 
-        ServiceResult result =
-            await _trainingPlanService.EditTrainingPlanAsync(editTrainingPlanRequest, UserId);
+        ServiceResult result = await _trainingPlanService
+            .EditTrainingPlanAsync(editTrainingPlanRequest, UserId);
         if (result.Status == ServiceResultStatus.InvalidRequest)
         {
             AddServiceErrorsToModelState(result.Errors);
 
+            await PopulateAvailableGoalsAsync(inputModel);
             await RestoreExistingWorkoutsAsync(inputModel);
 
             return View(inputModel);
@@ -234,8 +258,8 @@ public class TrainingPlanController : BaseController
             return BadRequest();
         }
 
-        ServiceResult result =
-            await _trainingPlanService.RemoveTrainingPlanAsync(id.Value, UserId);
+        ServiceResult result = await _trainingPlanService
+            .RemoveTrainingPlanAsync(id.Value, UserId);
         if (result.Status == ServiceResultStatus.NotFound)
         {
             return NotFound();
@@ -256,8 +280,8 @@ public class TrainingPlanController : BaseController
             return BadRequest();
         }
 
-        TrainingPlanDetailsResponseModel? trainingPlanDetailsResponse =
-            await _trainingPlanService.GetTrainingPlanDetailsAsync(id.Value, UserId);
+        TrainingPlanDetailsResponseModel? trainingPlanDetailsResponse = await _trainingPlanService
+            .GetTrainingPlanDetailsAsync(id.Value, UserId);
         if (trainingPlanDetailsResponse == null)
         {
             return NotFound();
@@ -267,8 +291,16 @@ public class TrainingPlanController : BaseController
         {
             Id = trainingPlanDetailsResponse.Id,
             Name = trainingPlanDetailsResponse.Name,
-            // TODO: Decide how to implement the new TrainingGoal
-            // Goal = trainingPlanDetailsResponse.Goal,
+            TrainingGoal = trainingPlanDetailsResponse.TrainingGoal == null
+                ? null
+                : new TrainingGoalViewModel
+                {
+                    Id = trainingPlanDetailsResponse.TrainingGoal.Id,
+                    Title = trainingPlanDetailsResponse.TrainingGoal.Title,
+                    TargetDistance = trainingPlanDetailsResponse.TrainingGoal.TargetDistance,
+                    StartDate = trainingPlanDetailsResponse.TrainingGoal.StartDate,
+                    EndDate = trainingPlanDetailsResponse.TrainingGoal.EndDate,
+                },
             StartDate = trainingPlanDetailsResponse.StartDate,
             EndDate = trainingPlanDetailsResponse.EndDate,
             Workouts = trainingPlanDetailsResponse.Workouts
@@ -298,6 +330,26 @@ public class TrainingPlanController : BaseController
         return View(trainingPlanDetailsViewModel);
     }
 
+    private async Task PopulateAvailableGoalsAsync(BaseTrainingPlanFormInputModel inputModel)
+    {
+        IEnumerable<AllTrainingGoalsResponseModel> goals = await _trainingGoalService
+            .GetAllTrainingGoalsAsync(UserId);
+
+        inputModel.AvailableGoals = goals
+            .OrderBy(g => g.StartDate)
+            .ThenBy(g => g.EndDate)
+            .ThenBy(g => g.Id)
+            .Select(g => new AllTrainingGoalsViewModel
+            {
+                Id = g.Id,
+                Title = g.Title,
+                TargetDistance = g.TargetDistance,
+                StartDate = g.StartDate,
+                EndDate = g.EndDate,
+            })
+            .ToArray();
+    }
+
     private async Task RestoreExistingWorkoutsAsync(EditTrainingPlanFormInputModel inputModel)
     {
         if (inputModel.Id <= 0)
@@ -305,8 +357,8 @@ public class TrainingPlanController : BaseController
             return;
         }
 
-        EditTrainingPlanResponseModel? trainingPlan =
-            await _trainingPlanService.GetTrainingPlanForEditAsync(inputModel.Id, UserId);
+        EditTrainingPlanResponseModel? trainingPlan = await _trainingPlanService
+            .GetTrainingPlanForEditAsync(inputModel.Id, UserId);
         if (trainingPlan != null)
         {
             HashSet<int> keptWorkouts = inputModel.KeptWorkoutIds.ToHashSet();

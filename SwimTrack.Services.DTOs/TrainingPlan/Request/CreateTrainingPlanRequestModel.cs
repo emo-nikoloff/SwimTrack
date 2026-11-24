@@ -11,9 +11,7 @@ public class CreateTrainingPlanRequestModel
     [StringLength(TitleMaxLength, MinimumLength = NameMinLength)]
     public string Name { get; set; } = null!;
 
-    // TODO: Decide how to implement the new TrainingGoal
-    // [MaxLength(GoalMaxLength)]
-    // public string? Goal { get; set; }
+    public int? TrainingGoalId { get; set; }
 
     public DateTime StartDate { get; set; }
 

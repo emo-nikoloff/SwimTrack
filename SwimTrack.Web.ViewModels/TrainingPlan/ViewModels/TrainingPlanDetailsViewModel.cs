@@ -1,4 +1,5 @@
 using SwimTrack.Shared.Enums;
+using SwimTrack.Web.ViewModels.TrainingGoal.ViewModels;
 
 namespace SwimTrack.Web.ViewModels.TrainingPlan.ViewModels;
 
@@ -9,8 +10,7 @@ public class TrainingPlanDetailsViewModel
 
     public string Name { get; set; } = null!;
 
-    // TODO: Decide how to implement the new TrainingGoal
-    // public string? Goal { get; set; }
+    public TrainingGoalViewModel? TrainingGoal { get; set; }
 
     public DateTime StartDate { get; set; }
 
