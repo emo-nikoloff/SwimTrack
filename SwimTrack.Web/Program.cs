@@ -44,6 +44,7 @@ public class Program
         }
 
         app.UseHttpsRedirection();
+        app.UseStatusCodePagesWithReExecute("/Home/Error", "?statusCode={0}");
         app.UseRouting();
 
         app.UseAuthentication();

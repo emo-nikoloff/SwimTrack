@@ -19,9 +19,24 @@ public class HomeController : BaseController
         return View();
     }
 
+    [IgnoreAntiforgeryToken]
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
+    public IActionResult Error(int? statusCode)
     {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        ErrorViewModel viewModel = new()
+        {
+            RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier,
+        };
+
+        int resolvedStatusCode = statusCode
+            ?? HttpContext.Response.StatusCode;
+
+        return resolvedStatusCode switch
+        {
+            StatusCodes.Status400BadRequest => View("BadRequest", viewModel),
+            StatusCodes.Status404NotFound => View("NotFound"),
+            StatusCodes.Status500InternalServerError => View("InternalServerError", viewModel),
+            _ => View(viewModel),
+        };
     }
 }

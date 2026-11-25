@@ -1,0 +1,133 @@
+@{
+    ViewData["Title"] = "Error 404";
+}
+
+<main>
+    <section class="container hero-section">
+        <div class="stack">
+            <p class="eyebrow-heading">Error 404 · Lane not found</p>
+            <div class="error-code" aria-hidden="true">4<partial name="_ErrorBuoyPartial" />4</div>
+            <h1 class="error-title">This lane is empty.</h1>
+            <p class="text-lead">The page you’re swimming to doesn’t exist. It may have been moved, or the link is out of date.</p>
+            <div class="flex-row">
+                <a class="button button--primary" asp-controller="TrainingPlan" asp-action="All">Back to plans</a>
+                <a class="button" asp-controller="Home" asp-action="Index">Go home</a>
+            </div>
+            <div class="lane-rope-divider"></div>
+            <div class="flex-row">
+                <small>Try another lane:</small>
+                <a class="chip" asp-controller="TrainingPlan" asp-action="All">Plans</a>
+                <a class="chip" asp-controller="TrainingGoal" asp-action="All">Goals</a>
+                <a class="chip" asp-controller="SwimmingPool" asp-action="All">Pools</a>
+            </div>
+        </div>
+        <div class="error-art" role="img" aria-label="A pool from above: the swimmers keep to their lanes, but lane 3 is empty and only a ghost of a swimmer and a lost pair of goggles remain">
+            <svg viewBox="0 0 560 520">
+                <defs>
+                    <g id="sw">
+                        <path d="M-62-20Q-86 0-62 20" fill="none" stroke="#fff" stroke-width="3" stroke-opacity=".45" stroke-linecap="round"></path>
+                        <path d="M-80-32Q-114 0-80 32" fill="none" stroke="#fff" stroke-width="3" stroke-opacity=".22" stroke-linecap="round"></path>
+                        <path d="M-34-5L-66-11M-34 5L-66 12" stroke="#F2B58F" stroke-width="9" stroke-linecap="round"></path>
+                        <circle cx="-71" cy="-12" r="5" fill="#fff" fill-opacity=".8"></circle>
+                        <circle cx="-71" cy="13" r="5" fill="#fff" fill-opacity=".8"></circle>
+                        <path d="M14-10C30-34 62-38 88-26" fill="none" stroke="#F2B58F" stroke-width="9" stroke-linecap="round"></path>
+                        <circle cx="90" cy="-25" r="6" fill="#F2B58F"></circle>
+                        <path d="M4 10C12 36 36 40 58 30" fill="none" stroke="#F2B58F" stroke-width="9" stroke-linecap="round"></path>
+                        <circle cx="60" cy="29" r="6" fill="#F2B58F"></circle>
+                        <rect x="-40" y="-14" width="72" height="28" rx="14" fill="#FF6B3D"></rect>
+                        <circle cx="40" cy="0" r="15" fill="#3DD9D0"></circle>
+                        <path d="M35-13Q49 0 35 13" fill="none" stroke="#0A7C86" stroke-width="3"></path>
+                        <ellipse cx="50" cy="-6" rx="4" ry="3.2" fill="#0B1F33"></ellipse>
+                        <ellipse cx="50" cy="6" rx="4" ry="3.2" fill="#0B1F33"></ellipse>
+                    </g>
+                    <linearGradient id="shine" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0" stop-color="#fff" stop-opacity=".1"></stop>
+                        <stop offset=".5" stop-color="#fff" stop-opacity="0"></stop>
+                        <stop offset="1" stop-color="#0B1F33" stop-opacity=".22"></stop>
+                    </linearGradient>
+                </defs>
+                <rect x="0" y="0" width="560" height="104" fill="#12506B"></rect>
+                <rect x="0" y="104" width="560" height="104" fill="#0E3A52"></rect>
+                <rect x="0" y="208" width="560" height="104" fill="#12506B"></rect>
+                <rect x="0" y="312" width="560" height="104" fill="#0E3A52"></rect>
+                <rect x="0" y="416" width="560" height="104" fill="#12506B"></rect>
+                <path d="M441 110q9-7 18 0t18 0t18 0" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="2.5" stroke-linecap="round"></path>
+                <path d="M275 129q9-7 18 0t18 0t18 0" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="2.5" stroke-linecap="round"></path>
+                <path d="M337 160q9-7 18 0t18 0t18 0" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="2.5" stroke-linecap="round"></path>
+                <path d="M265 12q9-7 18 0t18 0t18 0" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="2.5" stroke-linecap="round"></path>
+                <path d="M349 53q9-7 18 0t18 0t18 0" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="2.5" stroke-linecap="round"></path>
+                <path d="M244 345q9-7 18 0t18 0t18 0" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="2.5" stroke-linecap="round"></path>
+                <path d="M152 218q9-7 18 0t18 0t18 0" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="2.5" stroke-linecap="round"></path>
+                <path d="M292 487q9-7 18 0t18 0t18 0" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="2.5" stroke-linecap="round"></path>
+                <path d="M440 52q9-7 18 0t18 0t18 0" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="2.5" stroke-linecap="round"></path>
+                <path d="M372 140q9-7 18 0t18 0t18 0" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="2.5" stroke-linecap="round"></path>
+                <path d="M171 398q9-7 18 0t18 0t18 0" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="2.5" stroke-linecap="round"></path>
+                <path d="M127 272q9-7 18 0t18 0t18 0" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="2.5" stroke-linecap="round"></path>
+                <path d="M157 25q9-7 18 0t18 0t18 0" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="2.5" stroke-linecap="round"></path>
+                <path d="M45 298q9-7 18 0t18 0t18 0" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="2.5" stroke-linecap="round"></path>
+                <path d="M402 65q9-7 18 0t18 0t18 0" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="2.5" stroke-linecap="round"></path>
+                <path d="M215 65q9-7 18 0t18 0t18 0" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="2.5" stroke-linecap="round"></path>
+                <path d="M443 158q9-7 18 0t18 0t18 0" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="2.5" stroke-linecap="round"></path>
+                <path d="M207 44q9-7 18 0t18 0t18 0" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="2.5" stroke-linecap="round"></path>
+                <path d="M18 443q9-7 18 0t18 0t18 0" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="2.5" stroke-linecap="round"></path>
+                <path d="M360 10q9-7 18 0t18 0t18 0" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="2.5" stroke-linecap="round"></path>
+                <path d="M119 117q9-7 18 0t18 0t18 0" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="2.5" stroke-linecap="round"></path>
+                <path d="M484 476q9-7 18 0t18 0t18 0" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="2.5" stroke-linecap="round"></path>
+                <path d="M36 250q9-7 18 0t18 0t18 0" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="2.5" stroke-linecap="round"></path>
+                <path d="M202 372q9-7 18 0t18 0t18 0" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="2.5" stroke-linecap="round"></path>
+                <path d="M213 224q9-7 18 0t18 0t18 0" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="2.5" stroke-linecap="round"></path>
+                <path d="M47 299q9-7 18 0t18 0t18 0" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="2.5" stroke-linecap="round"></path>
+                <line x1="66" x2="500" y1="52" y2="52" stroke="#0B1F33" stroke-opacity=".32" stroke-width="5" stroke-linecap="round"></line>
+                <line x1="500" x2="500" y1="34" y2="70" stroke="#0B1F33" stroke-opacity=".32" stroke-width="5" stroke-linecap="round"></line>
+                <line x1="66" x2="500" y1="156" y2="156" stroke="#0B1F33" stroke-opacity=".32" stroke-width="5" stroke-linecap="round"></line>
+                <line x1="500" x2="500" y1="138" y2="174" stroke="#0B1F33" stroke-opacity=".32" stroke-width="5" stroke-linecap="round"></line>
+                <line x1="66" x2="500" y1="260" y2="260" stroke="#0B1F33" stroke-opacity=".32" stroke-width="5" stroke-linecap="round" stroke-dasharray="6 12"></line>
+                <line x1="500" x2="500" y1="242" y2="278" stroke="#0B1F33" stroke-opacity=".32" stroke-width="5" stroke-linecap="round"></line>
+                <line x1="66" x2="500" y1="364" y2="364" stroke="#0B1F33" stroke-opacity=".32" stroke-width="5" stroke-linecap="round"></line>
+                <line x1="500" x2="500" y1="346" y2="382" stroke="#0B1F33" stroke-opacity=".32" stroke-width="5" stroke-linecap="round"></line>
+                <line x1="66" x2="500" y1="468" y2="468" stroke="#0B1F33" stroke-opacity=".32" stroke-width="5" stroke-linecap="round"></line>
+                <line x1="500" x2="500" y1="450" y2="486" stroke="#0B1F33" stroke-opacity=".32" stroke-width="5" stroke-linecap="round"></line>
+                <rect x="64" y="218" width="440" height="84" rx="14" fill="none" stroke="#3DD9D0" stroke-width="3" stroke-dasharray="10 10" stroke-opacity=".7"></rect>
+                <line x1="0" x2="560" y1="4" y2="4" stroke="#FF6B3D" stroke-width="8" stroke-dasharray="16 16"></line>
+                <line x1="0" x2="560" y1="4" y2="4" stroke="#fff" stroke-width="8" stroke-dasharray="16 16" stroke-dashoffset="16"></line>
+                <line x1="0" x2="560" y1="104" y2="104" stroke="#FF6B3D" stroke-width="8" stroke-dasharray="16 16"></line>
+                <line x1="0" x2="560" y1="104" y2="104" stroke="#fff" stroke-width="8" stroke-dasharray="16 16" stroke-dashoffset="16"></line>
+                <line x1="0" x2="560" y1="208" y2="208" stroke="#FF6B3D" stroke-width="8" stroke-dasharray="16 16"></line>
+                <line x1="0" x2="560" y1="208" y2="208" stroke="#fff" stroke-width="8" stroke-dasharray="16 16" stroke-dashoffset="16"></line>
+                <line x1="0" x2="560" y1="312" y2="312" stroke="#FF6B3D" stroke-width="8" stroke-dasharray="16 16"></line>
+                <line x1="0" x2="560" y1="312" y2="312" stroke="#fff" stroke-width="8" stroke-dasharray="16 16" stroke-dashoffset="16"></line>
+                <line x1="0" x2="560" y1="416" y2="416" stroke="#FF6B3D" stroke-width="8" stroke-dasharray="16 16"></line>
+                <line x1="0" x2="560" y1="416" y2="416" stroke="#fff" stroke-width="8" stroke-dasharray="16 16" stroke-dashoffset="16"></line>
+                <line x1="0" x2="560" y1="516" y2="516" stroke="#FF6B3D" stroke-width="8" stroke-dasharray="16 16"></line>
+                <line x1="0" x2="560" y1="516" y2="516" stroke="#fff" stroke-width="8" stroke-dasharray="16 16" stroke-dashoffset="16"></line>
+                <rect x="12" y="38" width="28" height="28" rx="6" fill="#0B1F33"></rect>
+                <text x="26.0" y="58" text-anchor="middle" font-family="'Bricolage Grotesque','DM Sans',sans-serif" font-weight="800" font-size="16" fill="#fff">1</text>
+                <rect x="12" y="142" width="28" height="28" rx="6" fill="#0B1F33"></rect>
+                <text x="26.0" y="162" text-anchor="middle" font-family="'Bricolage Grotesque','DM Sans',sans-serif" font-weight="800" font-size="16" fill="#fff">2</text>
+                <rect x="12" y="350" width="28" height="28" rx="6" fill="#0B1F33"></rect>
+                <text x="26.0" y="370" text-anchor="middle" font-family="'Bricolage Grotesque','DM Sans',sans-serif" font-weight="800" font-size="16" fill="#fff">4</text>
+                <rect x="12" y="454" width="28" height="28" rx="6" fill="#0B1F33"></rect>
+                <text x="26.0" y="474" text-anchor="middle" font-family="'Bricolage Grotesque','DM Sans',sans-serif" font-weight="800" font-size="16" fill="#fff">5</text>
+                <rect x="12" y="246" width="50" height="28" rx="6" fill="#FF6B3D"></rect>
+                <text x="37.0" y="266" text-anchor="middle" font-family="'Bricolage Grotesque','DM Sans',sans-serif" font-weight="800" font-size="16" fill="#0B1F33">404</text>
+                <g class="glide">
+                    <use href="#sw" transform="translate(380 156)"></use>
+                </g>
+                <g class="glide">
+                    <use href="#sw" transform="translate(250 364)"></use>
+                </g>
+                <use href="#sw" transform="translate(300 260)" opacity="0.22"></use>
+                <g transform="translate(150 264) rotate(-14)">
+                    <circle cx="-14" r="11" fill="#3DD9D0" fill-opacity=".5" stroke="#fff" stroke-width="3"></circle>
+                    <circle cx="14" r="11" fill="#3DD9D0" fill-opacity=".5" stroke="#fff" stroke-width="3"></circle>
+                    <path d="M-3 0h6M-25-2q-14 4-14 14M25-2q14 4 14 14" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"></path>
+                </g>
+                <ellipse cx="150" cy="268" rx="44" ry="16" fill="none" stroke="#fff" stroke-opacity=".25" stroke-width="2"></ellipse>
+                <circle cx="346" cy="230" r="20" fill="#FF6B3D"></circle>
+                <path d="M339 246l7 13 7-13z" fill="#FF6B3D"></path>
+                <text x="346" y="238" text-anchor="middle" font-family="'Bricolage Grotesque','DM Sans',sans-serif" font-weight="800" font-size="24" fill="#0B1F33">?</text>
+                <rect width="560" height="520" fill="url(#shine)"></rect>
+            </svg>
+        </div>
+    </section>
+</main>

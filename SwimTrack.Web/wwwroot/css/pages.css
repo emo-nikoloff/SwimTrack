@@ -32,8 +32,8 @@
   color: var(--color-danger);
 }
 
-.error-title {
-  font-size: 36px;
+.app h1.error-title {
+  font-size: clamp(34px, 4.2vw, 56px);
 }
 
 .error-request-id {
@@ -46,6 +46,63 @@
 
 .error-actions {
   margin-top: 12px;
+}
+
+.error-art {
+  border-radius: 32px;
+  overflow: hidden;
+  line-height: 0;
+  background: #0E3A52;
+  box-shadow: 0 14px 0 var(--color-ink-light);
+}
+
+.error-art svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.error-code {
+  display: flex;
+  align-items: center;
+  font: 800 clamp(84px, 11vw, 150px)/.9 var(--font-display);
+  letter-spacing: -.04em;
+  color: var(--color-ink);
+}
+
+.buoy {
+  display: inline-block;
+  width: .8em;
+  height: .8em;
+  margin-inline: .02em;
+  animation: bob 4s ease-in-out infinite;
+}
+
+.buoy + .buoy {
+  animation-delay: -1.6s;
+}
+
+.glide {
+  animation: glide 7s ease-in-out infinite alternate;
+}
+
+@keyframes bob {
+  50% {
+    transform: translateY(-7px) rotate(6deg);
+  }
+}
+
+@keyframes glide {
+  to {
+    transform: translateX(26px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .buoy,
+  .glide {
+    animation: none;
+  }
 }
 
 .auth-form-actions {
