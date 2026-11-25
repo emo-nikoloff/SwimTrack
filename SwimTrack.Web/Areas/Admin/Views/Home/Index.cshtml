@@ -9,132 +9,186 @@
             <h1 class="page-title">Admin Dashboard</h1>
         </div>
     </div>
-    
-    <section class="grid-3-columns">
-        <!-- User Management -->
-        <article class="card plan-card admin-management-card">
-            <header>
-                <div class="admin-icon-wrapper">
-                    <i class="bi bi-people-fill"></i>
+
+    <section class="stack">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-12">
+            <h2>Open Lanes</h2>
+            <span class="badge badge--active">Ready</span>
+        </div>
+
+        <div class="grid-3-columns">
+            <!-- User Management -->
+            <article class="card plan-card admin-management-card">
+                <header>
+                    <div class="admin-icon-wrapper">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <span class="badge badge--planned">Access &amp; Roles</span>
+                </header>
+
+                <div>
+                    <h3>User Management</h3>
+                    <p class="text-muted">Manage swimmer accounts, assign or revoke Administrator and Manager roles, and supervise permissions.</p>
                 </div>
-                <span class="badge badge--planned">Access &amp; Roles</span>
-            </header>
 
-            <div>
-                <h3>User Management</h3>
-                <p class="text-muted">Manage swimmer accounts, assign or revoke Administrator and Manager roles, and supervise permissions.</p>
-            </div>
+                <footer>
+                    <a class="button button--primary button--full-width" asp-area="Admin" asp-controller="UserManagement" asp-action="Index">
+                        <i class="bi bi-person-gear"></i> Manage Users
+                    </a>
+                </footer>
+            </article>
+        </div>
+    </section>
 
-            <footer>
-                <a class="button button--primary button--full-width" asp-area="Admin" asp-controller="UserManagement" asp-action="Index">
-                    <i class="bi bi-person-gear"></i> Manage Users
-                </a>
-            </footer>
-        </article>
+    <!-- Lane Rope Divider -->
+    <div class="lane-rope-divider" aria-hidden="true"></div>
 
-        <!-- Swimming Pools Management -->
-        <article class="card plan-card admin-management-card">
-            <header>
-                <div class="admin-icon-wrapper">
-                    <i class="bi bi-water"></i>
+    <section class="stack">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-12">
+            <h2>Closed for Maintenance</h2>
+            <span class="badge badge--upcoming">Under Construction</span>
+        </div>
+
+        <div class="grid-3-columns">
+            <!-- Swimming Pools Management -->
+            <article class="card plan-card admin-management-card">
+                <header>
+                    <div class="admin-icon-wrapper">
+                        <i class="bi bi-water"></i>
+                    </div>
+                    <span class="badge badge--upcoming">Lane Closed</span>
+                </header>
+
+                <div>
+                    <h3>Swimming Pools</h3>
+                    <p class="text-muted">Curate the facility directory, verify standard pool lengths (25m/50m), locations, and approve public pools.</p>
                 </div>
-                <span class="badge badge--planned">Facilities</span>
-            </header>
 
-            <div>
-                <h3>Swimming Pools</h3>
-                <p class="text-muted">Curate the facility directory, verify standard pool lengths (25m/50m), locations, and approve public pools.</p>
-            </div>
+                <footer>
+                    <button type="button" class="button button--primary button--full-width" popovertarget="lane-closed-pools">
+                        <i class="bi bi-geo-alt"></i> Manage Pools
+                    </button>
+                    <div class="popover-dialog" id="lane-closed-pools" popover="">
+                        <h3>Lane Closed: Swimming Pools</h3>
+                        <p class="text-muted remove-plan-warning">We’re still measuring pool lengths with a very long tape measure (25m or 50m… we keep losing count). Grab a kickboard and check back soon!</p>
+                        <div class="flex-row">
+                            <button class="button button--dark" type="button" popovertarget="lane-closed-pools" popovertargetaction="hide">Back to deck</button>
+                        </div>
+                    </div>
+                </footer>
+            </article>
 
-            <footer>
-                <a class="button button--primary button--full-width" asp-area="Admin" asp-controller="SwimmingPoolManagement" asp-action="Index">
-                    <i class="bi bi-geo-alt"></i> Manage Pools
-                </a>
-            </footer>
-        </article>
+            <!-- Training Plans Management -->
+            <article class="card plan-card admin-management-card">
+                <header>
+                    <div class="admin-icon-wrapper">
+                        <i class="bi bi-calendar3"></i>
+                    </div>
+                    <span class="badge badge--upcoming">Lane Closed</span>
+                </header>
 
-        <!-- Training Plans Management -->
-        <article class="card plan-card admin-management-card">
-            <header>
-                <div class="admin-icon-wrapper">
-                    <i class="bi bi-calendar3"></i>
+                <div>
+                    <h3>Training Plans</h3>
+                    <p class="text-muted">Create official training blocks, manage curated plan templates, and oversee member plan configurations.</p>
                 </div>
-                <span class="badge badge--planned">Programs</span>
-            </header>
 
-            <div>
-                <h3>Training Plans</h3>
-                <p class="text-muted">Create official training blocks, manage curated plan templates, and oversee member plan configurations.</p>
-            </div>
+                <footer>
+                    <button type="button" class="button button--primary button--full-width" popovertarget="lane-closed-plans">
+                        <i class="bi bi-card-checklist"></i> Manage Plans
+                    </button>
+                    <div class="popover-dialog" id="lane-closed-plans" popover="">
+                        <h3>Lane Closed: Training Plans</h3>
+                        <p class="text-muted remove-plan-warning">Coach is still arguing with the whiteboard about pyramid sets. This lane will reopen once the ink dries!</p>
+                        <div class="flex-row">
+                            <button class="button button--dark" type="button" popovertarget="lane-closed-plans" popovertargetaction="hide">Back to deck</button>
+                        </div>
+                    </div>
+                </footer>
+            </article>
 
-            <footer>
-                <a class="button button--primary button--full-width" asp-area="Admin" asp-controller="TrainingPlanManagement" asp-action="Index">
-                    <i class="bi bi-card-checklist"></i> Manage Plans
-                </a>
-            </footer>
-        </article>
+            <!-- Training Goals Management -->
+            <article class="card plan-card admin-management-card">
+                <header>
+                    <div class="admin-icon-wrapper">
+                        <i class="bi bi-bullseye"></i>
+                    </div>
+                    <span class="badge badge--upcoming">Lane Closed</span>
+                </header>
 
-        <!-- Training Goals Management -->
-        <article class="card plan-card admin-management-card">
-            <header>
-                <div class="admin-icon-wrapper">
-                    <i class="bi bi-bullseye"></i>
+                <div>
+                    <h3>Training Goals</h3>
+                    <p class="text-muted">Configure platform goal presets, target distance/frequency benchmarks, and track swimmer achievement metrics.</p>
                 </div>
-                <span class="badge badge--planned">Milestones</span>
-            </header>
 
-            <div>
-                <h3>Training Goals</h3>
-                <p class="text-muted">Configure platform goal presets, target distance/frequency benchmarks, and track swimmer achievement metrics.</p>
-            </div>
+                <footer>
+                    <button type="button" class="button button--primary button--full-width" popovertarget="lane-closed-goals">
+                        <i class="bi bi-trophy"></i> Manage Goals
+                    </button>
+                    <div class="popover-dialog" id="lane-closed-goals" popover="">
+                        <h3>Lane Closed: Training Goals</h3>
+                        <p class="text-muted remove-plan-warning">We’re recalibrating the scoreboard so 10 km doesn’t look quite as scary. Hang tight on the deck!</p>
+                        <div class="flex-row">
+                            <button class="button button--dark" type="button" popovertarget="lane-closed-goals" popovertargetaction="hide">Back to deck</button>
+                        </div>
+                    </div>
+                </footer>
+            </article>
 
-            <footer>
-                <a class="button button--primary button--full-width" asp-area="Admin" asp-controller="TrainingGoalManagement" asp-action="Index">
-                    <i class="bi bi-trophy"></i> Manage Goals
-                </a>
-            </footer>
-        </article>
+            <!-- Workouts & Drills Management -->
+            <article class="card plan-card admin-management-card">
+                <header>
+                    <div class="admin-icon-wrapper">
+                        <i class="bi bi-stopwatch-fill"></i>
+                    </div>
+                    <span class="badge badge--upcoming">Lane Closed</span>
+                </header>
 
-        <!-- Workouts & Drills Management -->
-        <article class="card plan-card admin-management-card">
-            <header>
-                <div class="admin-icon-wrapper">
-                    <i class="bi bi-stopwatch-fill"></i>
+                <div>
+                    <h3>Workouts &amp; Drills</h3>
+                    <p class="text-muted">Maintain the exercise catalog, swimming stroke categories, session templates, and review completed logs.</p>
                 </div>
-                <span class="badge badge--planned">Exercises</span>
-            </header>
 
-            <div>
-                <h3>Workouts &amp; Drills</h3>
-                <p class="text-muted">Maintain the exercise catalog, swimming stroke categories, session templates, and review completed logs.</p>
-            </div>
+                <footer>
+                    <button type="button" class="button button--primary button--full-width" popovertarget="lane-closed-workouts">
+                        <i class="bi bi-activity"></i> Manage Workouts
+                    </button>
+                    <div class="popover-dialog" id="lane-closed-workouts" popover="">
+                        <h3>Lane Closed: Workouts &amp; Drills</h3>
+                        <p class="text-muted remove-plan-warning">Someone dropped the stopwatch at the bottom of the deep end. Sending a diver down now—check back shortly!</p>
+                        <div class="flex-row">
+                            <button class="button button--dark" type="button" popovertarget="lane-closed-workouts" popovertargetaction="hide">Back to deck</button>
+                        </div>
+                    </div>
+                </footer>
+            </article>
 
-            <footer>
-                <a class="button button--primary button--full-width" asp-area="Admin" asp-controller="WorkoutManagement" asp-action="Index">
-                    <i class="bi bi-activity"></i> Manage Workouts
-                </a>
-            </footer>
-        </article>
+            <!-- System & Maintenance -->
+            <article class="card plan-card admin-management-card">
+                <header>
+                    <div class="admin-icon-wrapper">
+                        <i class="bi bi-shield-lock-fill"></i>
+                    </div>
+                    <span class="badge badge--upcoming">Lane Closed</span>
+                </header>
 
-        <!-- System & Maintenance -->
-        <article class="card plan-card admin-management-card">
-            <header>
-                <div class="admin-icon-wrapper">
-                    <i class="bi bi-shield-lock-fill"></i>
+                <div>
+                    <h3>System &amp; Audit</h3>
+                    <p class="text-muted">Inspect administrative audit logs, review security events, and manage platform application settings.</p>
                 </div>
-                <span class="badge badge--planned">System</span>
-            </header>
 
-            <div>
-                <h3>System &amp; Audit</h3>
-                <p class="text-muted">Inspect administrative audit logs, review security events, and manage platform application settings.</p>
-            </div>
-
-            <footer>
-                <a class="button button--dark button--full-width" asp-area="Admin" asp-controller="SystemManagement" asp-action="Index">
-                    <i class="bi bi-sliders"></i> System Settings
-                </a>
-            </footer>
-        </article>
+                <footer>
+                    <button type="button" class="button button--dark button--full-width" popovertarget="lane-closed-system">
+                        <i class="bi bi-sliders"></i> System Settings
+                    </button>
+                    <div class="popover-dialog" id="lane-closed-system" popover="">
+                        <h3>Lane Closed: System &amp; Audit</h3>
+                        <p class="text-muted remove-plan-warning">Still checking who splashed water near the server rack. This lane is drying off under construction!</p>
+                        <div class="flex-row">
+                            <button class="button button--dark" type="button" popovertarget="lane-closed-system" popovertargetaction="hide">Back to deck</button>
+                        </div>
+                    </div>
+                </footer>
+            </article>
+        </div>
     </section>
 </main>
