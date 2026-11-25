@@ -106,6 +106,9 @@ public static class ValidationMessages
         public const string CannotDeleteLastAdmin =
             "You cannot delete the last remaining administrator.";
 
+        public const string CannotRemoveLastAdminRole =
+            "You cannot remove the administrator role from the last remaining administrator.";
+
         public const string RoleAssignedSuccess =
             "The role was assigned to the user successfully.";
 

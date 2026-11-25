@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 using SwimTrack.Data.Seeding.Utilities;
 using SwimTrack.Web.Areas.Admin.ViewModels;
+using static SwimTrack.Shared.Constants.ApplicationDefaults;
 using static SwimTrack.Shared.Constants.ApplicationDefaults.Identity;
 using static SwimTrack.Shared.Constants.ApplicationDefaults.Notification;
 using static SwimTrack.Shared.Constants.ValidationMessages.Notification;
@@ -16,10 +17,16 @@ public class UserManagementController : BaseAdminController
 
     private readonly RoleManager<IdentityRole> _roleManager;
 
-    public UserManagementController(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+    private readonly SignInManager<IdentityUser> _signInManager;
+
+    public UserManagementController(
+        UserManager<IdentityUser> userManager,
+        RoleManager<IdentityRole> roleManager,
+        SignInManager<IdentityUser> signInManager)
     {
         _userManager = userManager;
         _roleManager = roleManager;
+        _signInManager = signInManager;
     }
 
     [HttpGet]
@@ -132,6 +139,22 @@ public class UserManagementController : BaseAdminController
             return RedirectToAction(nameof(Index));
         }
 
+        bool isAdminRole = string.Equals(
+            dbRole.Name,
+            Role.Admin,
+            StringComparison.OrdinalIgnoreCase);
+        if (isAdminRole)
+        {
+            IList<IdentityUser> admins = await _userManager
+                .GetUsersInRoleAsync(Role.Admin);
+            if (admins.Count <= 1)
+            {
+                TempData[ErrorNotificationKey] = CannotRemoveLastAdminRole;
+
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
         IdentityResult result = await _userManager
             .RemoveFromRoleAsync(dbUser, inputModel.RoleName);
         if (!result.Succeeded)
@@ -141,7 +164,19 @@ public class UserManagementController : BaseAdminController
             return RedirectToAction(nameof(Index));
         }
 
+        bool isSelf = string.Equals(dbUser.Id, UserId, StringComparison.Ordinal);
+        if (isSelf)
+        {
+            await _signInManager
+                .RefreshSignInAsync(dbUser);
+        }
+
         TempData[SuccessNotificationKey] = RoleRemovedSuccess;
+
+        if (isSelf && isAdminRole)
+        {
+            return LocalRedirect(ApplicationHomePagePath);
+        }
 
         return RedirectToAction(nameof(Index));
     }
@@ -163,7 +198,8 @@ public class UserManagementController : BaseAdminController
             return RedirectToAction(nameof(Index));
         }
 
-        if (string.Equals(dbUser.Id, UserId, StringComparison.Ordinal))
+        bool isSelf = string.Equals(dbUser.Id, UserId, StringComparison.Ordinal);
+        if (isSelf)
         {
             TempData[ErrorNotificationKey] = CannotDeleteOwnAccount;
 
