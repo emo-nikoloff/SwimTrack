@@ -219,9 +219,10 @@ public class TrainingGoalService : ITrainingGoalService
 
         IEnumerable<TrainingPlan> referencingTrainingPlans = await _trainingPlanRepository
             .All()
-            .Where(tp => tp.TrainingGoalId == id)
+            .Where(tp =>
+                tp.TrainingGoalId == id &&
+                tp.UserId == currentUserId)
             .ToArrayAsync();
-
         foreach (TrainingPlan trainingPlan in referencingTrainingPlans)
         {
             trainingPlan.TrainingGoalId = null;

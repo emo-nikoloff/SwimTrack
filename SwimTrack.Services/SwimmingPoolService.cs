@@ -83,8 +83,8 @@ public class SwimmingPoolService : ISwimmingPoolService
         SwimmingPool? requestedPool = await _swimmingPoolRepository
             .AllAsNoTracking()
             .FirstOrDefaultAsync(sp =>
-                sp.Id == id
-                && sp.UserId == currentUserId);
+                sp.Id == id &&
+                sp.UserId == currentUserId);
         if (requestedPool == null)
         {
             return null;
@@ -130,8 +130,8 @@ public class SwimmingPoolService : ISwimmingPoolService
         SwimmingPool? requestedPool = await _swimmingPoolRepository
             .All()
             .FirstOrDefaultAsync(sp =>
-                sp.Id == request.Id
-                && sp.UserId == currentUserId);
+                sp.Id == request.Id &&
+                sp.UserId == currentUserId);
         if (requestedPool == null)
         {
             return ServiceResult.Failure(
@@ -153,8 +153,8 @@ public class SwimmingPoolService : ISwimmingPoolService
         SwimmingPool? requestedPool = await _swimmingPoolRepository
             .All()
             .FirstOrDefaultAsync(sp =>
-                sp.Id == id
-                && sp.UserId == currentUserId);
+                sp.Id == id &&
+                sp.UserId == currentUserId);
 
         if (requestedPool == null)
         {
@@ -165,9 +165,10 @@ public class SwimmingPoolService : ISwimmingPoolService
 
         IEnumerable<TrainingPlan> referencingTrainingPlans = await _trainingPlanRepository
             .All()
-            .Where(tp => tp.SwimmingPoolId == requestedPool.Id)
+            .Where(tp =>
+                tp.SwimmingPoolId == requestedPool.Id &&
+                tp.UserId == currentUserId)
             .ToArrayAsync();
-
         foreach (TrainingPlan trainingPlan in referencingTrainingPlans)
         {
             trainingPlan.SwimmingPoolId = null;
@@ -176,9 +177,10 @@ public class SwimmingPoolService : ISwimmingPoolService
 
         IEnumerable<WorkoutResult> referencingWorkoutResults = await _workoutResultRepository
             .All()
-            .Where(wr => wr.SwimmingPoolId == requestedPool.Id)
+            .Where(wr =>
+                wr.SwimmingPoolId == requestedPool.Id &&
+                wr.Workout.TrainingPlan.UserId == currentUserId)
             .ToArrayAsync();
-
         foreach (WorkoutResult workoutResult in referencingWorkoutResults)
         {
             workoutResult.SwimmingPoolId = null;
