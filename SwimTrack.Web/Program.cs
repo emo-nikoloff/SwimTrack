@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using SwimTrack.Data.Extensions;
 using SwimTrack.Services.Extensions;
 using SwimTrack.Web.Infrastructure.Extensions;
@@ -13,8 +14,17 @@ public class Program
         // Add services to the container.
         builder.Services.AddApplicationDbContext(builder.Configuration);
         builder.Services.AddApplicationIdentity(builder.Configuration);
+
+        /* Degrades performance, but increases reactivity in case of user deletion
+           Trade-off between reactivity and performance */
+        builder.Services.Configure<SecurityStampValidatorOptions>(options =>
+        {
+            options.ValidationInterval = TimeSpan.FromMinutes(1);
+        });
+
         builder.Services.AddApplicationRepositories();
         builder.Services.AddApplicationServices();
+
         builder.Services.AddControllersWithViews();
         builder.Services.AddRazorPages();
 

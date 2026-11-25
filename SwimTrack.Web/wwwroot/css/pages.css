@@ -287,4 +287,77 @@
   flex-shrink: 0;
 }
 
+.admin-table-card {
+  padding: 0;
+  overflow: hidden;
+  display: block;
+}
+
+.admin-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.admin-table thead th {
+  padding: 16px 24px;
+  background-color: var(--color-ink);
+  color: #fff;
+  font: 700 13px/1.2 var(--font-body);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.admin-table tbody td {
+  padding: 18px 24px;
+  border-bottom: 1.5px solid var(--color-border);
+  vertical-align: middle;
+}
+
+.admin-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-user-email {
+  font-weight: 700;
+  color: var(--color-ink);
+  word-break: break-word;
+}
+
+.admin-role-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.admin-role-select {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 2px solid var(--color-border);
+  border-radius: 99px;
+  background-color: #fff;
+  color: var(--color-ink);
+  font: 500 15px var(--font-body);
+  cursor: pointer;
+}
+
+.admin-role-select:focus {
+  outline: 3px solid var(--color-aqua);
+  border-color: var(--color-ink);
+}
+
 

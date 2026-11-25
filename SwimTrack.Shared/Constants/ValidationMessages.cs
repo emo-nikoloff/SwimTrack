@@ -82,4 +82,40 @@ public static class ValidationMessages
         public const string CannotPlanAgainWorkoutDueToStatus =
             "The workout cannot be planned again because it is not in Skipped status.";
     }
+
+    public static class Notification
+    {
+        public const string MissingUserEmail =
+            "Email is not set. Please check the user record.";
+
+        public const string UserNotFound =
+            "The selected user no longer exists.";
+
+        public const string RoleNotFound =
+            "The selected role no longer exists.";
+
+        public const string UserAlreadyInRole =
+            "This user is already assigned to the selected role.";
+
+        public const string UserNotInRole =
+            "This user does not have the selected role.";
+
+        public const string CannotDeleteOwnAccount =
+            "You cannot delete your own account.";
+
+        public const string CannotDeleteLastAdmin =
+            "You cannot delete the last remaining administrator.";
+
+        public const string RoleAssignedSuccess =
+            "The role was assigned to the user successfully.";
+
+        public const string RoleRemovedSuccess =
+            "The role was removed from the user successfully.";
+
+        public const string UserDeletedSuccess =
+            "The user was deleted successfully.";
+
+        public const string UnexpectedError =
+            "An unexpected error occurred. Please try again later.";
+    }
 }

@@ -16,4 +16,11 @@ public static class ApplicationDefaults
             public const string Admin = "Admin";
         }
     }
+
+    public static class Notification
+    {
+        public const string SuccessNotificationKey = "SuccessMessage";
+        public const string WarningNotificationKey = "WarningMessage";
+        public const string ErrorNotificationKey = "ErrorMessage";
+    }
 }

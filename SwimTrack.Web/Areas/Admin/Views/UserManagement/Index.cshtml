@@ -1,0 +1,95 @@
+@model UserManagementViewModel
+@{
+    ViewData["Title"] = "User Management";
+}
+
+<main class="container page-content">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-12">
+        <div>
+            <p class="eyebrow-heading">Admin Portal · @DateTime.Today.ToString(DateTimeFormat)</p>
+            <h1 class="page-title">User Management</h1>
+        </div>
+        <a class="text-muted" asp-area="Admin" asp-controller="Home" asp-action="Index">← Back to Dashboard</a>
+    </div>
+
+    @if (!Model.HasUsers)
+    {
+        <div class="card card--center">
+            <h3>No users found</h3>
+            <p class="text-muted">There are currently no registered users to display.</p>
+        </div>
+    }
+    else
+    {
+        <section class="card admin-table-card">
+            <div class="admin-table-wrapper">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Email</th>
+                            <th scope="col">Roles</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (UserViewModel user in Model.Users)
+                        {
+                            <tr>
+                                <td class="admin-user-email">@user.Email</td>
+                                <td>
+                                    @if (user.Roles.Count > 0)
+                                    {
+                                        <div class="admin-role-badges">
+                                            @foreach (string role in user.Roles)
+                                            {
+                                                string badgeModifier = role switch
+                                                {
+                                                    Admin => "badge--active",
+                                                    Manager => "badge--upcoming",
+                                                    _ => "badge--planned"
+                                                };
+
+                                                <span class="badge @badgeModifier">@role</span>
+                                            }
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">No roles assigned</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="admin-table-actions">
+                                        <form method="post" class="admin-table-actions">
+                                            <input type="hidden" name="UserId" value="@user.Id" />
+                                            <select name="RoleName" class="admin-role-select" aria-label="Select role for @user.Email">
+                                                @foreach (string role in Model.ApplicationRoles)
+                                                {
+                                                    <option value="@role" selected="@user.Roles.Contains(role)">@role</option>
+                                                }
+                                            </select>
+                                            <button type="submit" asp-area="Admin" asp-controller="UserManagement" asp-action="AssignRole" class="button button--small button--primary">Assign Role</button>
+                                            <button type="submit" asp-area="Admin" asp-controller="UserManagement" asp-action="RemoveRole" class="button button--small">Remove Role</button>
+                                        </form>
+                                        <button type="button" class="button button--small button--danger" popovertarget="delete-user-@user.Id">Delete</button>
+                                        <div class="popover-dialog" id="delete-user-@user.Id" popover="">
+                                            <h3>Delete “@user.Email”?</h3>
+                                            <p class="text-muted remove-plan-warning">This cannot be undone. All data associated with this user will be permanently removed.</p>
+                                            <div class="flex-row">
+                                                <form class="inline-form" asp-area="Admin" asp-controller="UserManagement" asp-action="DeleteUser" method="post">
+                                                    <input type="hidden" name="userId" value="@user.Id" />
+                                                    <button class="button button--small button--danger" type="submit">Yes, delete</button>
+                                                </form>
+                                                <button class="button button--small" type="button" popovertarget="delete-user-@user.Id" popovertargetaction="hide">Cancel</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    }
+</main>

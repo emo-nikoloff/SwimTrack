@@ -1,0 +1,18 @@
+@if (TempData.ContainsKey(ErrorNotificationKey))
+{
+    <script>window.addEventListener("load",function(){
+        toastr.error('@TempData[ErrorNotificationKey]');
+    })</script>
+}
+else if (TempData.ContainsKey(WarningNotificationKey))
+{
+    <script>window.addEventListener("load",function(){
+        toastr.warning('@TempData[WarningNotificationKey]');
+    })</script>
+}
+else if (TempData.ContainsKey(SuccessNotificationKey))
+{
+    <script>window.addEventListener("load",function(){
+        toastr.success('@TempData[SuccessNotificationKey]');
+    })</script>
+}
